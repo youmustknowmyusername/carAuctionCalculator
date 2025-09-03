@@ -44,7 +44,7 @@
       padding:6px 10px;
       cursor:pointer;
       display:flex;align-items:center;justify-content:center;
-      min-width:140px; min-height:56px;  /* original button size */
+      min-width:140px; min-height:56px;  /* original size */
       transition:border-color .15s, box-shadow .15s, transform .05s;
     }
     .auction-buttons button:hover{transform:translateY(-1px)}
@@ -53,17 +53,13 @@
       box-shadow:0 0 0 3px rgba(255,48,48,.2);
     }
     .auction-buttons img{
-      height:55px;   /* bigger logos */
+      height:55px;   /* zoomed logos */
       width:auto;
       display:block;
     }
 
-    /* Section headers (bigger + bolder) */
-    h2 {
-      font-size: 22px;
-      font-weight: 800;
-      margin-bottom: 12px;
-    }
+    /* Section headers bigger + bolder */
+    h2 { font-size:22px; font-weight:800; margin-bottom:12px; }
   </style>
 </head>
 <body>
@@ -75,6 +71,7 @@
 
 <main class="container grid grid-2" style="margin-top:16px">
   <section class="card">
+    <h2>Inputs</h2>
     <div class="grid" style="gap:12px">
 
       <!-- Auction logos -->
@@ -100,6 +97,24 @@
 
       <div class="row three">
         <div>
+          <label for="hammer">Car price (USD)</label>
+          <input id="hammer" type="number" min="0" step="100" value="8000" />
+        </div>
+        <div>
+          <label for="exrate">USD→AMD</label>
+          <input id="exrate" type="number" min="1" step="1" value="395" />
+        </div>
+        <div>
+          <label for="currency2">Show total in</label>
+          <select id="currency2">
+            <option value="USD">USD</option>
+            <option value="AMD">AMD</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row three">
+        <div>
           <label for="engine">Engine type</label>
           <select id="engine">
             <option value="gas">Gasoline</option>
@@ -109,12 +124,12 @@
           </select>
         </div>
         <div>
-          <label for="capacity">Engine cc (0 for EV)</label>
+          <label for="capacity">Engine displacement, cm³</label>
           <input id="capacity" type="number" min="0" step="100" value="1998" />
         </div>
         <div>
-          <label for="age">Vehicle age (years)</label>
-          <input id="age" type="number" min="0" step="1" value="7" />
+          <label for="year">Year of manufacture</label>
+          <input id="year" type="number" min="1985" max="2100" step="1" value="2018" />
         </div>
       </div>
 
@@ -128,8 +143,8 @@
           <input id="broker" type="number" step="1" value="75" />
         </div>
         <div>
-          <label for="otherFees">Other local (USD)</label>
-          <input id="otherFees" type="number" step="1" value="300" />
+          <label for="transportFee">Transportation fee (USD)</label>
+          <input id="transportFee" type="number" step="1" value="1450" />
         </div>
       </div>
 
@@ -149,6 +164,7 @@
 </main>
 
 <script>
+/* ===== Internal data (fees/taxes) ===== */
 const DATA = {
   locations: [
     { id:'CA-LOS ANGELES', inland: 450 },
@@ -158,12 +174,13 @@ const DATA = {
     iaai:   [[1000,95],[5000,309],[999999,679]],
     copart: [[1000,99],[5000,319],[999999,699]]
   },
-  ocean: { base: 1050 },
+  ocean: { base: 1050 }, // no longer used in total (replaced by Transportation fee)
   taxes: [
     { engine:'gas',minAge:0,maxAge:30,ccMin:0,ccMax:3000,dutyPct:10,perCcUSD:0,vatPct:20 }
   ]
 };
 
+/* ===== Helpers ===== */
 const $ = s => document.querySelector(s);
 const fmt = (v,cur)=>(cur==='AMD'?Math.round(v):v.toFixed(0)).replace(/\B(?=(\d{3})+(?!\d))/g,',');
 
@@ -181,14 +198,11 @@ function auctionFee(auction,price){
   return tiers.length ? tiers.at(-1)[1] : 0;
 }
 
-function inlandByLocation(locId){
-  const it=DATA.locations.find(l=>l.id===locId); return it?it.inland:0;
-}
-
 function pickTaxRule(engine,age,cc){
   return DATA.taxes.find(r=>r.engine===engine&&age>=r.minAge&&age<=r.maxAge&&cc>=r.ccMin&&cc<=r.ccMax) || {dutyPct:0,perCcUSD:0,vatPct:0};
 }
 
+/* ===== Auction buttons behavior ===== */
 function setupAuctionButtons(){
   const buttons = document.querySelectorAll('#auctionButtons button');
   const hidden  = document.getElementById('auction');
@@ -211,24 +225,25 @@ function setupAuctionButtons(){
   activate('copart');
 }
 
+/* ===== Core calculation ===== */
 function calculate(){
   const auction=$('#auction').value;
-  const loc=$('#location').value;
   const price=+$('#hammer').value||0;
   const engine=$('#engine').value;
   const cc=+$('#capacity').value||0;
-  const age=+$('#age').value||0;
+  const year=+$('#year').value||2018;
+  const currentYear=(new Date()).getFullYear();
+  const age=Math.max(0, currentYear - year);             // compute age from year
   const insPct=(+$('#insurancePct').value||0)/100;
   const broker=+$('#broker').value||0;
-  const other=+$('#otherFees').value||0;
+  const transport=+$('#transportFee').value||0;          // new transport fee
   const ex=+$('#exrate').value||400;
   const outCur=$('#currency2').value;
 
   const aFee=auctionFee(auction,price);
-  const inland=inlandByLocation(loc);
-  const ocean=DATA.ocean.base;
 
-  const cif=price+aFee+inland+ocean;
+  // CIF now = price + transport (shipping). Insurance is % of CIF.
+  const cif=price + transport;
   const insurance=cif*insPct;
 
   const rule=pickTaxRule(engine,age,cc);
@@ -236,31 +251,35 @@ function calculate(){
   const duty=rule.perCcUSD>0?rule.perCcUSD*(cc||0):(rule.dutyPct/100)*customsBase;
   const vat=(rule.vatPct/100)*(customsBase+duty);
 
-  const totalUSD=price+aFee+inland+ocean+insurance+duty+vat+broker+other;
+  const totalUSD=price+aFee+transport+insurance+duty+vat+broker;
   const t=v=>outCur==='AMD'?fmt(v*ex,'AMD'):fmt(v,'USD');
 
   $('#resultBody').innerHTML=`
     <tr><td>Auction</td><td class="right">${auction.toUpperCase()}</td></tr>
-    <tr><td>Car price (hammer)</td><td class="right">${t(price)}</td></tr>
+    <tr><td>Car price</td><td class="right">${t(price)}</td></tr>
     <tr><td>Auction fee</td><td class="right">${t(aFee)}</td></tr>
-    <tr><td>Inland transport</td><td class="right">${t(inland)}</td></tr>
-    <tr><td>Ocean freight</td><td class="right">${t(ocean)}</td></tr>
-    <tr><td>Insurance (${(insPct*100).toFixed(1)}%)</td><td class="right">${t(insurance)}</td></tr>
+    <tr><td>Transportation fee</td><td class="right">${t(transport)}</td></tr>
+    <tr><td>Insurance (${(insPct*100).toFixed(1)}% of CIF)</td><td class="right">${t(insurance)}</td></tr>
     <tr><td>Customs duty</td><td class="right">${t(duty)}</td></tr>
     <tr><td>VAT</td><td class="right">${t(vat)}</td></tr>
     <tr><td>Broker</td><td class="right">${t(broker)}</td></tr>
-    <tr><td>Other local</td><td class="right">${t(other)}</td></tr>
   `;
   $('#grandTotal').textContent=t(totalUSD);
   $('#curLbl').textContent=outCur;
 }
 
+/* ===== Init ===== */
 document.addEventListener('DOMContentLoaded',()=>{
   fillLocations();
   setupAuctionButtons();
+
+  // If year was previously an "age" of 7, set default to currentYear-7.
+  const yr = (new Date()).getFullYear() - 7;
+  if (!$('#year').value) $('#year').value = String(yr);
+
   calculate();
   $('#calcBtn').addEventListener('click',calculate);
-  ['location','hammer','engine','capacity','age','insurancePct','broker','otherFees','exrate','currency2']
+  ['location','hammer','engine','capacity','year','insurancePct','broker','transportFee','exrate','currency2']
     .forEach(id=>document.getElementById(id)?.addEventListener('change',calculate));
 });
 </script>
