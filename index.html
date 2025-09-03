@@ -6,22 +6,23 @@
   <title>Car Auction Calculator</title>
   <meta name="color-scheme" content="light dark" />
   <style>
-    :root{--bg:#0c0f16;--fg:#e9eef5;--muted:#9aa8bc;--card:#121725;--accent:#5aa3ff;--line:color-mix(in oklab,var(--fg) 14%,transparent);}
-    @media(prefers-color-scheme:light){:root{--bg:#f7f9fc;--fg:#0f1728;--muted:#5c6678;--card:#fff;--accent:#1a6cff;}}
+    :root{--bg:#0c0f16;--fg:#e9eef5;--muted:#9aa8bc;--card:#121725;--accent:#5aa3ff;--line:color-mix(in oklab,var(--fg) 14%,transparent)}
+    @media(prefers-color-scheme:light){:root{--bg:#f7f9fc;--fg:#0f1728;--muted:#5c6678;--card:#ffffff;--accent:#1a6cff}}
+    *{box-sizing:border-box}
     body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.55 system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif}
     .container{max-width:1100px;margin:auto;padding:24px}
     header{position:sticky;top:0;z-index:10;background:color-mix(in oklab,var(--bg) 86%,transparent);border-bottom:1px solid var(--line);backdrop-filter:blur(8px)}
-    .nav{display:flex;justify-content:space-between;align-items:center}
-    .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px}
+    .nav{display:flex;justify-content:space-between;align-items:center;padding:14px 0}
+    .brand{font-weight:800}
     .grid{display:grid;gap:16px}
     @media(min-width:900px){.grid-2{grid-template-columns:1.2fr .8fr}}
-    .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:center}
     .row.three{grid-template-columns:1fr 1fr 1fr}
     label{font-size:13px;color:var(--muted)}
-    input,select{width:100%;padding:10px;border:1px solid var(--line);border-radius:10px;background:transparent;color:var(--fg)}
+    input,select{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:transparent;color:var(--fg)}
     input[type=number]{text-align:right}
-    .btn{padding:10px 14px;border-radius:12px;border:1px solid var(--line);background:transparent;color:var(--fg);cursor:pointer}
-    .btn.primary{background:var(--accent);color:#fff;border:none}
+    .btn{padding:10px 14px;border-radius:12px;border:1px solid var(--line);background:var(--accent);color:#fff;cursor:pointer}
     table{width:100%;border-collapse:collapse}
     th,td{padding:8px;border-bottom:1px dashed var(--line)}
     tfoot td{font-weight:700}
@@ -32,13 +33,15 @@
 <body>
 <header>
   <div class="container nav">
-    <div>🚗 Car Auction Calculator</div>
+    <div class="brand">🚗 Car Auction Calculator</div>
   </div>
 </header>
 
 <main class="container grid grid-2" style="margin-top:16px">
   <section class="card">
     <h2>Inputs</h2>
+    <p class="note">Enter details and click Calculate. Fee tables are hidden and handled internally.</p>
+
     <div class="grid" style="gap:12px">
       <div class="row">
         <div>
@@ -53,28 +56,61 @@
           <select id="location"></select>
         </div>
       </div>
+
       <div class="row three">
-        <div><label for="hammer">Hammer price (USD)</label><input id="hammer" type="number" value="8000"/></div>
-        <div><label for="exrate">USD→AMD</label><input id="exrate" type="number" value="395"/></div>
-        <div><label for="currency2">Show total in</label><select id="currency2"><option value="USD">USD</option><option value="AMD">AMD</option></select></div>
+        <div>
+          <label for="hammer">Hammer price (USD)</label>
+          <input id="hammer" type="number" min="0" step="100" value="8000" />
+        </div>
+        <div>
+          <label for="exrate">USD→AMD</label>
+          <input id="exrate" type="number" min="1" step="1" value="395" />
+        </div>
+        <div>
+          <label for="currency2">Show total in</label>
+          <select id="currency2">
+            <option value="USD">USD</option>
+            <option value="AMD">AMD</option>
+          </select>
+        </div>
       </div>
+
       <div class="row three">
-        <div><label for="engine">Engine</label><select id="engine"><option value="gas">Gasoline</option><option value="diesel">Diesel</option><option value="hybrid">Hybrid</option><option value="ev">Electric</option></select></div>
-        <div><label for="capacity">Engine cc</label><input id="capacity" type="number" value="1998"/></div>
-        <div><label for="age">Vehicle age</label><input id="age" type="number" value="7"/></div>
+        <div>
+          <label for="engine">Engine type</label>
+          <select id="engine">
+            <option value="gas">Gasoline</option>
+            <option value="diesel">Diesel</option>
+            <option value="hybrid">Hybrid</option>
+            <option value="ev">Electric</option>
+          </select>
+        </div>
+        <div>
+          <label for="capacity">Engine cc (0 for EV)</label>
+          <input id="capacity" type="number" min="0" step="100" value="1998" />
+        </div>
+        <div>
+          <label for="age">Vehicle age (years)</label>
+          <input id="age" type="number" min="0" step="1" value="7" />
+        </div>
       </div>
+
       <div class="row three">
-        <div><label for="insurancePct">Insurance % of CIF</label><input id="insurancePct" type="number" value="1"/></div>
-        <div><label for="broker">Broker (USD)</label><input id="broker" type="number" value="75"/></div>
-        <div><label for="otherFees">Other local (USD)</label><input id="otherFees" type="number" value="300"/></div>
+        <div>
+          <label for="insurancePct">Insurance, % of CIF</label>
+          <input id="insurancePct" type="number" step="0.1" value="1.0" />
+        </div>
+        <div>
+          <label for="broker">Broker (USD)</label>
+          <input id="broker" type="number" step="1" value="75" />
+        </div>
+        <div>
+          <label for="otherFees">Other local (USD)</label>
+          <input id="otherFees" type="number" step="1" value="300" />
+        </div>
       </div>
-      <button id="calcBtn" class="btn primary" type="button">Calculate</button>
-    </div>
-    <h3 class="mt">Other tables (editable)</h3>
-    <div class="grid" style="gap:14px">
-      <div class="card"><div>Inland transport</div><table id="inlandTbl"></table></div>
-      <div class="card"><div>Ocean freight</div><table id="oceanTbl"></table></div>
-      <div class="card"><div>Customs & VAT</div><table id="taxTbl"></table></div>
+
+      <button id="calcBtn" class="btn" type="button">Calculate</button>
     </div>
   </section>
 
@@ -82,44 +118,128 @@
     <h2>Result</h2>
     <table>
       <tbody id="resultBody"></tbody>
-      <tfoot><tr><td>Total (<span id="curLbl">USD</span>)</td><td id="grandTotal" class="total">0</td></tr></tfoot>
+      <tfoot>
+        <tr><td>Total (<span id="curLbl">USD</span>)</td><td id="grandTotal" class="total">0</td></tr>
+      </tfoot>
     </table>
+    <p class="note">CIF = Car price + Auction fee + Inland + Ocean. Insurance applies to CIF. Taxes apply per internal rules.</p>
   </aside>
 </main>
 
 <script>
-const DATA={
-  locations:[{id:'CA-LOS ANGELES',inland:450},{id:'TX-DALLAS',inland:400}],
-  auctionFees:{
-    copart:[[1000,99],[5000,319],[999999,699]],
-    iaai:[[1000,95],[5000,309],[999999,679]]
+/* ===== Internal data (hidden from UI) ===== */
+const DATA = {
+  locations: [
+    { id:'CA-LOS ANGELES', inland: 450 },
+    { id:'CA-SAN JOSE',    inland: 500 },
+    { id:'TX-DALLAS',      inland: 400 },
+    { id:'FL-MIAMI',       inland: 380 },
+    { id:'NY-NEW YORK',    inland: 520 },
+    { id:'GA-ATLANTA',     inland: 420 },
+    { id:'IL-CHICAGO',     inland: 480 },
+  ],
+  // Auction fee tiers [upper bound, fee]
+  auctionFees: {
+    copart: [[500,59],[1000,99],[2000,169],[3000,219],[4000,269],[5000,319],[7000,389],[10000,449],[15000,499],[20000,549],[50000,699],[999999,899]],
+    iaai:   [[500,55],[1000,95],[2000,159],[3000,209],[4000,259],[5000,309],[7000,379],[10000,439],[15000,489],[20000,539],[50000,679],[999999,879]]
   },
-  ocean:{base:1050},
-  taxes:[{engine:'gas',minAge:0,maxAge:30,ccMin:0,ccMax:3000,dutyPct:10,perCcUSD:0,vatPct:20}]
+  ocean: { base: 1050 }, // fixed single value
+  taxes: [
+    // Simplified example rules; adjust in code
+    { engine:'gas',   minAge:0, maxAge:3,   ccMin:0,   ccMax:3000, dutyPct:10, perCcUSD:0,   vatPct:20 },
+    { engine:'gas',   minAge:4, maxAge:30,  ccMin:0,   ccMax:1000, dutyPct:0,  perCcUSD:1.2, vatPct:20 },
+    { engine:'gas',   minAge:4, maxAge:30,  ccMin:1001,ccMax:2000, dutyPct:0,  perCcUSD:1.5, vatPct:20 },
+    { engine:'gas',   minAge:4, maxAge:30,  ccMin:2001,ccMax:3000, dutyPct:0,  perCcUSD:2.0, vatPct:20 },
+    { engine:'diesel',minAge:0, maxAge:3,   ccMin:0,   ccMax:3000, dutyPct:10, perCcUSD:0,   vatPct:20 },
+    { engine:'diesel',minAge:4, maxAge:30,  ccMin:0,   ccMax:2000, dutyPct:0,  perCcUSD:1.6, vatPct:20 },
+    { engine:'diesel',minAge:4, maxAge:30,  ccMin:2001,ccMax:3000, dutyPct:0,  perCcUSD:2.3, vatPct:20 },
+    { engine:'hybrid',minAge:0, maxAge:30,  ccMin:0,   ccMax:3000, dutyPct:5,  perCcUSD:0,   vatPct:20 },
+    { engine:'ev',    minAge:0, maxAge:30,  ccMin:0,   ccMax:0,    dutyPct:0,  perCcUSD:0,   vatPct:0 },
+  ]
 };
-const $=s=>document.querySelector(s);
-function fmt(v,c){return(c==='AMD'?Math.round(v):v.toFixed(0)).replace(/\B(?=(\d{3})+(?!\d))/g,',');}
-function renderTables(){
-  $('#inlandTbl').innerHTML='<tr><th>Location</th><th>Inland</th></tr>'+DATA.locations.map(l=>`<tr><td contenteditable>${l.id}</td><td contenteditable>${l.inland}</td></tr>`).join('');
-  $('#oceanTbl').innerHTML='<tr><th>Ocean</th><th>USD</th></tr><tr><td>Base</td><td contenteditable>'+DATA.ocean.base+'</td></tr>';
-  $('#taxTbl').innerHTML='<tr><th>Engine</th><th>Age min</th><th>Duty %</th><th>VAT %</th></tr>'+DATA.taxes.map(r=>`<tr><td contenteditable>${r.engine}</td><td contenteditable>${r.minAge}</td><td contenteditable>${r.dutyPct}</td><td contenteditable>${r.vatPct}</td></tr>`).join('');
+
+/* ===== Helpers ===== */
+const $ = s => document.querySelector(s);
+const fmt = (v, cur) => (cur==='AMD'? Math.round(v) : v.toFixed(0)).replace(/\B(?=(\d{3})+(?!\d))/g,',');
+
+function fillLocations(){
+  const sel = $('#location'); sel.innerHTML = '';
+  DATA.locations.forEach(l => {
+    const o = document.createElement('option');
+    o.value = l.id; o.textContent = l.id;
+    sel.appendChild(o);
+  });
 }
-function auctionFee(auction,price){const tiers=DATA.auctionFees[auction];for(const [limit,fee]of tiers){if(price<=limit)return fee;}return tiers.at(-1)[1];}
-function inlandByLocation(locId){const it=DATA.locations.find(l=>l.id===locId);return it?it.inland:0;}
+
+function auctionFee(auction, price){
+  const tiers = DATA.auctionFees[auction];
+  for (const [limit, fee] of tiers){ if(price <= limit) return fee; }
+  return tiers.at(-1)[1];
+}
+
+function inlandByLocation(locId){
+  const x = DATA.locations.find(l => l.id === locId);
+  return x ? x.inland : 0;
+}
+
+function pickTaxRule(engine, age, cc){
+  return DATA.taxes.find(r => r.engine===engine && age>=r.minAge && age<=r.maxAge && cc>=r.ccMin && cc<=r.ccMax)
+         || { dutyPct:0, perCcUSD:0, vatPct:0 };
+}
+
+/* ===== Core calc ===== */
 function calculate(){
-  const auction=$('#auction').value,loc=$('#location').value,price=+$('#hammer').value||0;
-  const engine=$('#engine').value,cc=+$('#capacity').value||0,age=+$('#age').value||0;
-  const insPct=(+$('#insurancePct').value||0)/100,broker=+$('#broker').value||0,other=+$('#otherFees').value||0;
-  const ex=+$('#exrate').value||400,outCur=$('#currency2').value;
-  const aFee=auctionFee(auction,price),inland=inlandByLocation(loc),ocean=DATA.ocean.base;
-  const cif=price+aFee+inland+ocean,insurance=cif*insPct,duty=(0.1*cif),vat=0.2*(cif+duty);
-  const totalUSD=price+aFee+inland+ocean+insurance+duty+vat+broker+other;
-  const t=v=>outCur==='AMD'?fmt(v*ex,'AMD'):fmt(v,'USD');
-  $('#resultBody').innerHTML=`<tr><td>Hammer</td><td>${t(price)}</td></tr><tr><td>Auction fee</td><td>${t(aFee)}</td></tr><tr><td>Inland</td><td>${t(inland)}</td></tr><tr><td>Ocean</td><td>${t(ocean)}</td></tr><tr><td>Insurance</td><td>${t(insurance)}</td></tr><tr><td>Duty</td><td>${t(duty)}</td></tr><tr><td>VAT</td><td>${t(vat)}</td></tr><tr><td>Broker</td><td>${t(broker)}</td></tr><tr><td>Other</td><td>${t(other)}</td></tr>`;
-  $('#grandTotal').textContent=t(totalUSD);$('#curLbl').textContent=outCur;
+  const auction = $('#auction').value;
+  const loc     = $('#location').value;
+  const price   = +$('#hammer').value || 0;
+  const engine  = $('#engine').value;
+  const cc      = +$('#capacity').value || 0;
+  const age     = +$('#age').value || 0;
+  const insPct  = (+$('#insurancePct').value || 0)/100;
+  const broker  = +$('#broker').value || 0;
+  const other   = +$('#otherFees').value || 0;
+  const ex      = +$('#exrate').value || 400;
+  const outCur  = $('#currency2').value;
+
+  const aFee   = auctionFee(auction, price);
+  const inland = inlandByLocation(loc);
+  const ocean  = DATA.ocean.base;
+
+  const cif = price + aFee + inland + ocean;
+  const insurance = cif * insPct;
+
+  const rule = pickTaxRule(engine, age, cc);
+  const customsBase = cif + insurance;
+  const duty = rule.perCcUSD>0 ? rule.perCcUSD * (cc||0) : (rule.dutyPct/100) * customsBase;
+  const vat  = (rule.vatPct/100) * (customsBase + duty);
+
+  const totalUSD = price + aFee + inland + ocean + insurance + duty + vat + broker + other;
+  const t = (v)=> outCur==='AMD' ? fmt(v*ex,'AMD') : fmt(v,'USD');
+
+  $('#resultBody').innerHTML = `
+    <tr><td>Car price (hammer)</td><td class="right">${t(price)}</td></tr>
+    <tr><td>Auction fee</td><td class="right">${t(aFee)}</td></tr>
+    <tr><td>Inland transport</td><td class="right">${t(inland)}</td></tr>
+    <tr><td>Ocean freight</td><td class="right">${t(ocean)}</td></tr>
+    <tr><td>Insurance (${(insPct*100).toFixed(1)}%)</td><td class="right">${t(insurance)}</td></tr>
+    <tr><td>Customs duty</td><td class="right">${t(duty)}</td></tr>
+    <tr><td>VAT</td><td class="right">${t(vat)}</td></tr>
+    <tr><td>Broker</td><td class="right">${t(broker)}</td></tr>
+    <tr><td>Other local</td><td class="right">${t(other)}</td></tr>
+  `;
+  $('#grandTotal').textContent = t(totalUSD);
+  $('#curLbl').textContent = outCur;
 }
-function fillLocations(){const sel=$('#location');sel.innerHTML='';DATA.locations.forEach(l=>{const o=document.createElement('option');o.value=l.id;o.textContent=l.id;sel.appendChild(o);});}
-document.addEventListener('DOMContentLoaded',()=>{renderTables();fillLocations();calculate();$('#calcBtn').addEventListener('click',calculate);});
+
+/* ===== Init ===== */
+document.addEventListener('DOMContentLoaded', () => {
+  fillLocations();
+  calculate();
+  $('#calcBtn').addEventListener('click', calculate);
+  // Live recalc when fields change
+  ['auction','location','hammer','engine','capacity','age','insurancePct','broker','otherFees','exrate','currency2']
+    .forEach(id => document.getElementById(id)?.addEventListener('change', calculate));
+});
 </script>
 </body>
 </html>
