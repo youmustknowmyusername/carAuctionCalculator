@@ -1,1 +1,142 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Car Auction Calculator</title>
+  <meta name="color-scheme" content="light dark" />
+  <style>
+    :root{
+      --bg:#0c0f16; --fg:#e9eef5; --muted:#9aa8bc; --card:#121725;
+      --line: color-mix(in oklab, var(--fg) 16%, transparent);
+      --accent:#1a6cff; --active-red:#ff3030; --inactive:#cfd6e0;
+    }
+    @media (prefers-color-scheme: light){
+      :root{ --bg:#f7f9fc; --fg:#0f1728; --muted:#5c6678; --card:#ffffff; --line:#e5eaf1 }
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.55 system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif}
+    .container{max-width:1100px;margin:auto;padding:24px}
+    header{position:sticky;top:0;z-index:10;background:color-mix(in oklab,var(--bg) 86%, transparent);border-bottom:1px solid var(--line);backdrop-filter:blur(8px)}
+    .nav{display:flex;justify-content:space-between;align-items:center;padding:14px 0}
+    .brand{font-weight:800}
+    .grid{display:grid;gap:16px}
+    @media(min-width:900px){.grid-2{grid-template-columns:1.2fr .8fr}}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px}
+    h2 { font-size:22px; font-weight:800; margin-bottom:12px; }
+
+    /* Auction logo buttons */
+    .auction-buttons{display:flex;gap:12px}
+    .auction-buttons button{
+      border:2px solid var(--inactive);
+      background:#fff;
+      border-radius:14px;
+      padding:6px 10px;
+      cursor:pointer;
+      display:flex;align-items:center;justify-content:center;
+      min-width:140px; min-height:56px;   /* original button size */
+      transition:border-color .15s, box-shadow .15s, transform .05s;
+    }
+    .auction-buttons button:hover{transform:translateY(-1px)}
+    .auction-buttons button.active{
+      border-color:var(--active-red);
+      box-shadow:0 0 0 3px rgba(255,48,48,.2);
+    }
+    .auction-buttons img{
+      height:55px;  /* bigger logos, buttons unchanged */
+      width:auto;
+      display:block;
+    }
+
+    .btn{padding:10px 14px;border-radius:12px;border:1px solid var(--line);background:var(--accent);color:#fff;cursor:pointer}
+    table{width:100%;border-collapse:collapse}
+    td{padding:8px;border-bottom:1px dashed var(--line)}
+    .total{font-weight:800;font-size:clamp(22px,3vw,32px);text-align:right}
+    .muted{color:var(--muted);font-size:13px}
+  </style>
+</head>
+<body>
+<header>
+  <div class="container nav">
+    <div class="brand">🚗 Car Auction Calculator</div>
+  </div>
+</header>
+
+<main class="container grid grid-2" style="margin-top:16px">
+  <!-- LEFT: Inputs -->
+  <section class="card">
+    <h2>Inputs</h2>
+
+    <!-- Auction (kept) -->
+    <div>
+      <div class="muted" style="margin-bottom:6px;">Auction</div>
+      <div id="auctionButtons" class="auction-buttons" role="group" aria-label="Select auction">
+        <button type="button" data-value="iaai" aria-pressed="false" title="IAA">
+          <img src="assets/iaa.png" alt="IAA">
+        </button>
+        <button type="button" data-value="copart" aria-pressed="true" title="Copart">
+          <img src="assets/copart.png" alt="Copart">
+        </button>
+      </div>
+      <input type="hidden" id="auction" value="copart" />
+    </div>
+
+    <!-- Calculate -->
+    <div style="margin-top:16px">
+      <button id="calcBtn" class="btn" type="button">Calculate</button>
+    </div>
+  </section>
+
+  <!-- RIGHT: Result -->
+  <aside class="card">
+    <h2>Result</h2>
+    <table>
+      <tbody id="resultBody">
+        <tr><td class="muted">Nothing to calculate yet. We removed the old fields.</td></tr>
+      </tbody>
+      <tfoot>
+        <tr><td class="total" id="grandTotal">—</td></tr>
+      </tfoot>
+    </table>
+  </aside>
+</main>
+
+<script>
+  /* Only keep auction selection behavior */
+  function setupAuctionButtons(){
+    const buttons = document.querySelectorAll('#auctionButtons button');
+    const hidden  = document.getElementById('auction');
+
+    function activate(val){
+      hidden.value = val;
+      buttons.forEach(b=>{
+        const on = b.dataset.value === val;
+        b.classList.toggle('active', on);
+        b.setAttribute('aria-pressed', String(on));
+      });
+    }
+
+    buttons.forEach(btn=>{
+      btn.addEventListener('click', ()=> activate(btn.dataset.value));
+    });
+
+    // Default = Copart active
+    activate('copart');
+  }
+
+  function calculate(){
+    const auction = document.getElementById('auction').value.toUpperCase();
+    document.getElementById('resultBody').innerHTML =
+      `<tr><td>Selected auction: <strong>${auction}</strong></td></tr>`;
+    document.getElementById('grandTotal').textContent = '—';
+  }
+
+  document.addEventListener('DOMContentLoaded', ()=>{
+    setupAuctionButtons();
+    calculate();
+    document.getElementById('calcBtn').addEventListener('click', calculate);
+  });
+</script>
+</body>
+</html>
