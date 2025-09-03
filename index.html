@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Car Auction Calculator</title>
+  <meta name="description" content="Free car auction calculator: auction fee, inland transport, ocean freight, insurance, customs, VAT, broker, and local fees. Single HTML file." />
+  <meta name="color-scheme" content="light dark" />
+  <style>
+    :root{
+      --bg: #0c0f16; --fg:#e9eef5; --muted:#9aa8bc; --card:#121725; --accent:#5aa3ff; --ok:#33c27f; --warn:#ffb74d;
+      --line: color-mix(in oklab, var(--fg) 14%, transparent);
+    }
+    @media (prefers-color-scheme: light){
+      :root{ --bg:#f7f9fc; --fg:#0f1728; --muted:#5c6678; --card:#ffffff; --accent:#1a6cff; --ok:#209e63; --warn:#d38a18; }
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; background:var(--bg); color:var(--fg);
+      font:15px/1.55 system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif;
+      letter-spacing:.15px;
+    }
+    a{color:var(--accent); text-decoration:none}
+    a:hover{text-decoration:underline}
+    .container{max-width:1100px; margin-inline:auto; padding:24px}
+    header{position:sticky; top:0; z-index:10; backdrop-filter:saturate(130%) blur(8px);
+      background:color-mix(in oklab, var(--bg) 86%, transparent); border-bottom:1px solid var(--line)}
+    .nav{display:flex; align-items:center; justify-content:space-between; gap:12px; padding:14px 0}
+    .brand{font-weight:800; letter-spacing:.3px}
+    .muted{color:var(--muted)}
+    .grid{display:grid; gap:16px}
+    @media (min-width:900px){ .grid-2{grid-template-columns:1.2fr .8fr} }
+    .card{background:var(--card); border:1px solid var(--line); border-radius:16px; padding:18px; box-shadow:0 10px 26px rgba(0,0,0,.15)}
+    .row{display:grid; grid-template-columns:1fr 130px 110px; gap:10px; align-items:center}
+    .row label{font-size:13px; color:var(--muted)}
+    .row input, .row select{width:100%; padding:10px 12px; border-radius:10px; border:1px solid var(--line); background:transparent; color:var(--fg)}
+    .row input[type="number"]{text-align:right}
+    .h{margin:.3rem 0 1rem; font-size:14px; color:var(--muted); letter-spacing:.2px}
+    .section-title{font-weight:700; letter-spacing:.2px; margin:0 0 8px}
+    .total{font-weight:800; font-size:clamp(22px, 3vw, 32px)}
+    .btn{display:inline-flex; align-items:center; gap:8px; padding:10px 14px; border-radius:12px; border:1px solid var(--line); background:transparent; color:var(--fg); cursor:pointer}
+    .btn.primary{background:var(--accent); color:#fff; border:none}
+    .btn:focus{outline:3px solid color-mix(in oklab, var(--accent) 40%, transparent)}
+    .stack{display:flex; flex-wrap:wrap; gap:10px}
+    .small{font-size:12px}
+    table{width:100%; border-collapse:collapse}
+    th,td{padding:8px 6px; border-bottom:1px dashed var(--line); vertical-align:middle}
+    tfoot td{font-weight:700}
+    .note{font-size:12px; color:var(--muted)}
+    .pill{display:inline-block; padding:4px 10px; border-radius:999px; border:1px solid var(--line)}
+    .right{text-align:right}
+    .mt{margin-top:14px}
+    .sr-only{position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); border:0}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container nav">
+      <div class="brand">🚗 Car Auction Calculator</div>
+      <div class="stack">
+        <button id="shareBtn" class="btn" type="button">Share</button>
+        <button id="savePresetBtn" class="btn" type="button">Save preset</button>
+        <button id="resetBtn" class="btn" type="button">Reset</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container grid grid-2" style="margin-top:16px">
+    <section class="card">
+      <h2 class="section-title">Inputs</h2>
+      <p class="h">Like iaa.am: choose auction, location, transport, engine, and taxes. All tables below are editable.</p>
+
+      <div class="grid" style="gap:12px">
+        <div class="row" style="grid-template-columns:1fr 1fr 1fr">
+          <div>
+            <label for="auction">Auction</label>
+            <select id="auction" aria-label="Auction">
+              <option value="copart">Copart</option>
+              <option value="iaai">IAA</option>
+            </select>
+          </div>
+          <div>
+            <label for="location">Auction location</label>
+            <select id="location" aria-label="Auction location"></select>
+          </div>
+          <div>
+            <label for="transportType">Transport</label>
+            <select id="transportType" aria-label="Transport">
+              <option value="roro">Ro-Ro</option>
+              <option value="container">Container</option>
+              <option value="inland">Inland only</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row">
+          <div>
+            <label for="hammer">Hammer price (USD)</label>
+            <input id="hammer" type="number" min="0" step="100" placeholder="0" value="8000" />
+          </div>
+          <div>
+            <label for="exrate">USD→AMD</label>
+            <input id="exrate" type="number" min="1" step="1" value="395" />
+          </div>
+          <div>
+            <label for="currency2">Show total in</label>
+            <select id="currency2" aria-label="Output currency">
+              <option value="USD">USD</option>
+              <option value="AMD">AMD</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row" style="grid-template-columns:1fr 1fr 1fr">
+          <div>
+            <label for="engine">Engine type</label>
+            <select id="engine" aria-label="Engine type">
+              <option value="gas">Gasoline</option>
+              <option value="diesel">Diesel</option>
+              <option value="hybrid">Hybrid</option>
+              <option value="ev">Electric</option>
+            </select>
+          </div>
+          <div>
+            <label for="capacity">Engine cc (0 for EV)</label>
+            <input id="capacity" type="number" min="0" step="100" value="1998" />
+          </div>
+          <div>
+            <label for="age">Vehicle age (years)</label>
+            <input id="age" type="number" min="0" step="1" value="7" />
+          </div>
+        </div>
+
+        <div class="row">
+          <div>
+            <label for="insurancePct">Insurance, % of CIF</label>
+            <input id="insurancePct" type="number" step="0.1" value="1.0" />
+          </div>
+          <div>
+            <label for="broker">Broker (fixed, USD)</label>
+            <input id="broker" type="number" step="1" value="75" />
+          </div>
+          <div>
+            <label for="otherFees">Other local (USD)</label>
+            <input id="otherFees" type="number" step="1" value="300" />
+          </div>
+        </div>
+
+        <div class="stack">
+          <button id="calcBtn" class="btn primary" type="button">Calculate</button>
+          <button id="exportBtn" class="btn" type="button">Export JSON tables</button>
+          <span class="pill small" aria-hidden="true">Edit tables below before calculating</span>
+        </div>
+      </div>
+
+      <h3 class="section-title mt">Rate tables (editable)</h3>
+      <p class="note">Change values directly in the cells. Click “Calculate” to apply. Use “Export JSON” to download your custom tables.</p>
+
+      <div class="grid" style="gap:14px">
+        <div class="card" style="padding:12px">
+          <div class="section-title">Auction fee tiers</div>
+          <table id="auctionFeesTbl" aria-label="Auction fee tiers"></table>
+        </div>
+        <div class="card" style="padding:12px">
+          <div class="section-title">Inland transport by location</div>
+          <table id="inlandTbl" aria-label="Inland transport table"></table>
+        </div>
+        <div class="card" style="padding:12px">
+          <div class="section-title">Ocean freight (Ro-Ro / Container)</div>
+          <table id="oceanTbl" aria-label="Ocean freight table"></table>
+        </div>
+        <div class="card" style="padding:12px">
+          <div class="section-title">Customs & VAT rules (example)</div>
+          <table id="taxTbl" aria-label="Customs and VAT table"></table>
+          <p class="note">These are sample rules. Replace with official rates for your country/region.</p>
+        </div>
+      </div>
+    </section>
+
+    <aside class="card">
+      <h2 class="section-title">Result</h2>
+      <table aria-label="Calculation result">
+        <tbody id="resultBody"></tbody>
+        <tfoot>
+          <tr><td>Total (<span id="curLbl">USD</span>)</td><td class="right total" id="grandTotal">0</td></tr>
+        </tfoot>
+      </table>
+      <p class="note mt">CIF = Car price + Auction fee + Inland + Ocean. Insurance applies to CIF. Taxes apply per selected rule.</p>
+    </aside>
+  </main>
+
+  <script>
+  // ======= Default Data (editable) =======
+  const DATA = {
+    locations: [
+      { id:'CA-LOS ANGELES', inland: 450 },
+      { id:'CA-SAN JOSE', inland: 500 },
+      { id:'TX-DALLAS', inland: 400 },
+      { id:'FL-MIAMI', inland: 380 },
+      { id:'NY-NEW YORK', inland: 520 },
+      { id:'GA-ATLANTA', inland: 420 },
+      { id:'IL-CHICAGO', inland: 480 },
+    ],
+    auctionFees: {
+      copart: [ // [tierUpperUSD, feeUSD]
+        [500,  59], [1000,  99], [2000, 169], [3000, 219], [4000, 269], [5000, 319],
+        [7000, 389], [10000, 449], [15000, 499], [20000, 549], [50000, 699], [999999, 899]
+      ],
+      iaai: [
+        [500,  55], [1000,  95], [2000, 159], [3000, 209], [4000, 259], [5000, 309],
+        [7000, 379], [10000, 439], [15000, 489], [20000, 539], [50000, 679], [999999, 879]
+      ]
+    },
+    ocean: {
+      roro:  { base: 1050 },
+      container: { base: 1400 }
+    },
+    taxes: [
+      // Example (tweak for your customs): duty as % of base or per-cc for older cars; VAT 20%
+      // {engine, minAge, maxAge, ccMin, ccMax, dutyPct, perCcUSD, vatPct}
+      { engine:'gas',   minAge:0, maxAge:3,   ccMin:0,   ccMax:3000, dutyPct:10, perCcUSD:0,   vatPct:20 },
+      { engine:'gas',   minAge:4, maxAge:30,  ccMin:0,   ccMax:1000, dutyPct:0,  perCcUSD:1.2, vatPct:20 },
+      { engine:'gas',   minAge:4, maxAge:30,  ccMin:1001,ccMax:2000, dutyPct:0,  perCcUSD:1.5, vatPct:20 },
+      { engine:'gas',   minAge:4, maxAge:30,  ccMin:2001,ccMax:3000, dutyPct:0,  perCcUSD:2.0, vatPct:20 },
+
+      { engine:'diesel',minAge:0, maxAge:3,   ccMin:0,   ccMax:3000, dutyPct:10, perCcUSD:0,   vatPct:20 },
+      { engine:'diesel',minAge:4, maxAge:30,  ccMin:0,   ccMax:2000, dutyPct:0,  perCcUSD:1.6, vatPct:20 },
+      { engine:'diesel',minAge:4, maxAge:30,  ccMin:2001,ccMax:3000, dutyPct:0,  perCcUSD:2.3, vatPct:20 },
+
+      { engine:'hybrid',minAge:0, maxAge:30,  ccMin:0,   ccMax:3000, dutyPct:5,  perCcUSD:0,   vatPct:20 },
+      { engine:'ev',    minAge:0, maxAge:30,  ccMin:0,   ccMax:0,    dutyPct:0,  perCcUSD:0,   vatPct:0 },
+    ]
+  };
+
+  // ======= Helpers =======
+  const $ = s => document.querySelector(s);
+  const fmt = (v, cur) => (cur==='AMD'? Math.round(v): v.toFixed(0)).replace(/\B(?=(\d{3})+(?!\d))/g,',');
+
+  function renderTables(){
+    // Auction fees
+    const tblA = $('#auctionFeesTbl');
+    tblA.innerHTML = '<tr><th>Tier ≤ (USD)</th><th>Copart</th><th>IAA</th></tr>' +
+      DATA.auctionFees.copart.map((tier,i)=>{
+        const limit=tier[0], c=tier[1], ia=DATA.auctionFees.iaai[i][1];
+        return `<tr><td contenteditable>${limit}</td><td contenteditable>${c}</td><td contenteditable>${ia}</td></tr>`;
+      }).join('');
+
+    // Inland
+    const tblI = $('#inlandTbl');
+    tblI.innerHTML = '<tr><th>Location</th><th>Inland (USD)</th></tr>' +
+      DATA.locations.map(l=>`<tr><td contenteditable>${l.id}</td><td contenteditable>${l.inland}</td></tr>`).join('');
+
+    // Ocean
+    const tblO = $('#oceanTbl');
+    tblO.innerHTML = '<tr><th>Mode</th><th>Base (USD)</th></tr>' +
+      `<tr><td>Ro-Ro</td><td contenteditable>${DATA.ocean.roro.base}</td></tr>` +
+      `<tr><td>Container</td><td contenteditable>${DATA.ocean.container.base}</td></tr>`;
+
+    // Taxes
+    const tblT = $('#taxTbl');
+    tblT.innerHTML = '<tr><th>Engine</th><th>Age min</th><th>Age max</th><th>cc min</th><th>cc max</th><th>Duty %</th><th>Per-cc $</th><th>VAT %</th></tr>' +
+      DATA.taxes.map(r=>`<tr>
+        <td contenteditable>${r.engine}</td>
+        <td contenteditable>${r.minAge}</td>
+        <td contenteditable>${r.maxAge}</td>
+        <td contenteditable>${r.ccMin}</td>
+        <td contenteditable>${r.ccMax}</td>
+        <td contenteditable>${r.dutyPct}</td>
+        <td contenteditable>${r.perCcUSD}</td>
+        <td contenteditable>${r.vatPct}</td>
+      </tr>`).join('');
+  }
+
+  function readTables(){
+    // Auction fees
+    const rowsA = Array.from($('#auctionFeesTbl').querySelectorAll('tr')).slice(1);
+    const cop=[], iaa=[];
+    rowsA.forEach(r=>{
+      const t=r.querySelectorAll('td');
+      const limit = +t[0].innerText.replace(/[^0-9.]/g,'');
+      const cFee = +t[1].innerText.replace(/[^0-9.]/g,'');
+      const iFee = +t[2].innerText.replace(/[^0-9.]/g,'');
+      if(!isNaN(limit) && limit>0){ cop.push([limit, cFee]); iaa.push([limit, iFee]); }
+    });
+    if(cop.length) { DATA.auctionFees.copart = cop; DATA.auctionFees.iaai = iaa; }
+
+    // Inland
+    const rowsI = Array.from($('#inlandTbl').querySelectorAll('tr')).slice(1);
+    const newLocs = rowsI.map(r=>{
+      const t=r.querySelectorAll('td');
+      return { id:t[0].innerText.trim(), inland:+t[1].innerText.replace(/[^0-9.]/g,'')||0 };
+    }).filter(x=>x.id);
+    if(newLocs.length) DATA.locations = newLocs;
+
+    // Ocean
+    const rowsO = Array.from($('#oceanTbl').querySelectorAll('tr')).slice(1);
+    if(rowsO[0]) DATA.ocean.roro.base = +rowsO[0].querySelectorAll('td')[1].innerText.replace(/[^0-9.]/g,'')||0;
+    if(rowsO[1]) DATA.ocean.container.base = +rowsO[1].querySelectorAll('td')[1].innerText.replace(/[^0-9.]/g,'')||0;
+
+    // Taxes
+    const rowsT = Array.from($('#taxTbl').querySelectorAll('tr')).slice(1);
+    const newTaxes = rowsT.map(r=>{
+      const t=r.querySelectorAll('td');
+      return {
+        engine:t[0].innerText.trim(),
+        minAge:+t[1].innerText.replace(/[^0-9.]/g,'')||0,
+        maxAge:+t[2].innerText.replace(/[^0-9.]/g,'')||0,
+        ccMin:+t[3].innerText.replace(/[^0-9.]/g,'')||0,
+        ccMax:+t[4].innerText.replace(/[^0-9.]/g,'')||0,
+        dutyPct:+t[5].innerText.replace(/[^0-9.]/g,'')||0,
+        perCcUSD:+t[6].innerText.replace(/[^0-9.]/g,'')||0,
+        vatPct:+t[7].innerText.replace(/[^0-9.]/g,'')||0
+      };
+    }).filter(x=>x.engine);
+    if(newTaxes.length) DATA.taxes = newTaxes;
+  }
+
+  function auctionFee(auction, price){
+    const tiers = DATA.auctionFees[auction];
+    for(const [limit, fee] of tiers){ if(price <= limit) return fee; }
+    return tiers[tiers.length-1][1];
+  }
+
+  function inlandByLocation(locId){
+    const it = DATA.locations.find(l=>l.id===locId); return it? it.inland : 500;
+  }
+
+  function pickTaxRule(engine, age, cc){
+    return DATA.taxes.find(r=> r.engine===engine && age>=r.minAge && age<=r.maxAge && cc>=r.ccMin && cc<=r.ccMax);
+  }
+
+  function fillLocations(){
+    const sel = $('#location');
+    sel.innerHTML = '';
+    DATA.locations.forEach(l=>{
+      const o=document.createElement('option'); o.value=l.id; o.textContent=l.id; sel.appendChild(o);
+    });
+    if(!sel.value && DATA.locations[0]) sel.value = DATA.locations[0].id;
+  }
+
+  function calculate(){
+    readTables();
+
+    const auction   = $('#auction').value;
+    const loc       = $('#location').value;
+    const transport = $('#transportType').value;
+    const price     = +$('#hammer').value || 0;
+    const engine    = $('#engine').value;
+    const cc        = +$('#capacity').value || 0;
+    const age       = +$('#age').value || 0;
+    const insPct    = (+$('#insurancePct').value || 0)/100;
+    const broker    = +$('#broker').value || 0;
+    const other     = +$('#otherFees').value || 0;
+    const ex        = +$('#exrate').value || 400;
+    const outCur    = $('#currency2').value;
+
+    const aFee = auctionFee(auction, price);
+    const inland = inlandByLocation(loc);
+    const ocean = transport==='roro' ? DATA.ocean.roro.base :
+                  transport==='container' ? DATA.ocean.container.base : 0;
+
+    const cif = price + aFee + inland + ocean;
+    const insurance = cif * insPct;
+
+    const rule = pickTaxRule(engine, age, cc) || { dutyPct:0, perCcUSD:0, vatPct:0 };
+    const customsBase = cif + insurance; // typical approach
+    const duty = rule.perCcUSD>0 ? rule.perCcUSD * (cc||0) : (rule.dutyPct/100) * customsBase;
+    const vat  = (rule.vatPct/100) * (customsBase + duty);
+
+    const totalUSD = price + aFee + inland + ocean + insurance + duty + vat + broker + other;
+    const cur = outCur;
+    const t = (v)=> cur==='AMD'? fmt(v*ex,'AMD') : fmt(v,'USD');
+
+    $('#resultBody').innerHTML = `
+      <tr><td>Car price (hammer)</td><td class="right">${t(price)}</td></tr>
+      <tr><td>Auction fee</td><td class="right">${t(aFee)}</td></tr>
+      <tr><td>Inland transport</td><td class="right">${t(inland)}</td></tr>
+      <tr><td>Ocean freight (${transport.toUpperCase()})</td><td class="right">${t(ocean)}</td></tr>
+      <tr><td>Insurance (${(insPct*100).toFixed(1)}%)</td><td class="right">${t(insurance)}</td></tr>
+      <tr><td>Customs duty</td><td class="right">${t(duty)}</td></tr>
+      <tr><td>VAT</td><td class="right">${t(vat)}</td></tr>
+      <tr><td>Broker</td><td class="right">${t(broker)}</td></tr>
+      <tr><td>Other local</td><td class="right">${t(other)}</td></tr>
+    `;
+    $('#grandTotal').textContent = t(totalUSD);
+    $('#curLbl').textContent = cur;
+  }
+
+  function exportJSON(){
+    readTables();
+    const blob = new Blob([JSON.stringify(DATA, null, 2)], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'car-calculator-tables.json'; a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function savePreset(){
+    const payload = {
+      DATA,
+      inputs: {
+        auction: $('#auction').value,
+        location: $('#location').value,
+        transport: $('#transportType').value,
+        price: +$('#hammer').value,
+        engine: $('#engine').value,
+        cc: +$('#capacity').value,
+        age: +$('#age').value,
+        insPct: +$('#insurancePct').value,
+        broker: +$('#broker').value,
+        other: +$('#otherFees').value,
+        ex: +$('#exrate').value,
+        cur: $('#currency2').value,
+      }
+    };
+    localStorage.setItem('carCalcPreset', JSON.stringify(payload));
+    alert('Preset saved in your browser.');
+  }
+
+  function loadPreset(){
+    const raw = localStorage.getItem('carCalcPreset'); if(!raw) return;
+    try{
+      const p = JSON.parse(raw);
+      if(p.DATA) Object.assign(DATA, p.DATA);
+      renderTables();
+      if(p.inputs){
+        $('#auction').value = p.inputs.auction;
+        fillLocations();
+        $('#location').value = p.inputs.location;
+        $('#transportType').value = p.inputs.transport;
+        $('#hammer').value = p.inputs.price;
+        $('#engine').value = p.inputs.engine;
+        $('#capacity').value = p.inputs.cc;
+        $('#age').value = p.inputs.age;
+        $('#insurancePct').value = p.inputs.insPct;
+        $('#broker').value = p.inputs.broker;
+        $('#otherFees').value = p.inputs.other;
+        $('#exrate').value = p.inputs.ex;
+        $('#currency2').value = p.inputs.cur;
+      }
+    }catch(e){ console.warn('Failed to load preset', e); }
+  }
+
+  function share(){
+    const q = new URLSearchParams({
+      a: $('#auction').value,
+      l: $('#location').value,
+      t: $('#transportType').value,
+      p: $('#hammer').value,
+      e: $('#engine').value,
+      c: $('#capacity').value,
+      g: $('#age').value,
+      i: $('#insurancePct').value,
+      b: $('#broker').value,
+      o: $('#otherFees').value,
+      x: $('#exrate').value,
+      u: $('#currency2').value,
+    }).toString();
+    const url = location.origin + location.pathname + '?' + q;
+    navigator.clipboard.writeText(url).then(()=>alert('Link copied to clipboard!')).catch(()=>{
+      prompt('Copy this link:', url);
+    });
+  }
+
+  function loadFromQuery(){
+    const q = new URLSearchParams(location.search);
+    if(!q.has('p')) return;
+    $('#auction').value = q.get('a')||'copart';
+    fillLocations();
+    $('#location').value = q.get('l')||$('#location').value;
+    $('#transportType').value = q.get('t')||'roro';
+    $('#hammer').value = q.get('p')||'8000';
+    $('#engine').value = q.get('e')||'gas';
+    $('#capacity').value = q.get('c')||'1998';
+    $('#age').value = q.get('g')||'7';
+    $('#insurancePct').value = q.get('i')||'1.0';
+    $('#broker').value = q.get('b')||'75';
+    $('#otherFees').value = q.get('o')||'300';
+    $('#exrate').value = q.get('x')||'395';
+    $('#currency2').value = q.get('u')||'USD';
+  }
+
+  function resetAll(){
+    localStorage.removeItem('carCalcPreset');
+    location.href = location.pathname;
+  }
+
+  // ======= Init =======
+  function init(){
+    renderTables();
+    fillLocations();
+    loadPreset();
+    loadFromQuery();
+    calculate();
+
+    $('#calcBtn').addEventListener('click', calculate);
+    $('#exportBtn').addEventListener('click', exportJSON);
+    $('#savePresetBtn').addEventListener('click', savePreset);
+    $('#shareBtn').addEventListener('click', share);
+    $('#resetBtn').addEventListener('click', resetAll);
+
+    // Recalculate on quick changes
+    ['auction','location','transportType','hammer','engine','capacity','age','insurancePct','broker','otherFees','exrate','currency2']
+      .forEach(id=> document.getElementById(id)?.addEventListener('change', calculate));
+  }
+
+  document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>
