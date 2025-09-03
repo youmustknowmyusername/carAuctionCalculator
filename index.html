@@ -35,25 +35,24 @@
     .total{font-weight:800;font-size:clamp(22px,3vw,32px);text-align:right}
     .note{font-size:12px;color:var(--muted)}
 
-    /* Auction logo buttons (like your screenshot) */
+    /* Auction logo buttons */
     .auction-buttons{display:flex;gap:12px}
     .auction-buttons button{
-      border:2px solid var(--inactive);   /* light gray border (inactive) */
-      background:#fff;                    /* white background like screenshot */
-      color:#000;
+      border:2px solid var(--inactive);
+      background:#fff;
       border-radius:14px;
       padding:8px 16px;
       cursor:pointer;
-      display:flex; align-items:center; justify-content:center;
-      min-width:140px; min-height:56px;
-      transition:box-shadow .15s, transform .05s, border-color .15s;
+      display:flex;align-items:center;justify-content:center;
+      min-width:140px;min-height:56px;
+      transition:border-color .15s, box-shadow .15s, transform .05s;
     }
     .auction-buttons button:hover{transform:translateY(-1px)}
     .auction-buttons button.active{
-      border-color: var(--active-red);    /* RED active border */
-      box-shadow: 0 0 0 3px rgba(255,48,48,.2);
+      border-color:var(--active-red);
+      box-shadow:0 0 0 3px rgba(255,48,48,.2);
     }
-    .auction-buttons img{height:30px; width:auto; display:block}
+    .auction-buttons img{height:30px;width:auto;display:block}
   </style>
 </head>
 <body>
@@ -66,24 +65,20 @@
 <main class="container grid grid-2" style="margin-top:16px">
   <section class="card">
     <h2>Inputs</h2>
-    <p class="note">Enter details and click Calculate. All fees and taxes are handled internally.</p>
-
     <div class="grid" style="gap:12px">
-      <!-- Auction with logo buttons -->
+
+      <!-- Auction logos -->
       <div class="row">
         <div>
           <label>Auction</label>
           <div id="auctionButtons" class="auction-buttons" role="group" aria-label="Select auction">
-            <!-- IAA button (inactive by default) -->
             <button type="button" data-value="iaai" aria-pressed="false" title="IAA">
               <img src="assets/iaa.png" alt="IAA">
             </button>
-            <!-- Copart button (ACTIVE by default, red border) -->
             <button type="button" data-value="copart" aria-pressed="true" title="Copart">
               <img src="assets/copart.png" alt="Copart">
             </button>
           </div>
-          <!-- Hidden input keeps value for calculations -->
           <input type="hidden" id="auction" value="copart" />
         </div>
 
@@ -162,7 +157,6 @@
 </main>
 
 <script>
-/* ===== Internal data ===== */
 const DATA = {
   locations: [
     { id:'CA-LOS ANGELES', inland: 450 },
@@ -178,7 +172,6 @@ const DATA = {
   ]
 };
 
-/* ===== Helpers ===== */
 const $ = s => document.querySelector(s);
 const fmt = (v,cur)=>(cur==='AMD'?Math.round(v):v.toFixed(0)).replace(/\B(?=(\d{3})+(?!\d))/g,',');
 
@@ -204,7 +197,6 @@ function pickTaxRule(engine,age,cc){
   return DATA.taxes.find(r=>r.engine===engine&&age>=r.minAge&&age<=r.maxAge&&cc>=r.ccMin&&cc<=r.ccMax) || {dutyPct:0,perCcUSD:0,vatPct:0};
 }
 
-/* ===== Auction logo buttons behavior ===== */
 function setupAuctionButtons(){
   const buttons = document.querySelectorAll('#auctionButtons button');
   const hidden  = document.getElementById('auction');
@@ -223,11 +215,10 @@ function setupAuctionButtons(){
     btn.addEventListener('click', ()=> activate(btn.dataset.value));
   });
 
-  // Default active = Copart (red border)
+  // Default = Copart active
   activate('copart');
 }
 
-/* ===== Core calc ===== */
 function calculate(){
   const auction=$('#auction').value;
   const loc=$('#location').value;
@@ -272,7 +263,6 @@ function calculate(){
   $('#curLbl').textContent=outCur;
 }
 
-/* ===== Init ===== */
 document.addEventListener('DOMContentLoaded',()=>{
   fillLocations();
   setupAuctionButtons();
