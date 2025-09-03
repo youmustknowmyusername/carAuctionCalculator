@@ -28,6 +28,22 @@
     tfoot td{font-weight:700}
     .total{font-weight:800;font-size:clamp(22px,3vw,32px);text-align:right}
     .note{font-size:12px;color:var(--muted)}
+
+    /* Auction logo buttons */
+    .auction-buttons{display:flex;gap:12px}
+    .auction-buttons button{
+      border:2px solid var(--line);
+      background:var(--card);
+      border-radius:12px;
+      padding:6px 12px;
+      cursor:pointer;
+      transition:border-color .2s, transform .1s;
+      display:flex; align-items:center; justify-content:center;
+      min-width:120px; min-height:52px;
+    }
+    .auction-buttons button:hover{transform:translateY(-1px)}
+    .auction-buttons button.active{border-color:var(--accent); box-shadow:0 0 0 3px color-mix(in oklab,var(--accent) 30%, transparent)}
+    .auction-buttons img{height:30px; width:auto; display:block}
   </style>
 </head>
 <body>
@@ -43,14 +59,25 @@
     <p class="note">Enter details and click Calculate. All fees and taxes are handled internally.</p>
 
     <div class="grid" style="gap:12px">
+
+      <!-- Auction selection as logo buttons -->
       <div class="row">
         <div>
-          <label for="auction">Auction</label>
-          <select id="auction">
-            <option value="copart">Copart</option>
-            <option value="iaai">IAA</option>
-          </select>
+          <label>Auction</label>
+          <div id="auctionButtons" class="auction-buttons" role="group" aria-label="Select auction">
+            <!-- FIRST BUTTON = IAA -->
+            <button type="button" data-value="iaai" aria-pressed="false" title="IAA">
+              <img src="assets/iaa.png" alt="IAA">
+            </button>
+            <!-- SECOND BUTTON = Copart -->
+            <button type="button" data-value="copart" aria-pressed="false" title="Copart">
+              <img src="assets/copart.png" alt="Copart">
+            </button>
+          </div>
+          <!-- Hidden input to keep same logic -->
+          <input type="hidden" id="auction" value="iaai" />
         </div>
+
         <div>
           <label for="location">Auction location</label>
           <select id="location"></select>
@@ -133,8 +160,8 @@ const DATA = {
     { id:'TX-DALLAS', inland: 400 }
   ],
   auctionFees: {
-    copart: [[1000,99],[5000,319],[999999,699]],
-    iaai:   [[1000,95],[5000,309],[999999,679]]
+    iaai:   [[1000,95],[5000,309],[999999,679]],   // IAA
+    copart: [[1000,99],[5000,319],[999999,699]]    // Copart
   },
   ocean: { base: 1050 },
   taxes: [
@@ -155,9 +182,9 @@ function fillLocations(){
 }
 
 function auctionFee(auction,price){
-  const tiers=DATA.auctionFees[auction];
+  const tiers=DATA.auctionFees[auction] || [];
   for(const [limit,fee] of tiers){ if(price<=limit) return fee; }
-  return tiers.at(-1)[1];
+  return tiers.length ? tiers.at(-1)[1] : 0;
 }
 
 function inlandByLocation(locId){
@@ -166,6 +193,29 @@ function inlandByLocation(locId){
 
 function pickTaxRule(engine,age,cc){
   return DATA.taxes.find(r=>r.engine===engine&&age>=r.minAge&&age<=r.maxAge&&cc>=r.ccMin&&cc<=r.ccMax) || {dutyPct:0,perCcUSD:0,vatPct:0};
+}
+
+/* ===== Auction logo buttons behavior ===== */
+function setupAuctionButtons(){
+  const buttons = document.querySelectorAll('#auctionButtons button');
+  const hidden  = document.getElementById('auction');
+
+  function activate(val){
+    hidden.value = val;
+    buttons.forEach(b=>{
+      const isActive = b.dataset.value === val;
+      b.classList.toggle('active', isActive);
+      b.setAttribute('aria-pressed', String(isActive));
+    });
+    calculate();
+  }
+
+  buttons.forEach(btn=>{
+    btn.addEventListener('click', ()=> activate(btn.dataset.value));
+  });
+
+  // Default selection = IAA (first button)
+  activate('iaai');
 }
 
 /* ===== Core calc ===== */
@@ -198,6 +248,7 @@ function calculate(){
   const t=v=>outCur==='AMD'?fmt(v*ex,'AMD'):fmt(v,'USD');
 
   $('#resultBody').innerHTML=`
+    <tr><td>Auction</td><td class="right">${auction.toUpperCase()}</td></tr>
     <tr><td>Car price (hammer)</td><td class="right">${t(price)}</td></tr>
     <tr><td>Auction fee</td><td class="right">${t(aFee)}</td></tr>
     <tr><td>Inland transport</td><td class="right">${t(inland)}</td></tr>
@@ -215,9 +266,10 @@ function calculate(){
 /* ===== Init ===== */
 document.addEventListener('DOMContentLoaded',()=>{
   fillLocations();
+  setupAuctionButtons();
   calculate();
   $('#calcBtn').addEventListener('click',calculate);
-  ['auction','location','hammer','engine','capacity','age','insurancePct','broker','otherFees','exrate','currency2']
+  ['location','hammer','engine','capacity','age','insurancePct','broker','otherFees','exrate','currency2']
     .forEach(id=>document.getElementById(id)?.addEventListener('change',calculate));
 });
 </script>
