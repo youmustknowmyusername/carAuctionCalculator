@@ -59,12 +59,14 @@
     .location-select {
       flex: 1;
     }
-    .location-select label {
-      display: block;
-      font-size: 13px;
-      color: var(--muted);
-      margin-bottom: 4px;
-    }
+  .location-select label {
+  display: block;
+  font-size: 16px;     /* bigger */
+  font-weight: 700;    /* bolder */
+  color: var(--fg);    /* main text color instead of muted */
+  margin-bottom: 6px;
+}
+
     .location-select select {
       width: 100%;
       padding: 12px 14px;
@@ -90,7 +92,6 @@
 </header>
 
 <main class="container grid grid-2" style="margin-top:16px">
-  <!-- LEFT: Inputs -->
   <section class="card">
 
     <!-- Auction + Location in one row -->
