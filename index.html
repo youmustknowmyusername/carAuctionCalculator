@@ -40,7 +40,7 @@
 <main class="container grid grid-2" style="margin-top:16px">
   <section class="card">
     <h2>Inputs</h2>
-    <p class="note">Enter details and click Calculate. Fee tables are hidden and handled internally.</p>
+    <p class="note">Enter details and click Calculate. All fees and taxes are handled internally.</p>
 
     <div class="grid" style="gap:12px">
       <div class="row">
@@ -122,101 +122,82 @@
         <tr><td>Total (<span id="curLbl">USD</span>)</td><td id="grandTotal" class="total">0</td></tr>
       </tfoot>
     </table>
-    <p class="note">CIF = Car price + Auction fee + Inland + Ocean. Insurance applies to CIF. Taxes apply per internal rules.</p>
   </aside>
 </main>
 
 <script>
-/* ===== Internal data (hidden from UI) ===== */
+/* ===== Internal data ===== */
 const DATA = {
   locations: [
     { id:'CA-LOS ANGELES', inland: 450 },
-    { id:'CA-SAN JOSE',    inland: 500 },
-    { id:'TX-DALLAS',      inland: 400 },
-    { id:'FL-MIAMI',       inland: 380 },
-    { id:'NY-NEW YORK',    inland: 520 },
-    { id:'GA-ATLANTA',     inland: 420 },
-    { id:'IL-CHICAGO',     inland: 480 },
+    { id:'TX-DALLAS', inland: 400 }
   ],
-  // Auction fee tiers [upper bound, fee]
   auctionFees: {
-    copart: [[500,59],[1000,99],[2000,169],[3000,219],[4000,269],[5000,319],[7000,389],[10000,449],[15000,499],[20000,549],[50000,699],[999999,899]],
-    iaai:   [[500,55],[1000,95],[2000,159],[3000,209],[4000,259],[5000,309],[7000,379],[10000,439],[15000,489],[20000,539],[50000,679],[999999,879]]
+    copart: [[1000,99],[5000,319],[999999,699]],
+    iaai:   [[1000,95],[5000,309],[999999,679]]
   },
-  ocean: { base: 1050 }, // fixed single value
+  ocean: { base: 1050 },
   taxes: [
-    // Simplified example rules; adjust in code
-    { engine:'gas',   minAge:0, maxAge:3,   ccMin:0,   ccMax:3000, dutyPct:10, perCcUSD:0,   vatPct:20 },
-    { engine:'gas',   minAge:4, maxAge:30,  ccMin:0,   ccMax:1000, dutyPct:0,  perCcUSD:1.2, vatPct:20 },
-    { engine:'gas',   minAge:4, maxAge:30,  ccMin:1001,ccMax:2000, dutyPct:0,  perCcUSD:1.5, vatPct:20 },
-    { engine:'gas',   minAge:4, maxAge:30,  ccMin:2001,ccMax:3000, dutyPct:0,  perCcUSD:2.0, vatPct:20 },
-    { engine:'diesel',minAge:0, maxAge:3,   ccMin:0,   ccMax:3000, dutyPct:10, perCcUSD:0,   vatPct:20 },
-    { engine:'diesel',minAge:4, maxAge:30,  ccMin:0,   ccMax:2000, dutyPct:0,  perCcUSD:1.6, vatPct:20 },
-    { engine:'diesel',minAge:4, maxAge:30,  ccMin:2001,ccMax:3000, dutyPct:0,  perCcUSD:2.3, vatPct:20 },
-    { engine:'hybrid',minAge:0, maxAge:30,  ccMin:0,   ccMax:3000, dutyPct:5,  perCcUSD:0,   vatPct:20 },
-    { engine:'ev',    minAge:0, maxAge:30,  ccMin:0,   ccMax:0,    dutyPct:0,  perCcUSD:0,   vatPct:0 },
+    { engine:'gas',minAge:0,maxAge:30,ccMin:0,ccMax:3000,dutyPct:10,perCcUSD:0,vatPct:20 }
   ]
 };
 
 /* ===== Helpers ===== */
 const $ = s => document.querySelector(s);
-const fmt = (v, cur) => (cur==='AMD'? Math.round(v) : v.toFixed(0)).replace(/\B(?=(\d{3})+(?!\d))/g,',');
+const fmt = (v,cur)=>(cur==='AMD'?Math.round(v):v.toFixed(0)).replace(/\B(?=(\d{3})+(?!\d))/g,',');
 
 function fillLocations(){
-  const sel = $('#location'); sel.innerHTML = '';
-  DATA.locations.forEach(l => {
-    const o = document.createElement('option');
-    o.value = l.id; o.textContent = l.id;
-    sel.appendChild(o);
+  const sel=$('#location'); sel.innerHTML='';
+  DATA.locations.forEach(l=>{
+    const o=document.createElement('option');
+    o.value=l.id; o.textContent=l.id; sel.appendChild(o);
   });
 }
 
-function auctionFee(auction, price){
-  const tiers = DATA.auctionFees[auction];
-  for (const [limit, fee] of tiers){ if(price <= limit) return fee; }
+function auctionFee(auction,price){
+  const tiers=DATA.auctionFees[auction];
+  for(const [limit,fee] of tiers){ if(price<=limit) return fee; }
   return tiers.at(-1)[1];
 }
 
 function inlandByLocation(locId){
-  const x = DATA.locations.find(l => l.id === locId);
-  return x ? x.inland : 0;
+  const it=DATA.locations.find(l=>l.id===locId); return it?it.inland:0;
 }
 
-function pickTaxRule(engine, age, cc){
-  return DATA.taxes.find(r => r.engine===engine && age>=r.minAge && age<=r.maxAge && cc>=r.ccMin && cc<=r.ccMax)
-         || { dutyPct:0, perCcUSD:0, vatPct:0 };
+function pickTaxRule(engine,age,cc){
+  return DATA.taxes.find(r=>r.engine===engine&&age>=r.minAge&&age<=r.maxAge&&cc>=r.ccMin&&cc<=r.ccMax) || {dutyPct:0,perCcUSD:0,vatPct:0};
 }
 
 /* ===== Core calc ===== */
 function calculate(){
-  const auction = $('#auction').value;
-  const loc     = $('#location').value;
-  const price   = +$('#hammer').value || 0;
-  const engine  = $('#engine').value;
-  const cc      = +$('#capacity').value || 0;
-  const age     = +$('#age').value || 0;
-  const insPct  = (+$('#insurancePct').value || 0)/100;
-  const broker  = +$('#broker').value || 0;
-  const other   = +$('#otherFees').value || 0;
-  const ex      = +$('#exrate').value || 400;
-  const outCur  = $('#currency2').value;
+  const auction=$('#auction').value;
+  const loc=$('#location').value;
+  const price=+$('#hammer').value||0;
+  const engine=$('#engine').value;
+  const cc=+$('#capacity').value||0;
+  const age=+$('#age').value||0;
+  const insPct=(+$('#insurancePct').value||0)/100;
+  const broker=+$('#broker').value||0;
+  const other=+$('#otherFees').value||0;
+  const ex=+$('#exrate').value||400;
+  const outCur=$('#currency2').value;
 
-  const aFee   = auctionFee(auction, price);
-  const inland = inlandByLocation(loc);
-  const ocean  = DATA.ocean.base;
+  const aFee=auctionFee(auction,price);
+  const inland=inlandByLocation(loc);
+  const ocean=DATA.ocean.base;
 
-  const cif = price + aFee + inland + ocean;
-  const insurance = cif * insPct;
+  const cif=price+aFee+inland+ocean;
+  const insurance=cif*insPct;
 
-  const rule = pickTaxRule(engine, age, cc);
-  const customsBase = cif + insurance;
-  const duty = rule.perCcUSD>0 ? rule.perCcUSD * (cc||0) : (rule.dutyPct/100) * customsBase;
-  const vat  = (rule.vatPct/100) * (customsBase + duty);
+  const rule=pickTaxRule(engine,age,cc);
+  const customsBase=cif+insurance;
+  const duty=rule.perCcUSD>0?rule.perCcUSD*(cc||0):(rule.dutyPct/100)*customsBase;
+  const vat=(rule.vatPct/100)*(customsBase+duty);
 
-  const totalUSD = price + aFee + inland + ocean + insurance + duty + vat + broker + other;
-  const t = (v)=> outCur==='AMD' ? fmt(v*ex,'AMD') : fmt(v,'USD');
+  const totalUSD=price+aFee+inland+ocean+insurance+duty+vat+broker+other;
+  const t=v=>outCur==='AMD'?fmt(v*ex,'AMD'):fmt(v,'USD');
 
-  $('#resultBody').innerHTML = `
+  $('#resultBody').innerHTML=`
     <tr><td>Car price (hammer)</td><td class="right">${t(price)}</td></tr>
     <tr><td>Auction fee</td><td class="right">${t(aFee)}</td></tr>
     <tr><td>Inland transport</td><td class="right">${t(inland)}</td></tr>
@@ -227,18 +208,17 @@ function calculate(){
     <tr><td>Broker</td><td class="right">${t(broker)}</td></tr>
     <tr><td>Other local</td><td class="right">${t(other)}</td></tr>
   `;
-  $('#grandTotal').textContent = t(totalUSD);
-  $('#curLbl').textContent = outCur;
+  $('#grandTotal').textContent=t(totalUSD);
+  $('#curLbl').textContent=outCur;
 }
 
 /* ===== Init ===== */
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded',()=>{
   fillLocations();
   calculate();
-  $('#calcBtn').addEventListener('click', calculate);
-  // Live recalc when fields change
+  $('#calcBtn').addEventListener('click',calculate);
   ['auction','location','hammer','engine','capacity','age','insurancePct','broker','otherFees','exrate','currency2']
-    .forEach(id => document.getElementById(id)?.addEventListener('change', calculate));
+    .forEach(id=>document.getElementById(id)?.addEventListener('change',calculate));
 });
 </script>
 </body>
