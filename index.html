@@ -41,7 +41,7 @@
       padding:6px 10px;
       cursor:pointer;
       display:flex;align-items:center;justify-content:center;
-      min-width:140px; min-height:56px;
+      min-width:140px; min-height:56px; /* original size */
       transition:border-color .15s, box-shadow .15s, transform .05s;
     }
     .auction-buttons button:hover{transform:translateY(-1px)}
@@ -50,7 +50,7 @@
       box-shadow:0 0 0 3px rgba(255,48,48,.2);
     }
     .auction-buttons img{
-      height:55px;
+      height:55px; /* bigger logos */
       width:auto;
       display:block;
     }
@@ -59,22 +59,20 @@
     .location-select {
       flex: 1;
     }
-.location-select label {
-  display: block;
-  font-size: 16px;     /* bigger */
-  font-weight: 700;    /* bolder */
-  color: var(--fg);    /* main text color */
-  margin-bottom: 6px;
-  text-align: center;  /* center it */
-}
-
-
+    .location-select label {
+      display: block;
+      font-size: 16px;     /* bigger */
+      font-weight: 700;    /* bolder */
+      color: var(--fg);    /* main text color */
+      margin-bottom: 6px;
+      text-align: center;  /* centered label */
+    }
     .location-select select {
       width: 100%;
       padding: 12px 14px;
       border-radius: 12px;
       border: 1px solid var(--line);
-      background: #fff;
+      background: #fff;    /* keep white like your mock */
       color: #000;
       font-size: 14px;
     }
@@ -94,6 +92,7 @@
 </header>
 
 <main class="container grid grid-2" style="margin-top:16px">
+  <!-- LEFT: Inputs (no "Inputs" label as requested) -->
   <section class="card">
 
     <!-- Auction + Location in one row -->
@@ -112,11 +111,7 @@
       <!-- Location -->
       <div class="location-select">
         <label for="location">Auction location</label>
-        <select id="location">
-          <option value="CA-LOS ANGELES">CA-LOS ANGELES</option>
-          <option value="TX-DALLAS">TX-DALLAS</option>
-          <option value="NY-LONG ISLAND">NY-LONG ISLAND</option>
-        </select>
+        <select id="location"></select>
       </div>
     </div>
 
@@ -139,6 +134,91 @@
 </main>
 
 <script>
+  /* ===== Full location list from iaa.am "Select Location" ===== */
+  const LOCATIONS = [
+    "AL-BIRMINGHAM","AL-DOTHAN","AL-HUNTSVILLE","AL-MOBILE","AL-MONTGOMERY","AL-TANNER",
+    "AR-FAYETTEVILLE COPART","AR-FAYETTEVILLE IAA","AR-LITTLE ROCK COPART","AR-LITTLE ROCK IAA",
+    "AZ-PHOENIX","AZ-TUCSON",
+    "CA- ACE Carson","CA- ACE Perris","CA-ADELANTO","CA-ANAHEIM","CA-ANTELOPE","CA-BAKERSFIELD",
+    "CA-COLTON","CA-EAST BAY","CA-FONTANA","CA-FREMONT","CA-FRESNO","CA-HAYWARD","CA-HAYWARD DESERT VIEW",
+    "CA-HIGH DESERT","CA-LONG BEACH","CA-LOS ANGELES","CA-MARTINEZ","CA-NORTH HOLLYWOOD",
+    "CA-RANCHO CUCAMONGA","CA-RANCHO-DESERT VIEW","CA-REDDING","CA-RIVERSIDE","CA-SACRAMENTO",
+    "CA-SACRAMENTO-DESERT VIEW","CA-SAN BERNARDINO","CA-SAN DIEGO","CA-SAN DIEGO-DESERT VIEW",
+    "CA-SAN JOSE","CA-SANTA PAULA-DESERT VIEW","CA-SO SACRAMENTO","CA-SUN VALLEY","CA-VALLEJO","CA-VAN NUYS",
+    "CO-COLORADO SPRINGS","CO-DENVER","CO-DENVER CENTRAL","CO-DENVER EAST","CO-DENVER SOUTH","CO-WESTERN COLORADO",
+    "CT-HARTFORD","CT-HARTFORD SPRINGFIELD","CT-Hartford-South",
+    "DC-WASHINGTON DC-MD",
+    "DE-NEW CASTLE","DE-SEAFORD",
+    "FL-CAT Jacksonville Sub lot","FL-CAT Orlando Boggy Creek","FL-CLEARWATER","FL-Dover Sublot","FL-FORT MYERS",
+    "FL-FORT PIERCE","FL-FT.PIERCE","FL-JACKSONVILLE","FL-JACKSONVILLE EAST","FL-JACKSONVILLE WEST","FL-MIAMI",
+    "FL-MIAMI CENTRAL","FL-MIAMI NORTH","FL-MIAMI SOUTH","FL-OCALA","FL-ORLANDO","FL-ORLANDO NORTH","FL-ORLANDO SOUTH",
+    "FL-PENSACOLA","FL-PUNTA GORDA","FL-TALLAHASSEE","FL-TAMPA","FL-WEST PALM BEACH",
+    "GA-ATLANTA","GA-ATLANTA EAST","GA-ATLANTA NORTH","GA-ATLANTA SOUTH","GA-ATLANTA WEST","GA-CARTERSVILLE","GA-FAIRBURN",
+    "GA-MACON","GA-SAVANNAH","GA-TIFTON",
+    "HI-HONOLULU",
+    "IA-Crashedtoys Eldridge","IA-DAVENPORT","IA-DES MOINES",
+    "ID-BOISE",
+    "IL-CHICAGO NORTH","IL-CHICAGO SOUTH","IL-CHICAGO WEST","IL-LINCOLN","IL-PEORIA","IL-SOUTHERN ILLINOIS",
+    "IL-SPECIALTY DIVISION","IL-ST. LOUIS","IL-WHEELING",
+    "IN- IAA Indy Minnesota Street Sublot","IN-CICERO","IN-DYER","IN-FORT WAYNE","IN-HAMMOND","IN-HARTFORD CITY",
+    "IN-INDIANAPOLIS","IN-SOUTH BEND",
+    "KS-KANSAS CITY","KS-WICHITA",
+    "KY-ASHLAND","KY-BOWLING GREEN","KY-LEXINGTON EAST","KY-LEXINGTON WEST","KY-LOUISVILLE","KY-PADUCAH","KY-WALTON",
+    "LA- LAFAYETTE","LA- NEW ORLEANS EAST","LA-BATON ROUGE","LA-NEW ORLEANS","LA-SHREVEPORT",
+    "MA -TEMPLETON","MA-BOSTON SHIRLEY","MA-FREETOWN","MA-NORTH BOSTON","MA-SOUTH BOSTON","MA-TAUNTON","MA-WEST WARREN",
+    "MD White Plans Aux Lot","MD-BALTIMORE","MD-DUNDALK","MD-LAUREL","MD-METRO DC","MD-ROSEDALE",
+    "ME- Gray Sub lot","ME-LYMAN","ME-ORONO","ME-PORTLAND GORHAM",
+    "MI-DETROIT","MI-FLINT","MI-GRAND RAPIDS","MI-GREAT LAKES","MI-IONIA","MI-KINCHELOE","MI-LANSING",
+    "MN- IAA Faribault","MN-Big Lake Sub lot","MN-CRASHEDTOYS EAST BETHEL","MN-Ham lake Sun lot","MN-MINNEAPOLIS",
+    "MN-MINNEAPOLIS NORTH","MN-ST. CLOUD",
+    "MO-COLUMBIA","MO-SIKESTON","MO-SPRINGFIELD","MO-ST. LOUIS",
+    "MS-GRENADA","MS-GULF COAST","MS-JACKSON",
+    "MT-BILLINGS","MT-HELENA","MT-MISSOULA",
+    "NC-ASHEVILLE","NC-CHARLOTTE","NC-CHINA GROVE","NC-CONCORD","NC-GREENSBORO","NC-LUMBERTON","NC-MEBANE","NC-MOCKSVILLE",
+    "NC-RALEIGH","NC-WILMINGTON",
+    "ND-BISMARCK","ND-FARGO",
+    "NE-LINCOLN","NE-OMAHA",
+    "NH- Salem Sub lot","NH-CANDIA","NH-MANCHESTER","NH-WEBSTER",
+    "NJ-AVENEL NEW JERSEY","NJ-CENTRAL NEW JERSEY","NJ-ENGLISHTOWN","NJ-GLASSBORO EAST","NJ-GLASSBORO WEST",
+    "NJ-NORTHERN NEW JERSEY","NJ-SAYREVILLE","NJ-SOMERVILLE","NJ-SOUTHERN NEW JERSEY","NJ-TRENTON",
+    "NM-ALBUQUERQUE",
+    "NV-LAS VEGAS","NV-RENO",
+    "NY-ALBANY","NY-BUFFALO","NY-LONG ISLAND","NY-NEWBURGH","NY-ROCHESTER","NY-SYRACUSE",
+    "OH- IAAI Stimmel Rd Sub lot","OH- Vermillion North Ford Offsite lot","OH-AKRON CANTON","OH-CINCINNATI",
+    "OH-CLEVELAND","OH-CLEVELAND EAST","OH-CLEVELAND WEST","OH-COLUMBUS","OH-DAYTON",
+    "OK-OKLAHOMA CITY","OK-TULSA",
+    "OR-EUGENE","OR-PORTLAND","OR-PORTLAND NORTH","OR-PORTLAND SOUTH","OR-PORTLAND WEST","OR-WOODBURN",
+    "PA-ALTOONA","PA-BRIDGEPORT","PA-CHAMBERSBURG","PA-ERIE","PA-HARRISBURG","PA-PHILADELPHIA","PA-PHILADELPHIA EAST",
+    "PA-PITTSBURG","PA-PITTSBURG NORTH","PA-PITTSBURG SOUTH","PA-PITTSBURG WEST","PA-SCRANTON","PA-YORK HAVEN","PA-YORKS SPRINGS",
+    "RI-EXETER","RI-PROVIDENCE",
+    "SC-CHARLESTON","SC-COLUMBIA","SC-GREENVILLE","SC-LEXINGTON","SC-South Gaston Sublot","SC-SPARTANBURG","SC-Spartanburg sublot",
+    "SD-SIOUX FALLS",
+    "TN-CHATTANOOGA","TN-KNOXVILLE","TN-MEMPHIS","TN-NASHVILLE",
+    "TX-ABILENE","TX-AMARILLO","TX-ANDREWS","TX-AUSTIN","TX-CORPUS CHRISTI","TX-CRASHEDTOYS DALLAS","TX-DALLAS","TX-DALLAS SOUTH",
+    "TX-EL PASO","TX-FT. WORTH","TX-HOUSTON","TX-LONGVIEW","TX-LUBBOCK","TX-LUFKIN","TX-MCALLEN","TX-PERMIAN BASIN","TX-SAN ANTONIO","TX-WACO",
+    "UT-OGDEN","UT-SALT LAKE CITY",
+    "VA-CULPEPER","VA-DANVILLE","VA-FREDERICKSBURG","VA-FREDERICKSBURG-SOUTH","VA-HAMPTON","VA-NORTHERN VIRGINIA","VA-PULASKI",
+    "VA-RICHMOND","VA-ROANOKE","VA-SUFFOLK","VA-TIDEWATER",
+    "VT- Devil's Bowl Sub lot","VT-BURLINGTON","VT-FAIR HAVEN","VT-ORLEANS","VT-RUTLAND",
+    "WA- Seattle Puyallup","WA-GRAHAM","WA-NORTH SEATTLE","WA-PASCO","WA-SEATTLE","WA-SEATTLE-SOUTH","WA-SPOKANE",
+    "WI-APPLETON","WI-MADISON","WI-MILWAUKEE","WI-PORTAGE",
+    "WV-BUCKHANNON","WV-CHARLESTON","WV-SHADY SPRING",
+    "WY-CASPER"
+  ];
+
+  /* Populate the location dropdown */
+  function fillLocations() {
+    const sel = document.getElementById('location');
+    sel.innerHTML = '';
+    LOCATIONS.forEach(loc => {
+      const opt = document.createElement('option');
+      opt.value = opt.textContent = loc;
+      sel.appendChild(opt);
+    });
+    // default selection:
+    if (LOCATIONS.includes("NY-LONG ISLAND")) sel.value = "NY-LONG ISLAND";
+  }
+
   /* Auction buttons */
   function setupAuctionButtons(){
     const buttons = document.querySelectorAll('#auctionButtons button');
@@ -160,7 +240,7 @@
     activate('copart');
   }
 
-  /* Calculation (placeholder) */
+  /* Simple display */
   function calculate(){
     const auction = document.getElementById('auction').value.toUpperCase();
     const location = document.getElementById('location').value;
@@ -172,10 +252,10 @@
 
   document.addEventListener('DOMContentLoaded', ()=>{
     setupAuctionButtons();
+    fillLocations();
     calculate();
     document.getElementById('calcBtn').addEventListener('click', calculate);
   });
 </script>
 </body>
 </html>
-
