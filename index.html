@@ -6,12 +6,18 @@
   <title>Car Auction Calculator</title>
   <meta name="color-scheme" content="light dark" />
   <style>
-    :root{--bg:#0c0f16;--fg:#e9eef5;--muted:#9aa8bc;--card:#121725;--accent:#5aa3ff;--line:color-mix(in oklab,var(--fg) 14%,transparent)}
-    @media(prefers-color-scheme:light){:root{--bg:#f7f9fc;--fg:#0f1728;--muted:#5c6678;--card:#ffffff;--accent:#1a6cff}}
+    :root{
+      --bg:#0c0f16; --fg:#e9eef5; --muted:#9aa8bc; --card:#121725;
+      --line: color-mix(in oklab, var(--fg) 16%, transparent);
+      --accent:#1a6cff; --active-red:#ff3030; --inactive:#cfd6e0;
+    }
+    @media (prefers-color-scheme: light){
+      :root{ --bg:#f7f9fc; --fg:#0f1728; --muted:#5c6678; --card:#ffffff; --line:#e5eaf1 }
+    }
     *{box-sizing:border-box}
     body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.55 system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif}
     .container{max-width:1100px;margin:auto;padding:24px}
-    header{position:sticky;top:0;z-index:10;background:color-mix(in oklab,var(--bg) 86%,transparent);border-bottom:1px solid var(--line);backdrop-filter:blur(8px)}
+    header{position:sticky;top:0;z-index:10;background:color-mix(in oklab,var(--bg) 86%, transparent);border-bottom:1px solid var(--line);backdrop-filter:blur(8px)}
     .nav{display:flex;justify-content:space-between;align-items:center;padding:14px 0}
     .brand{font-weight:800}
     .grid{display:grid;gap:16px}
@@ -29,20 +35,24 @@
     .total{font-weight:800;font-size:clamp(22px,3vw,32px);text-align:right}
     .note{font-size:12px;color:var(--muted)}
 
-    /* Auction logo buttons */
+    /* Auction logo buttons (like your screenshot) */
     .auction-buttons{display:flex;gap:12px}
     .auction-buttons button{
-      border:2px solid var(--line);
-      background:var(--card);
-      border-radius:12px;
-      padding:6px 12px;
+      border:2px solid var(--inactive);   /* light gray border (inactive) */
+      background:#fff;                    /* white background like screenshot */
+      color:#000;
+      border-radius:14px;
+      padding:8px 16px;
       cursor:pointer;
-      transition:border-color .2s, transform .1s;
       display:flex; align-items:center; justify-content:center;
-      min-width:120px; min-height:52px;
+      min-width:140px; min-height:56px;
+      transition:box-shadow .15s, transform .05s, border-color .15s;
     }
     .auction-buttons button:hover{transform:translateY(-1px)}
-    .auction-buttons button.active{border-color:var(--accent); box-shadow:0 0 0 3px color-mix(in oklab,var(--accent) 30%, transparent)}
+    .auction-buttons button.active{
+      border-color: var(--active-red);    /* RED active border */
+      box-shadow: 0 0 0 3px rgba(255,48,48,.2);
+    }
     .auction-buttons img{height:30px; width:auto; display:block}
   </style>
 </head>
@@ -59,23 +69,22 @@
     <p class="note">Enter details and click Calculate. All fees and taxes are handled internally.</p>
 
     <div class="grid" style="gap:12px">
-
-      <!-- Auction selection as logo buttons -->
+      <!-- Auction with logo buttons -->
       <div class="row">
         <div>
           <label>Auction</label>
           <div id="auctionButtons" class="auction-buttons" role="group" aria-label="Select auction">
-            <!-- FIRST BUTTON = IAA -->
+            <!-- IAA button (inactive by default) -->
             <button type="button" data-value="iaai" aria-pressed="false" title="IAA">
               <img src="assets/iaa.png" alt="IAA">
             </button>
-            <!-- SECOND BUTTON = Copart -->
-            <button type="button" data-value="copart" aria-pressed="false" title="Copart">
+            <!-- Copart button (ACTIVE by default, red border) -->
+            <button type="button" data-value="copart" aria-pressed="true" title="Copart">
               <img src="assets/copart.png" alt="Copart">
             </button>
           </div>
-          <!-- Hidden input to keep same logic -->
-          <input type="hidden" id="auction" value="iaai" />
+          <!-- Hidden input keeps value for calculations -->
+          <input type="hidden" id="auction" value="copart" />
         </div>
 
         <div>
@@ -160,8 +169,8 @@ const DATA = {
     { id:'TX-DALLAS', inland: 400 }
   ],
   auctionFees: {
-    iaai:   [[1000,95],[5000,309],[999999,679]],   // IAA
-    copart: [[1000,99],[5000,319],[999999,699]]    // Copart
+    iaai:   [[1000,95],[5000,309],[999999,679]],
+    copart: [[1000,99],[5000,319],[999999,699]]
   },
   ocean: { base: 1050 },
   taxes: [
@@ -203,9 +212,9 @@ function setupAuctionButtons(){
   function activate(val){
     hidden.value = val;
     buttons.forEach(b=>{
-      const isActive = b.dataset.value === val;
-      b.classList.toggle('active', isActive);
-      b.setAttribute('aria-pressed', String(isActive));
+      const on = b.dataset.value === val;
+      b.classList.toggle('active', on);
+      b.setAttribute('aria-pressed', String(on));
     });
     calculate();
   }
@@ -214,8 +223,8 @@ function setupAuctionButtons(){
     btn.addEventListener('click', ()=> activate(btn.dataset.value));
   });
 
-  // Default selection = IAA (first button)
-  activate('iaai');
+  // Default active = Copart (red border)
+  activate('copart');
 }
 
 /* ===== Core calc ===== */
