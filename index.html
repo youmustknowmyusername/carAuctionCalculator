@@ -1,1 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Car Auction Calculator</title>
+  <meta name="color-scheme" content="light dark" />
+  <style>
+    :root{
+      --bg:#0c0f16; --fg:#e9eef5; --muted:#9aa8bc; --card:#121725;
+      --line: color-mix(in oklab, var(--fg) 16%, transparent);
+      --accent:#1a6cff; --active-red:#ff3030; --inactive:#cfd6e0;
+    }
+    @media (prefers-color-scheme: light){
+      :root{ --bg:#f7f9fc; --fg:#0f1728; --muted:#5c6678; --card:#ffffff; --line:#e5eaf1 }
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.55 system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif}
+    .container{max-width:1100px;margin:auto;padding:24px}
+    header{position:sticky;top:0;z-index:10;background:color-mix(in oklab,var(--bg) 86%, transparent);border-bottom:1px solid var(--line);backdrop-filter:blur(8px)}
+    .nav{display:flex;justify-content:space-between;align-items:center;padding:14px 0}
+    .brand{font-weight:800}
+    .grid{display:grid;gap:16px}
+    @media(min-width:900px){.grid-2{grid-template-columns:1.2fr .8fr}}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:center}
+    .row.three{grid-template-columns:1fr 1fr 1fr}
+    label{font-size:13px;color:var(--muted)}
+    input,select{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:transparent;color:var(--fg)}
+    input[type=number]{text-align:right}
+    .btn{padding:10px 14px;border-radius:12px;border:1px solid var(--line);background:var(--accent);color:#fff;cursor:pointer}
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:8px;border-bottom:1px dashed var(--line)}
+    tfoot td{font-weight:700}
+    .total{font-weight:800;font-size:clamp(22px,3vw,32px);text-align:right}
+    .note{font-size:12px;color:var(--muted)}
+
+    /* Auction logo buttons */
+    .auction-buttons{display:flex;gap:12px}
+    .auction-buttons button{
+      border:2px solid var(--inactive);
+      background:#fff;
+      border-radius:14px;
+      padding:6px 10px;
+      cursor:pointer;
+      display:flex;align-items:center;justify-content:center;
+      min-width:140px; min-height:56px;
+      transition:border-color .15s, box-shadow .15s, transform .05s;
+    }
+    .auction-buttons button:hover{transform:translateY(-1px)}
+    .auction-buttons button.active{
+      border-color:var(--active-red);
+      box-shadow:0 0 0 3px rgba(255,48,48,.2);
+    }
+    .auction-buttons img{
+      height:55px;
+      width:auto;
+      display:block;
+    }
+
+    /* Section headers bigger + bolder */
+    h2 { font-size:22px; font-weight:800; margin-bottom:12px; }
+
+    /* Remove arrows from number inputs */
+    input.no-spin::-webkit-outer-spin-button,
+    input.no-spin::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    input.no-spin {
+      -moz-appearance: textfield; /* Firefox */
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div class="container nav">
+    <div class="brand">🚗 Car Auction Calculator</div>
+  </div>
+</header>
+
+<main class="container grid grid-2" style="margin-top:16px">
+  <section class="card">
+    <h2>Inputs</h2>
+    <div class="grid" style="gap:12px">
+
+      <!-- Auction logos -->
+      <div class="row">
+        <div>
+          <label>Auction</label>
+          <div id="auctionButtons" class="auction-buttons" role="group" aria-label="Select auction">
+            <button type="button" data-value="iaai" aria-pressed="false" title="IAA">
+              <img src="assets/iaa.png" alt="IAA">
+            </button>
+            <button type="button" data-value="copart" aria-pressed="true" title="Copart">
+              <img src="assets/copart.png" alt="Copart">
+            </button>
+          </div>
+          <input type="hidden" id="auction" value="copart" />
+        </div>
+
+        <div>
+          <label for="location">Auction location</label>
+          <select id="location"></select>
+        </div>
+      </div>
+
+      <div class="row three">
+        <div>
+          <label for="hammer">Car price (USD)</label>
+          <input id="hammer" type="number" min="0" step="100" value="8000" class="no-spin" />
+        </div>
+        <div>
+          <label for="exrate">USD→AMD</label>
+          <input id="exrate" type="number" min="1" step="1" value="395" class="no-spin" />
+        </div>
+        <div>
+          <label for="currency2">Show total in</label>
+          <select id="currency2">
+            <option value="USD">USD</option>
+            <option value="AMD">AMD</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row three">
+        <div>
+          <label for="engine">Engine type</label>
+          <select id="engine">
+            <option value="gas">Gasoline</option>
+            <option value="diesel">Diesel</option>
+            <option value="hybrid">Hybrid</option>
+            <option value="ev">Electric</option>
+          </select>
+        </div>
+        <div>
+          <label for="capacity">Engine displacement, cm³</label>
+          <input id="capacity" type="number" min="0" step="100" value="1998" class="no-spin" />
+        </div>
+        <div>
+          <label for="year">Year of manufacture</label>
+          <input id="year" type="number" min="1985" max="2100" step="1" value="2018" class="no-spin" />
+        </div>
+      </div>
+
+      <div class="row three">
+        <div>
+          <label for="insurancePct">Insurance, % of CIF</label>
+          <input id="insurancePct" type="number" step="0.1" value="1.0" class="no-spin" />
+        </div>
+        <div>
+          <label for="broker">Broker (USD)</label>
+          <input id="broker" type="number" step="1" value="75" class="no-spin" />
+        </div>
+        <div>
+          <label for="transportFee">Transportation fee (USD)</label>
+          <input id="transportFee" type="number" step="1" value="1450" class="no-spin" />
+        </div>
+      </div>
+
+      <button id="calcBtn" class="btn" type="button">Calculate</button>
+    </div>
+  </section>
+
+  <aside class="card">
+    <h2>Result</h2>
+    <table>
+      <tbody id="resultBody"></tbody>
+      <tfoot>
+        <tr><td>Total (<span id="curLbl">USD</span>)</td><td id="grandTotal" class="total">0</td></tr>
+      </tfoot>
+    </table>
+  </aside>
+</main>
+
+<script>
+const DATA = {
+  auctionFees: {
+    iaai:   [[1000,95],[5000,309],[999999,679]],
+    copart: [[1000,99],[5000,319],[999999,699]]
+  },
+  taxes: [
+    { engine:'gas',minAge:0,maxAge:30,ccMin:0,ccMax:3000,dutyPct:10,perCcUSD:0,vatPct:20 }
+  ]
+};
+
+const $ = s => document.querySelector(s);
+const fmt = (v,cur)=>(cur==='AMD'?Math.round(v):v.toFixed(0)).replace(/\B(?=(\d{3})+(?!\d))/g,',');
+
+function auctionFee(auction,price){
+  const tiers=DATA.auctionFees[auction] || [];
+  for(const [limit,fee] of tiers){ if(price<=limit) return fee; }
+  return tiers.length ? tiers.at(-1)[1] : 0;
+}
+
+function pickTaxRule(engine,age,cc){
+  return DATA.taxes.find(r=>r.engine===engine&&age>=r.minAge&&age<=r.maxAge&&cc>=r.ccMin&&cc<=r.ccMax) || {dutyPct:0,perCcUSD:0,vatPct:0};
+}
+
+function setupAuctionButtons(){
+  const buttons = document.querySelectorAll('#auctionButtons button');
+  const hidden  = document.getElementById('auction');
+
+  function activate(val){
+    hidden.value = val;
+    buttons.forEach(b=>{
+      const on = b.dataset.value === val;
+      b.classList.toggle('active', on);
+      b.setAttribute('aria-pressed', String(on));
+    });
+    calculate();
+  }
+
+  buttons.forEach(btn=>{
+    btn.addEventListener('click', ()=> activate(btn.dataset.value));
+  });
+
+  activate('copart');
+}
+
+function calculate(){
+  const auction=$('#auction').value;
+  const price=+$('#hammer').value||0;
+  const engine=$('#engine').value;
+  const cc=+$('#capacity').value||0;
+  const year=+$('#year').value||2018;
+  const currentYear=(new Date()).getFullYear();
+  const age=Math.max(0, currentYear - year);
+  const insPct=(+$('#insurancePct').value||0)/100;
+  const broker=+$('#broker').value||0;
+  const transport=+$('#transportFee').value||0;
+  const ex=+$('#exrate').value||400;
+  const outCur=$('#currency2').value;
+
+  const aFee=auctionFee(auction,price);
+
+  const cif=price + transport;
+  const insurance=cif*insPct;
+
+  const rule=pickTaxRule(engine,age,cc);
+  const customsBase=cif+insurance;
+  const duty=rule.perCcUSD>0?rule.perCcUSD*(cc||0):(rule.dutyPct/100)*customsBase;
+  const vat=(rule.vatPct/100)*(customsBase+duty);
+
+  const totalUSD=price+aFee+transport+insurance+duty+vat+broker;
+  const t=v=>outCur==='AMD'?fmt(v*ex,'AMD'):fmt(v,'USD');
+
+  $('#resultBody').innerHTML=`
+    <tr><td>Auction</td><td class="right">${auction.toUpperCase()}</td></tr>
+    <tr><td>Car price</td><td class="right">${t(price)}</td></tr>
+    <tr><td>Auction fee</td><td class="right">${t(aFee)}</td></tr>
+    <tr><td>Transportation fee</td><td class="right">${t(transport)}</td></tr>
+    <tr><td>Insurance (${(insPct*100).toFixed(1)}% of CIF)</td><td class="right">${t(insurance)}</td></tr>
+    <tr><td>Customs duty</td><td class="right">${t(duty)}</td></tr>
+    <tr><td>VAT</td><td class="right">${t(vat)}</td></tr>
+    <tr><td>Broker</td><td class="right">${t(broker)}</td></tr>
+  `;
+  $('#grandTotal').textContent=t(totalUSD);
+  $('#curLbl').textContent=outCur;
+}
+
+document.addEventListener('DOMContentLoaded',()=>{
+  setupAuctionButtons();
+  calculate();
+  $('#calcBtn').addEventListener('click',calculate);
+  ['hammer','engine','capacity','year','insurancePct','broker','transportFee','exrate','currency2']
+    .forEach(id=>document.getElementById(id)?.addEventListener('change',calculate));
+});
+</script>
+</body>
+</html>
 
