@@ -21,18 +21,16 @@
     .nav{display:flex;justify-content:space-between;align-items:center;padding:14px 0}
     .brand{font-weight:800}
     .grid{display:grid;gap:16px}
+    @media(min-width:900px){.grid-2{grid-template-columns:1.2fr .8fr}}
     .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px}
     h2 { font-size:22px; font-weight:800; margin-bottom:12px; }
 
-    /* ---------- 2 equal columns helper ---------- */
-    .cols-2{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap:24px;                /* same gap everywhere so edges align */
-      align-items:start;
+    /* Auction row */
+    .auction-row{
+      display:flex;
+      gap:24px;
+      align-items:flex-start;
     }
-
-    /* Shared label style */
     .field-label{
       font-size:16px;
       font-weight:700;
@@ -40,11 +38,10 @@
       text-align:center;
       margin-bottom:6px;
     }
-
-    /* Left column: auction area */
     .auction-left{
       display:flex;
       flex-direction:column;
+      align-items:center;
       gap:8px;
     }
     .auction-buttons{
@@ -71,8 +68,8 @@
     }
     .auction-buttons img{height:55px;width:auto;display:block;}
 
-    /* Right column: location */
     .location-select{
+      flex:1;
       display:flex;
       flex-direction:column;
       gap:8px;
@@ -90,7 +87,13 @@
       line-height:20px;
     }
 
-    /* Generic field block (for the two rows beneath) */
+    /* Fields grid */
+    .fields-row{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:24px;
+      margin-top:16px;
+    }
     .field{
       display:flex;
       flex-direction:column;
@@ -127,10 +130,9 @@
   </div>
 </header>
 
-<main class="container grid" style="margin-top:16px">
+<main class="container grid grid-2" style="margin-top:16px">
   <section class="card">
-    <!-- Row 1: Auction (left) | Auction location (right) -->
-    <div class="cols-2">
+    <div class="auction-row">
       <div class="auction-left">
         <div class="field-label">Auction</div>
         <div id="auctionButtons" class="auction-buttons" role="group" aria-label="Select auction">
@@ -152,8 +154,8 @@
 
     <input type="hidden" id="auction" value="copart" />
 
-    <!-- Row 2: Car price (left) | Production year (right) -->
-    <div class="cols-2" style="margin-top:16px">
+    <!-- Car price + Production year -->
+    <div class="fields-row">
       <div class="field">
         <div class="field-label">Car price</div>
         <input type="number" id="carPrice" placeholder="Enter price..." />
@@ -166,8 +168,8 @@
       </div>
     </div>
 
-    <!-- Row 3: Engine type (left) | Engine, sm³ (right) -->
-    <div class="cols-2" style="margin-top:16px">
+    <!-- Engine type + Engine sm³ -->
+    <div class="fields-row">
       <div class="field">
         <div class="field-label">Engine type</div>
         <select id="engineType">
@@ -199,7 +201,6 @@
 </main>
 
 <script>
-  /* Short demo list; swap back to your full list when you’re ready */
   const LOCATIONS = [
     "CA-LOS ANGELES","CA-SAN DIEGO","CA-SAN JOSE",
     "NY-LONG ISLAND","NY-ROCHESTER","TX-DALLAS","TX-HOUSTON"
@@ -236,7 +237,6 @@
     activate('copart');
   }
 
-  /* Build Production year dropdown: 2013 -> current year */
   function populateYears(startYear = 2013) {
     const current = new Date().getFullYear();
     const sel = document.getElementById('productionYear');
