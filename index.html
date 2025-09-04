@@ -29,7 +29,7 @@
     .auction-row{
       display:flex;
       gap:24px;
-      align-items:flex-start;
+      align-items:flex-start;      /* top-align both columns */
     }
 
     /* Shared label style */
@@ -41,7 +41,7 @@
       margin-bottom:2px;
     }
 
-    /* Auction buttons */
+    /* Left column (auction + car price) */
     .auction-left{
       display:flex;
       flex-direction:column;
@@ -49,7 +49,7 @@
       gap:8px;
     }
     .auction-buttons{
-      display:flex;
+      display:flex;                /* IAA & Copart on one line */
       gap:12px;
       align-items:center;
       justify-content:center;
@@ -74,7 +74,38 @@
       height:55px; width:auto; display:block;
     }
 
-    /* Location select */
+    /* Car Price field (now inside left column) */
+    .car-price-field{
+      width:100%;
+      display:flex;
+      flex-direction:column;
+      align-items:stretch;         /* align to left column width */
+      gap:6px;
+      margin-top:14px;
+    }
+    .car-price-field .field-label{
+      text-align:left;             /* label aligned like your mock */
+      margin-left:4px;
+    }
+    .car-price-field input{
+      width:100%;
+      padding:12px 14px;
+      border-radius:12px;
+      border:1px solid var(--line);
+      background:#fff;
+      color:#000;
+      font-size:14px;
+      height:44px;
+      line-height:20px;
+      -moz-appearance:textfield;   /* Firefox: remove arrows */
+    }
+    .car-price-field input::-webkit-outer-spin-button,
+    .car-price-field input::-webkit-inner-spin-button{
+      -webkit-appearance:none;     /* Chrome/Safari: remove arrows */
+      margin:0;
+    }
+
+    /* Right column: Auction location */
     .location-select{
       flex:1;
       display:flex;
@@ -101,32 +132,6 @@
       line-height:20px;
     }
 
-    /* Car Price field */
-    .car-price-field {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;  /* align left */
-      gap: 6px;
-      margin-top: 20px;
-    }
-    .car-price-field input {
-      width: 100%;              /* same width as search box */
-      padding: 12px 14px;
-      border-radius: 12px;
-      border: 1px solid var(--line);
-      background: #fff;
-      color: #000;
-      font-size: 14px;
-      height: 44px;
-      line-height: 20px;
-      -moz-appearance: textfield; /* Firefox remove arrows */
-    }
-    .car-price-field input::-webkit-outer-spin-button,
-    .car-price-field input::-webkit-inner-spin-button {
-      -webkit-appearance: none; /* Chrome, Safari remove arrows */
-      margin: 0;
-    }
-
     table{width:100%;border-collapse:collapse}
     td{padding:8px;border-bottom:1px dashed var(--line)}
     .total{font-weight:800;font-size:clamp(22px,3vw,32px);text-align:right}
@@ -143,7 +148,7 @@
 <main class="container grid grid-2" style="margin-top:16px">
   <section class="card">
     <div class="auction-row">
-      <!-- LEFT: auction buttons -->
+      <!-- LEFT: auction buttons + car price (stays in left column) -->
       <div class="auction-left">
         <div class="field-label">Auction</div>
         <div id="auctionButtons" class="auction-buttons" role="group" aria-label="Select auction">
@@ -154,7 +159,14 @@
             <img src="assets/copart.png" alt="Copart">
           </button>
         </div>
+
+        <!-- Car Price lives here now -->
+        <div class="car-price-field">
+          <div class="field-label">Car price</div>
+          <input type="number" id="carPrice" placeholder="Enter price..." />
+        </div>
       </div>
+
       <input type="hidden" id="auction" value="copart" />
 
       <!-- RIGHT: location -->
@@ -163,12 +175,6 @@
         <input type="text" id="locationSearch" placeholder="Search location..." />
         <select id="location"></select>
       </div>
-    </div>
-
-    <!-- Car Price -->
-    <div class="car-price-field">
-      <label for="carPrice" class="field-label">Car price</label>
-      <input type="number" id="carPrice" placeholder="Enter price..." />
     </div>
   </section>
 
