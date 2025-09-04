@@ -25,12 +25,20 @@
     .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px}
     h2 { font-size:22px; font-weight:800; margin-bottom:12px; }
 
-    /* Auction row */
-    .auction-row {
-      display: flex;
-      gap: 16px;
-      align-items: center;
-    }
+   .auction-row {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;   /* align top */
+}
+
+.auction-buttons {
+  display: flex;
+  flex-direction: column;    /* stack vertically */
+  justify-content: center;   /* center vertically */
+  gap: 12px;
+  height: 100%;              /* take full height of location block */
+}
+
 
     /* Auction logo buttons */
     .auction-buttons{display:flex;gap:12px}
