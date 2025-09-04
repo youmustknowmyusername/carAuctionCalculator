@@ -201,7 +201,7 @@
 </main>
 
 <script>
-  /* ==== FULL location list ==== */
+  /* Full location list (unchanged) */
   const LOCATIONS = [
     "AL-BIRMINGHAM","AL-DOTHAN","AL-HUNTSVILLE","AL-MOBILE","AL-MONTGOMERY","AL-TANNER",
     "AR-FAYETTEVILLE COPART","AR-FAYETTEVILLE IAA","AR-LITTLE ROCK COPART","AR-LITTLE ROCK IAA",
@@ -273,9 +273,20 @@
     "WY-CASPER"
   ];
 
+  // UPDATED: show "Select location..." as the default placeholder (no auto-selection)
   function fillLocations(filter = "") {
     const sel = document.getElementById('location');
     sel.innerHTML = '';
+
+    // Add placeholder first (disabled + selected)
+    const ph = document.createElement('option');
+    ph.value = "";
+    ph.textContent = "Select location...";
+    ph.disabled = true;
+    ph.selected = true;
+    sel.appendChild(ph);
+
+    // Add filtered options
     const filtered = LOCATIONS.filter(loc =>
       loc.toLowerCase().includes(filter.trim().toLowerCase())
     );
@@ -284,9 +295,8 @@
       opt.value = opt.textContent = loc;
       sel.appendChild(opt);
     });
-    if (filtered.includes("NY-LONG ISLAND")) {
-      sel.value = "NY-LONG ISLAND";
-    }
+
+    // No auto-select anymore — placeholder stays until user chooses
   }
 
   function setupAuctionButtons(){
