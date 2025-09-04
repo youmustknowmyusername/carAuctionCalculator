@@ -105,13 +105,12 @@
     .car-price-field {
       display: flex;
       flex-direction: column;
-      align-items: center;
+      align-items: flex-start;  /* align left */
       gap: 6px;
       margin-top: 20px;
     }
     .car-price-field input {
-      width: 100%;
-      max-width: 400px;
+      width: 100%;              /* same width as search box */
       padding: 12px 14px;
       border-radius: 12px;
       border: 1px solid var(--line);
@@ -120,6 +119,12 @@
       font-size: 14px;
       height: 44px;
       line-height: 20px;
+      -moz-appearance: textfield; /* Firefox remove arrows */
+    }
+    .car-price-field input::-webkit-outer-spin-button,
+    .car-price-field input::-webkit-inner-spin-button {
+      -webkit-appearance: none; /* Chrome, Safari remove arrows */
+      margin: 0;
     }
 
     table{width:100%;border-collapse:collapse}
@@ -276,4 +281,3 @@
 </script>
 </body>
 </html>
-
