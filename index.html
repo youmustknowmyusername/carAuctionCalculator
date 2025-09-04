@@ -6,7 +6,7 @@
   <title>Car Auction Calculator</title>
   <meta name="color-scheme" content="light dark" />
   <style>
-    :root{
+    :root {
       --bg:#0c0f16; --fg:#e9eef5; --muted:#9aa8bc; --card:#121725;
       --line: color-mix(in oklab, var(--fg) 16%, transparent);
       --accent:#1a6cff; --active-red:#ff3030; --inactive:#cfd6e0;
@@ -25,7 +25,7 @@
     .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px}
     h2 { font-size:22px; font-weight:800; margin-bottom:12px; }
 
-    /* === Auction row === */
+    /* Auction row: two columns */
     .auction-row{
       display:flex;
       gap:24px;
@@ -37,10 +37,10 @@
       font-weight:700;
       color:var(--fg);
       text-align:center;
-      margin-bottom:2px;
+      margin-bottom:6px;
     }
 
-    /* Auction column */
+    /* Auction buttons */
     .auction-left{
       display:flex;
       flex-direction:column;
@@ -69,11 +69,9 @@
       border-color:var(--active-red);
       box-shadow:0 0 0 3px rgba(255,48,48,.2);
     }
-    .auction-buttons img{
-      height:55px; width:auto; display:block;
-    }
+    .auction-buttons img{height:55px; width:auto; display:block;}
 
-    /* Location column */
+    /* Location */
     .location-select{
       flex:1;
       display:flex;
@@ -85,7 +83,6 @@
       font-weight:700;
       color:var(--fg);
       text-align:center;
-      margin-bottom:2px;
     }
     .location-select input[type="text"],
     .location-select select{
@@ -100,40 +97,33 @@
       line-height:20px;
     }
 
-    /* === Equal row for Car price + Production year === */
-    .two-col-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 24px;
-      margin-top: 20px;
+    /* Shared row for inputs */
+    .two-col-row{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:24px;
+      margin-top:16px;
     }
-    .field {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
+    .field{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
     }
-    .field-label {
-      font-size: 16px;
-      font-weight: 700;
-      color: var(--fg);
-      text-align: center;
-    }
-    .field input {
-      width: 100%;
-      padding: 12px 14px;
-      border-radius: 12px;
-      border: 1px solid var(--line);
-      background: #fff;
-      color: #000;
-      font-size: 14px;
-      height: 44px;
-      line-height: 20px;
-      -moz-appearance: textfield;
+    .field input{
+      width:100%;
+      padding:12px 14px;
+      border-radius:12px;
+      border:1px solid var(--line);
+      background:#fff;
+      color:#000;
+      font-size:14px;
+      height:44px;
+      line-height:20px;
+      -moz-appearance:textfield;
     }
     .field input::-webkit-outer-spin-button,
-    .field input::-webkit-inner-spin-button {
-      -webkit-appearance: none;
-      margin: 0;
+    .field input::-webkit-inner-spin-button{
+      -webkit-appearance:none; margin:0;
     }
 
     table{width:100%;border-collapse:collapse}
@@ -152,7 +142,7 @@
 <main class="container grid grid-2" style="margin-top:16px">
   <section class="card">
     <div class="auction-row">
-      <!-- LEFT column -->
+      <!-- LEFT: Auction buttons -->
       <div class="auction-left">
         <div class="field-label">Auction</div>
         <div id="auctionButtons" class="auction-buttons" role="group" aria-label="Select auction">
@@ -166,7 +156,7 @@
       </div>
       <input type="hidden" id="auction" value="copart" />
 
-      <!-- RIGHT column -->
+      <!-- RIGHT: Location -->
       <div class="location-select">
         <label for="location">Auction location</label>
         <input type="text" id="locationSearch" placeholder="Search location..." />
@@ -174,7 +164,7 @@
       </div>
     </div>
 
-    <!-- Car Price + Production Year row -->
+    <!-- Car Price + Production Year -->
     <div class="two-col-row">
       <div class="field">
         <div class="field-label">Car price</div>
@@ -185,8 +175,21 @@
         <input type="number" id="productionYear" placeholder="Enter year..." />
       </div>
     </div>
+
+    <!-- Engine Type + Engine sm³ -->
+    <div class="two-col-row">
+      <div class="field">
+        <div class="field-label">Engine type</div>
+        <input type="text" id="engineType" placeholder="Enter engine type..." />
+      </div>
+      <div class="field">
+        <div class="field-label">Engine, sm³</div>
+        <input type="number" id="engineCC" placeholder="Enter engine size..." />
+      </div>
+    </div>
   </section>
 
+  <!-- RIGHT: Result -->
   <aside class="card">
     <h2>Result</h2>
     <table>
@@ -201,9 +204,10 @@
 </main>
 
 <script>
+  /* Locations list (shortened for now, but you can keep full list) */
   const LOCATIONS = [
-    "AL-BIRMINGHAM","AL-DOTHAN","AL-HUNTSVILLE","AL-MOBILE","AL-MONTGOMERY","AL-TANNER",
-    "CA-LOS ANGELES","CA-SAN DIEGO","NY-LONG ISLAND","PA-SCRANTON"
+    "CA-LOS ANGELES","CA-SAN DIEGO","CA-SAN JOSE",
+    "NY-LONG ISLAND","NY-ROCHESTER","TX-DALLAS","TX-HOUSTON"
   ];
 
   function fillLocations(filter = "") {
