@@ -25,11 +25,13 @@
     .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px}
     h2 { font-size:22px; font-weight:800; margin-bottom:12px; }
 
+    /* Auction row: two columns */
     .auction-row{
       display:flex;
       gap:24px;
       align-items:flex-start;
     }
+
     .field-label{
       font-size:16px;
       font-weight:700;
@@ -141,7 +143,7 @@
 <main class="container grid grid-2" style="margin-top:16px">
   <section class="card">
     <div class="auction-row">
-      <!-- Auction buttons -->
+      <!-- LEFT: Auction buttons -->
       <div class="auction-left">
         <div class="field-label">Auction</div>
         <div id="auctionButtons" class="auction-buttons" role="group" aria-label="Select auction">
@@ -155,7 +157,7 @@
       </div>
       <input type="hidden" id="auction" value="copart" />
 
-      <!-- Location -->
+      <!-- RIGHT: Location -->
       <div class="location-select">
         <label for="location">Auction location</label>
         <input type="text" id="locationSearch" placeholder="Search location..." />
@@ -171,7 +173,10 @@
       </div>
       <div class="field">
         <div class="field-label">Production year</div>
-        <input type="number" id="productionYear" placeholder="Enter year..." />
+        <!-- switched to a SELECT; options are inserted by JS -->
+        <select id="productionYear">
+          <option value="" disabled selected>Select year...</option>
+        </select>
       </div>
     </div>
 
@@ -209,6 +214,7 @@
 </main>
 
 <script>
+  /* Short location list kept for now (we can restore full list when you want) */
   const LOCATIONS = [
     "CA-LOS ANGELES","CA-SAN DIEGO","CA-SAN JOSE",
     "NY-LONG ISLAND","NY-ROCHESTER","TX-DALLAS","TX-HOUSTON"
@@ -245,9 +251,28 @@
     activate('copart');
   }
 
+  /* Populate Production year: from 2013 up to current year */
+  function populateYears(startYear = 2013) {
+    const now = new Date();
+    const current = now.getFullYear();
+    const sel = document.getElementById('productionYear');
+
+    // Clear existing (keep placeholder if present)
+    sel.querySelectorAll('option:not([disabled])').forEach(o => o.remove());
+
+    for (let y = current; y >= startYear; y--) {
+      const opt = document.createElement('option');
+      opt.value = String(y);
+      opt.textContent = y;
+      sel.appendChild(opt);
+    }
+  }
+
   document.addEventListener('DOMContentLoaded', ()=>{
     setupAuctionButtons();
     fillLocations();
+    populateYears(2013);
+
     document.getElementById('locationSearch').addEventListener('input', e=>{
       fillLocations(e.target.value);
     });
