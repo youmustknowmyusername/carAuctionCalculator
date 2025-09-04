@@ -25,10 +25,10 @@
     .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px}
     h2 { font-size:22px; font-weight:800; margin-bottom:12px; }
 
-    /* === Two-column area (shared boundaries) === */
+    /* === Two-column area === */
     .auction-row{
       display:grid;
-      grid-template-columns: 1fr 1fr;  /* equal columns */
+      grid-template-columns: 1fr 1fr;   /* equal columns */
       gap:24px;
       align-items:start;
     }
@@ -42,7 +42,7 @@
       margin-bottom:2px;
     }
 
-    /* LEFT column (Auction) */
+    /* LEFT column (Auction + Car price) */
     .auction-left{
       display:flex;
       flex-direction:column;
@@ -73,6 +73,24 @@
     }
     .auction-buttons img{ height:55px; width:auto; display:block; }
 
+    .car-price-field{
+      display:flex; flex-direction:column; gap:6px; margin-top:14px; /* matches right side */
+    }
+    .car-price-field .field-label{ text-align:center; }
+    .car-price-field input{
+      width:100%;
+      padding:12px 14px;
+      border-radius:12px;
+      border:1px solid var(--line);
+      background:#fff; color:#000;
+      font-size:14px; height:44px; line-height:20px;
+      -moz-appearance:textfield;
+    }
+    .car-price-field input::-webkit-outer-spin-button,
+    .car-price-field input::-webkit-inner-spin-button{
+      -webkit-appearance:none; margin:0;
+    }
+
     /* RIGHT column (Location + Production year) */
     .location-select{ display:flex; flex-direction:column; gap:8px; }
     .location-select label{
@@ -89,7 +107,7 @@
     }
 
     .production-year-field{
-      display:flex; flex-direction:column; gap:6px; margin-top:14px;
+      display:flex; flex-direction:column; gap:6px; margin-top:14px; /* same as left */
     }
     .production-year-field .field-label{ text-align:center; }
     .production-year-field input{
@@ -100,24 +118,6 @@
     }
     .production-year-field input::-webkit-outer-spin-button,
     .production-year-field input::-webkit-inner-spin-button{
-      -webkit-appearance:none; margin:0;
-    }
-
-    /* Car price full-width row (below both columns) */
-    .car-price-field{
-      display:flex; flex-direction:column; gap:6px;
-      margin-top:20px;
-      grid-column:1 / -1;           /* span both columns */
-    }
-    .car-price-field .field-label{ text-align:center; }
-    .car-price-field input{
-      width:100%; padding:12px 14px; border-radius:12px;
-      border:1px solid var(--line); background:#fff; color:#000;
-      font-size:14px; height:44px; line-height:20px;
-      -moz-appearance:textfield;
-    }
-    .car-price-field input::-webkit-outer-spin-button,
-    .car-price-field input::-webkit-inner-spin-button{
       -webkit-appearance:none; margin:0;
     }
 
@@ -148,6 +148,12 @@
             <img src="assets/copart.png" alt="Copart">
           </button>
         </div>
+
+        <!-- Car price (left column) -->
+        <div class="car-price-field">
+          <div class="field-label">Car price</div>
+          <input type="number" id="carPrice" placeholder="Enter price..." />
+        </div>
       </div>
 
       <input type="hidden" id="auction" value="copart" />
@@ -158,16 +164,11 @@
         <input type="text" id="locationSearch" placeholder="Search location..." />
         <select id="location"></select>
 
+        <!-- Production year (right column) -->
         <div class="production-year-field">
           <div class="field-label">Production year</div>
           <input type="number" id="productionYear" placeholder="Enter year..." />
         </div>
-      </div>
-
-      <!-- FULL-WIDTH ROW BELOW -->
-      <div class="car-price-field">
-        <div class="field-label">Car price</div>
-        <input type="number" id="carPrice" placeholder="Enter price..." />
       </div>
     </div>
   </section>
@@ -186,7 +187,7 @@
 </main>
 
 <script>
-  /* Full locations (same list you asked me to remember) */
+  /* Full locations (kept as our baseline) */
   const LOCATIONS = [
     "AL-BIRMINGHAM","AL-DOTHAN","AL-HUNTSVILLE","AL-MOBILE","AL-MONTGOMERY","AL-TANNER",
     "AR-FAYETTEVILLE COPART","AR-FAYETTEVILLE IAA","AR-LITTLE ROCK COPART","AR-LITTLE ROCK IAA",
