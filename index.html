@@ -75,38 +75,35 @@
       height:55px; width:auto; display:block;
     }
 
-    /* Car Price & Production Year fields */
-    .car-price-field,
-    .production-year-field{
-      width:100%;
-      display:flex;
-      flex-direction:column;
-      align-items:stretch;
-      gap:6px;
-      margin-top:14px;
+    /* Price + Year row */
+    .price-year-row {
+      display: flex;
+      gap: 24px;
+      margin-top: 20px;
     }
-    .car-price-field .field-label,
-    .production-year-field .field-label{
-      text-align:center;
-      margin-left:0;
+    .price-year-row > div {
+      flex: 1; /* make both equal width */
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
     }
-    .car-price-field input,
-    .production-year-field input{
-      width:100%;
-      padding:12px 14px;
-      border-radius:12px;
-      border:1px solid var(--line);
-      background:#fff;
-      color:#000;
-      font-size:14px;
-      height:44px;
-      line-height:20px;
+    .price-year-row .field-label {
+      text-align: center;
+    }
+    .price-year-row input {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: #fff;
+      color: #000;
+      font-size: 14px;
+      height: 44px;
+      line-height: 20px;
       -moz-appearance:textfield;
     }
-    .car-price-field input::-webkit-outer-spin-button,
-    .car-price-field input::-webkit-inner-spin-button,
-    .production-year-field input::-webkit-outer-spin-button,
-    .production-year-field input::-webkit-inner-spin-button{
+    .price-year-row input::-webkit-outer-spin-button,
+    .price-year-row input::-webkit-inner-spin-button{
       -webkit-appearance:none;
       margin:0;
     }
@@ -165,11 +162,6 @@
             <img src="assets/copart.png" alt="Copart">
           </button>
         </div>
-        <!-- Car Price -->
-        <div class="car-price-field">
-          <div class="field-label">Car price</div>
-          <input type="number" id="carPrice" placeholder="Enter price..." />
-        </div>
       </div>
 
       <input type="hidden" id="auction" value="copart" />
@@ -179,11 +171,18 @@
         <label for="location">Auction location</label>
         <input type="text" id="locationSearch" placeholder="Search location..." />
         <select id="location"></select>
-        <!-- Production Year -->
-        <div class="production-year-field">
-          <div class="field-label">Production year</div>
-          <input type="number" id="productionYear" placeholder="Enter year..." />
-        </div>
+      </div>
+    </div>
+
+    <!-- Car Price + Production Year in one row -->
+    <div class="price-year-row">
+      <div class="car-price-field">
+        <div class="field-label">Car price</div>
+        <input type="number" id="carPrice" placeholder="Enter price..." />
+      </div>
+      <div class="production-year-field">
+        <div class="field-label">Production year</div>
+        <input type="number" id="productionYear" placeholder="Enter year..." />
       </div>
     </div>
   </section>
