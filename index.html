@@ -132,25 +132,26 @@
 
 <main class="container grid grid-2" style="margin-top:16px">
   <section class="card">
-    <div class="auction-row">
-      <div class="auction-left">
-        <div class="field-label">Auction</div>
-        <div id="auctionButtons" class="auction-buttons" role="group" aria-label="Select auction">
-          <button type="button" data-value="iaai" aria-pressed="false" title="IAA">
-            <img src="assets/iaa.png" alt="IAA">
-          </button>
-          <button type="button" data-value="copart" aria-pressed="true" title="Copart">
-            <img src="assets/copart.png" alt="Copart">
-          </button>
-        </div>
-      </div>
-
-      <div class="location-select">
-        <div class="field-label">Auction location</div>
-        <input type="text" id="locationSearch" placeholder="Search location..." />
-        <select id="location"></select>
-      </div>
+   <div class="fields-row">
+  <div class="field">
+    <div class="field-label">Auction</div>
+    <div id="auctionButtons" class="auction-buttons" role="group" aria-label="Select auction">
+      <button type="button" data-value="iaai" aria-pressed="false" title="IAA">
+        <img src="assets/iaa.png" alt="IAA">
+      </button>
+      <button type="button" data-value="copart" aria-pressed="true" title="Copart">
+        <img src="assets/copart.png" alt="Copart">
+      </button>
     </div>
+  </div>
+
+  <div class="field">
+    <div class="field-label">Auction location</div>
+    <input type="text" id="locationSearch" placeholder="Search location..." />
+    <select id="location"></select>
+  </div>
+</div>
+
 
     <input type="hidden" id="auction" value="copart" />
 
