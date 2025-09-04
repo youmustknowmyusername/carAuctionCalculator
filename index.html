@@ -75,31 +75,30 @@
       height:55px; width:auto; display:block;
     }
 
-    /* Price + Year row */
-    .price-year-row {
-      display: flex;
-      gap: 24px;
-      margin-top: 20px;
+    /* Price + Year row (FORCE exact equality via grid) */
+    .price-year-row{
+      display:grid;
+      grid-template-columns: 1fr 1fr; /* equal columns */
+      gap:24px;
+      margin-top:20px;
     }
-    .price-year-row > div {
-      flex: 1; /* make both equal width */
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
+    .price-year-row > div{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      min-width:0; /* prevent intrinsic size from pushing layout */
     }
-    .price-year-row .field-label {
-      text-align: center;
-    }
-    .price-year-row input {
-      width: 100%;
-      padding: 12px 14px;
-      border-radius: 12px;
-      border: 1px solid var(--line);
-      background: #fff;
-      color: #000;
-      font-size: 14px;
-      height: 44px;
-      line-height: 20px;
+    .price-year-row .field-label{ text-align:center; }
+    .price-year-row input{
+      width:100%;
+      padding:12px 14px;
+      border-radius:12px;
+      border:1px solid var(--line);
+      background:#fff;
+      color:#000;
+      font-size:14px;
+      height:44px;
+      line-height:20px;
       -moz-appearance:textfield;
     }
     .price-year-row input::-webkit-outer-spin-button,
