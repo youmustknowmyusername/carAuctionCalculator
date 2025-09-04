@@ -25,12 +25,7 @@
     .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px}
     h2 { font-size:22px; font-weight:800; margin-bottom:12px; }
 
-    /* Auction row */
-    .auction-row{
-      display:flex;
-      gap:24px;
-      align-items:flex-start;
-    }
+    /* Shared label style */
     .field-label{
       font-size:16px;
       font-weight:700;
@@ -38,18 +33,14 @@
       text-align:center;
       margin-bottom:6px;
     }
-    .auction-left{
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      gap:8px;
-    }
+
+    /* Auction buttons */
     .auction-buttons{
       display:flex;
       gap:12px;
       align-items:center;
       justify-content:center;
-      margin-top:10px;
+      margin-bottom:16px;
     }
     .auction-buttons button{
       border:2px solid var(--inactive);
@@ -66,33 +57,14 @@
       border-color:var(--active-red);
       box-shadow:0 0 0 3px rgba(255,48,48,.2);
     }
-    .auction-buttons img{height:55px;width:auto;display:block;}
-
-    .location-select{
-      flex:1;
-      display:flex;
-      flex-direction:column;
-      gap:8px;
-    }
-    .location-select input[type="text"],
-    .location-select select{
-      width:100%;
-      padding:12px 14px;
-      border-radius:12px;
-      border:1px solid var(--line);
-      background:#fff;
-      color:#000;
-      font-size:14px;
-      height:44px;
-      line-height:20px;
-    }
+    .auction-buttons img{height:55px; width:auto; display:block;}
 
     /* Fields grid */
     .fields-row{
       display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap:24px;
-      margin-top:16px;
+      grid-template-columns:1fr 1fr;
+      gap:20px;
+      margin-top:20px;
     }
     .field{
       display:flex;
@@ -109,18 +81,7 @@
       color:#000;
       font-size:14px;
       height:44px;
-      line-height:20px;
-      -moz-appearance:textfield;
     }
-    .field input::-webkit-outer-spin-button,
-    .field input::-webkit-inner-spin-button{
-      -webkit-appearance:none; margin:0;
-    }
-
-    table{width:100%;border-collapse:collapse}
-    td{padding:8px;border-bottom:1px dashed var(--line)}
-    .total{font-weight:800;font-size:clamp(22px,3vw,32px);text-align:right}
-    .muted{color:var(--muted);font-size:13px}
   </style>
 </head>
 <body>
@@ -132,8 +93,8 @@
 
 <main class="container grid grid-2" style="margin-top:16px">
   <section class="card">
-   <div class="fields-row">
-  <div class="field">
+
+    <!-- Auction -->
     <div class="field-label">Auction</div>
     <div id="auctionButtons" class="auction-buttons" role="group" aria-label="Select auction">
       <button type="button" data-value="iaai" aria-pressed="false" title="IAA">
@@ -143,19 +104,14 @@
         <img src="assets/copart.png" alt="Copart">
       </button>
     </div>
-  </div>
+    <input type="hidden" id="auction" value="copart" />
 
-  <div class="field">
+    <!-- Auction location -->
     <div class="field-label">Auction location</div>
     <input type="text" id="locationSearch" placeholder="Search location..." />
     <select id="location"></select>
-  </div>
-</div>
 
-
-    <input type="hidden" id="auction" value="copart" />
-
-    <!-- Car price + Production year -->
+    <!-- Row: Car price + Production year -->
     <div class="fields-row">
       <div class="field">
         <div class="field-label">Car price</div>
@@ -164,17 +120,17 @@
       <div class="field">
         <div class="field-label">Production year</div>
         <select id="productionYear">
-          <option value="" disabled selected>Select year...</option>
+          <option value="">Select year...</option>
         </select>
       </div>
     </div>
 
-    <!-- Engine type + Engine sm³ -->
+    <!-- Row: Engine type + Engine sm³ -->
     <div class="fields-row">
       <div class="field">
         <div class="field-label">Engine type</div>
         <select id="engineType">
-          <option value="" disabled selected>Select engine type...</option>
+          <option value="">Select engine type...</option>
           <option>Gasoline</option>
           <option>Hybrid</option>
           <option>Diesel</option>
@@ -183,11 +139,13 @@
       </div>
       <div class="field">
         <div class="field-label">Engine, sm³</div>
-        <input type="number" id="engineCC" placeholder="Enter engine size..." />
+        <input type="number" id="engineSize" placeholder="Enter engine size..." />
       </div>
     </div>
+
   </section>
 
+  <!-- RIGHT: Result -->
   <aside class="card">
     <h2>Result</h2>
     <table>
@@ -202,9 +160,10 @@
 </main>
 
 <script>
+  /* Full locations */
   const LOCATIONS = [
-    "CA-LOS ANGELES","CA-SAN DIEGO","CA-SAN JOSE",
-    "NY-LONG ISLAND","NY-ROCHESTER","TX-DALLAS","TX-HOUSTON"
+    "NY-ALBANY","NY-BUFFALO","NY-LONG ISLAND","NY-NEWBURGH","NY-ROCHESTER","NY-SYRACUSE",
+    "CA-LOS ANGELES","CA-SAN DIEGO","CA-SAN JOSE","CA-SAN FRANCISCO","TX-DALLAS","TX-HOUSTON"
   ];
 
   function fillLocations(filter = "") {
@@ -238,14 +197,13 @@
     activate('copart');
   }
 
-  function populateYears(startYear = 2013) {
-    const current = new Date().getFullYear();
+  function fillProductionYears(){
     const sel = document.getElementById('productionYear');
-    sel.querySelectorAll('option:not([disabled])').forEach(o => o.remove());
-    for (let y = current; y >= startYear; y--) {
+    sel.innerHTML = '<option value="">Select year...</option>';
+    const currentYear = new Date().getFullYear();
+    for(let y = 2013; y <= currentYear; y++){
       const opt = document.createElement('option');
-      opt.value = String(y);
-      opt.textContent = y;
+      opt.value = y; opt.textContent = y;
       sel.appendChild(opt);
     }
   }
@@ -253,8 +211,7 @@
   document.addEventListener('DOMContentLoaded', ()=>{
     setupAuctionButtons();
     fillLocations();
-    populateYears(2013);
-
+    fillProductionYears();
     document.getElementById('locationSearch').addEventListener('input', e=>{
       fillLocations(e.target.value);
     });
