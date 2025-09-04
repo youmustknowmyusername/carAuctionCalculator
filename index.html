@@ -29,10 +29,10 @@
     .auction-row{
       display:flex;
       gap:24px;
-      align-items:flex-start;      /* top-align both columns */
+      align-items:flex-start;
+      justify-content:space-between;
     }
 
-    /* Shared label style */
     .field-label{
       font-size:16px;
       font-weight:700;
@@ -41,15 +41,16 @@
       margin-bottom:2px;
     }
 
-    /* Left column (auction + car price) */
+    /* Left column */
     .auction-left{
+      flex:1;
       display:flex;
       flex-direction:column;
       align-items:center;
       gap:8px;
     }
     .auction-buttons{
-      display:flex;                /* IAA & Copart on one line */
+      display:flex;
       gap:12px;
       align-items:center;
       justify-content:center;
@@ -74,21 +75,23 @@
       height:55px; width:auto; display:block;
     }
 
-    /* Car Price field (now inside left column) */
-    .car-price-field{
+    /* Car Price & Production Year fields */
+    .car-price-field,
+    .production-year-field{
       width:100%;
       display:flex;
       flex-direction:column;
-      align-items:stretch;         /* align to left column width */
+      align-items:stretch;
       gap:6px;
       margin-top:14px;
     }
-    .car-price-field .field-label{
-  text-align:center;           /* center label */
-  margin-left:0;
-}
-
-    .car-price-field input{
+    .car-price-field .field-label,
+    .production-year-field .field-label{
+      text-align:center;
+      margin-left:0;
+    }
+    .car-price-field input,
+    .production-year-field input{
       width:100%;
       padding:12px 14px;
       border-radius:12px;
@@ -98,15 +101,17 @@
       font-size:14px;
       height:44px;
       line-height:20px;
-      -moz-appearance:textfield;   /* Firefox: remove arrows */
+      -moz-appearance:textfield;
     }
     .car-price-field input::-webkit-outer-spin-button,
-    .car-price-field input::-webkit-inner-spin-button{
-      -webkit-appearance:none;     /* Chrome/Safari: remove arrows */
+    .car-price-field input::-webkit-inner-spin-button,
+    .production-year-field input::-webkit-outer-spin-button,
+    .production-year-field input::-webkit-inner-spin-button{
+      -webkit-appearance:none;
       margin:0;
     }
 
-    /* Right column: Auction location */
+    /* Right column */
     .location-select{
       flex:1;
       display:flex;
@@ -149,7 +154,7 @@
 <main class="container grid grid-2" style="margin-top:16px">
   <section class="card">
     <div class="auction-row">
-      <!-- LEFT: auction buttons + car price (stays in left column) -->
+      <!-- LEFT -->
       <div class="auction-left">
         <div class="field-label">Auction</div>
         <div id="auctionButtons" class="auction-buttons" role="group" aria-label="Select auction">
@@ -160,8 +165,7 @@
             <img src="assets/copart.png" alt="Copart">
           </button>
         </div>
-
-        <!-- Car Price lives here now -->
+        <!-- Car Price -->
         <div class="car-price-field">
           <div class="field-label">Car price</div>
           <input type="number" id="carPrice" placeholder="Enter price..." />
@@ -170,11 +174,16 @@
 
       <input type="hidden" id="auction" value="copart" />
 
-      <!-- RIGHT: location -->
+      <!-- RIGHT -->
       <div class="location-select">
         <label for="location">Auction location</label>
         <input type="text" id="locationSearch" placeholder="Search location..." />
         <select id="location"></select>
+        <!-- Production Year -->
+        <div class="production-year-field">
+          <div class="field-label">Production year</div>
+          <input type="number" id="productionYear" placeholder="Enter year..." />
+        </div>
       </div>
     </div>
   </section>
@@ -193,60 +202,8 @@
 </main>
 
 <script>
-  const LOCATIONS = [
-    "AL-BIRMINGHAM","AL-DOTHAN","AL-HUNTSVILLE","AL-MOBILE","AL-MONTGOMERY","AL-TANNER",
-    "AR-FAYETTEVILLE COPART","AR-FAYETTEVILLE IAA","AR-LITTLE ROCK COPART","AR-LITTLE ROCK IAA",
-    "AZ-PHOENIX","AZ-TUCSON","CA- ACE Carson","CA- ACE Perris","CA-ADELANTO",
-    "CA-ANAHEIM","CA-ANTELOPE","CA-BAKERSFIELD","CA-COLTON","CA-EAST BAY","CA-FONTANA",
-    "CA-FREMONT","CA-FRESNO","CA-HAYWARD","CA-HAYWARD DESERT VIEW","CA-HIGH DESERT","CA-LONG BEACH",
-    "CA-LOS ANGELES","CA-MARTINEZ","CA-NORTH HOLLYWOOD","CA-RANCHO CUCAMONGA","CA-RANCHO-DESERT VIEW",
-    "CA-REDDING","CA-RIVERSIDE","CA-SACRAMENTO","CA-SACRAMENTO-DESERT VIEW","CA-SAN BERNARDINO",
-    "CA-SAN DIEGO","CA-SAN DIEGO-DESERT VIEW","CA-SAN JOSE","CA-SANTA PAULA-DESERT VIEW","CA-SO SACRAMENTO",
-    "CA-SUN VALLEY","CA-VALLEJO","CA-VAN NUYS","CO-COLORADO SPRINGS","CO-DENVER","CO-DENVER CENTRAL",
-    "CO-DENVER EAST","CO-DENVER SOUTH","CO-WESTERN COLORADO","CT-HARTFORD","CT-HARTFORD SPRINGFIELD",
-    "CT-Hartford-South","DC-WASHINGTON DC-MD","DE-NEW CASTLE","DE-SEAFORD",
-    "FL-CAT Jacksonville Sub lot","FL-CAT Orlando Boggy Creek","FL-CLEARWATER","FL-Dover Sublot",
-    "FL-FORT MYERS","FL-FORT PIERCE","FL-FT.PIERCE","FL-JACKSONVILLE","FL-JACKSONVILLE EAST",
-    "FL-JACKSONVILLE WEST","FL-MIAMI","FL-MIAMI CENTRAL","FL-MIAMI NORTH","FL-MIAMI SOUTH",
-    "FL-OCALA","FL-ORLANDO","FL-ORLANDO NORTH","FL-ORLANDO SOUTH","FL-PENSACOLA","FL-PUNTA GORDA",
-    "FL-TALLAHASSEE","FL-TAMPA","FL-WEST PALM BEACH","GA-ATLANTA","GA-ATLANTA EAST","GA-ATLANTA NORTH",
-    "GA-ATLANTA SOUTH","GA-ATLANTA WEST","GA-CARTERSVILLE","GA-FAIRBURN","GA-MACON","GA-SAVANNAH",
-    "GA-TIFTON","HI-HONOLULU","IA-Crashedtoys Eldridge","IA-DAVENPORT","IA-DES MOINES","ID-BOISE",
-    "IL-CHICAGO NORTH","IL-CHICAGO SOUTH","IL-CHICAGO WEST","IL-LINCOLN","IL-PEORIA","IL-SOUTHERN ILLINOIS",
-    "IL-SPECIALTY DIVISION","IL-ST. LOUIS","IL-WHEELING","IN- IAA Indy Minnesota Street Sublot","IN-CICERO",
-    "IN-DYER","IN-FORT WAYNE","IN-HAMMOND","IN-HARTFORD CITY","IN-INDIANAPOLIS","IN-SOUTH BEND","KS-KANSAS CITY",
-    "KS-WICHITA","KY-ASHLAND","KY-BOWLING GREEN","KY-LEXINGTON EAST","KY-LEXINGTON WEST","KY-LOUISVILLE",
-    "KY-PADUCAH","KY-WALTON","LA- LAFAYETTE","LA- NEW ORLEANS EAST","LA-BATON ROUGE","LA-NEW ORLEANS","LA-SHREVEPORT",
-    "MA -TEMPLETON","MA-BOSTON SHIRLEY","MA-FREETOWN","MA-NORTH BOSTON","MA-SOUTH BOSTON","MA-TAUNTON","MA-WEST WARREN",
-    "MD White Plans Aux Lot","MD-BALTIMORE","MD-DUNDALK","MD-LAUREL","MD-METRO DC","MD-ROSEDALE",
-    "ME- Gray Sub lot","ME-LYMAN","ME-ORONO","ME-PORTLAND GORHAM","MI-DETROIT","MI-FLINT","MI-GRAND RAPIDS",
-    "MI-GREAT LAKES","MI-IONIA","MI-KINCHELOE","MI-LANSING","MN- IAA Faribault","MN-Big Lake Sub lot",
-    "MN-CRASHEDTOYS EAST BETHEL","MN-Ham lake Sun lot","MN-MINNEAPOLIS","MN-MINNEAPOLIS NORTH","MN-ST. CLOUD",
-    "MO-COLUMBIA","MO-SIKESTON","MO-SPRINGFIELD","MO-ST. LOUIS","MS-GRENADA","MS-GULF COAST","MS-JACKSON",
-    "MT-BILLINGS","MT-HELENA","MT-MISSOULA","NC-ASHEVILLE","NC-CHARLOTTE","NC-CHINA GROVE","NC-CONCORD",
-    "NC-GREENSBORO","NC-LUMBERTON","NC-MEBANE","NC-MOCKSVILLE","NC-RALEIGH","NC-WILMINGTON","ND-BISMARCK",
-    "ND-FARGO","NE-LINCOLN","NE-OMAHA","NH- Salem Sub lot","NH-CANDIA","NH-MANCHESTER","NH-WEBSTER",
-    "NJ-AVENEL NEW JERSEY","NJ-CENTRAL NEW JERSEY","NJ-ENGLISHTOWN","NJ-GLASSBORO EAST","NJ-GLASSBORO WEST",
-    "NJ-NORTHERN NEW JERSEY","NJ-SAYREVILLE","NJ-SOMERVILLE","NJ-SOUTHERN NEW JERSEY","NJ-TRENTON",
-    "NM-ALBUQUERQUE","NV-LAS VEGAS","NV-RENO","NY-ALBANY","NY-BUFFALO","NY-LONG ISLAND","NY-NEWBURGH","NY-ROCHESTER",
-    "NY-SYRACUSE","OH- IAAI Stimmel Rd Sub lot","OH- Vermillion North Ford Offsite lot","OH-AKRON CANTON",
-    "OH-CINCINNATI","OH-CLEVELAND","OH-CLEVELAND EAST","OH-CLEVELAND WEST","OH-COLUMBUS","OH-DAYTON",
-    "OK-OKLAHOMA CITY","OK-TULSA","OR-EUGENE","OR-PORTLAND","OR-PORTLAND NORTH","OR-PORTLAND SOUTH","OR-PORTLAND WEST",
-    "OR-WOODBURN","PA-ALTOONA","PA-BRIDGEPORT","PA-CHAMBERSBURG","PA-ERIE","PA-HARRISBURG","PA-PHILADELPHIA",
-    "PA-PHILADELPHIA EAST","PA-PITTSBURG","PA-PITTSBURG NORTH","PA-PITTSBURG SOUTH","PA-PITTSBURG WEST",
-    "PA-SCRANTON","PA-YORK HAVEN","PA-YORKS SPRINGS","RI-EXETER","RI-PROVIDENCE","SC-CHARLESTON","SC-COLUMBIA",
-    "SC-GREENVILLE","SC-LEXINGTON","SC-South Gaston Sublot","SC-SPARTANBURG","SC-Spartanburg sublot","SD-SIOUX FALLS",
-    "TN-CHATTANOOGA","TN-KNOXVILLE","TN-MEMPHIS","TN-NASHVILLE","TX-ABILENE","TX-AMARILLO","TX-ANDREWS",
-    "TX-AUSTIN","TX-CORPUS CHRISTI","TX-CRASHEDTOYS DALLAS","TX-DALLAS","TX-DALLAS SOUTH","TX-EL PASO","TX-FT. WORTH",
-    "TX-HOUSTON","TX-LONGVIEW","TX-LUBBOCK","TX-LUFKIN","TX-MCALLEN","TX-PERMIAN BASIN","TX-SAN ANTONIO",
-    "TX-WACO","UT-OGDEN","UT-SALT LAKE CITY","VA-CULPEPER","VA-DANVILLE","VA-FREDERICKSBURG",
-    "VA-FREDERICKSBURG-SOUTH","VA-HAMPTON","VA-NORTHERN VIRGINIA","VA-PULASKI","VA-RICHMOND","VA-ROANOKE",
-    "VA-SUFFOLK","VA-TIDEWATER","VT- Devil's Bowl Sub lot","VT-BURLINGTON","VT-FAIR HAVEN","VT-ORLEANS",
-    "VT-RUTLAND","WA- Seattle Puyallup","WA-GRAHAM","WA-NORTH SEATTLE","WA-PASCO","WA-SEATTLE","WA-SEATTLE-SOUTH",
-    "WA-SPOKANE","WI-APPLETON","WI-MADISON","WI-MILWAUKEE","WI-PORTAGE","WV-BUCKHANNON","WV-CHARLESTON",
-    "WV-SHADY SPRING","WY-CASPER"
-  ];
-
+  const LOCATIONS = ["AL-BIRMINGHAM","AL-DOTHAN","AL-HUNTSVILLE","AL-MOBILE","AL-MONTGOMERY","AL-TANNER","AR-FAYETTEVILLE COPART","AR-FAYETTEVILLE IAA","AR-LITTLE ROCK COPART","AR-LITTLE ROCK IAA","AZ-PHOENIX","AZ-TUCSON","CA-LOS ANGELES","CA-SAN DIEGO","CA-SAN JOSE","NY-LONG ISLAND","TX-DALLAS","TX-HOUSTON","FL-MIAMI","IL-CHICAGO"];
+  
   function fillLocations(filter = "") {
     const sel = document.getElementById('location');
     sel.innerHTML = '';
@@ -258,9 +215,7 @@
       opt.value = opt.textContent = loc;
       sel.appendChild(opt);
     });
-    if (filtered.includes("NY-LONG ISLAND")) {
-      sel.value = "NY-LONG ISLAND";
-    }
+    if (filtered.includes("NY-LONG ISLAND")) sel.value = "NY-LONG ISLAND";
   }
 
   function setupAuctionButtons(){
