@@ -25,13 +25,11 @@
     .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px}
     h2 { font-size:22px; font-weight:800; margin-bottom:12px; }
 
-    /* Auction row: two columns */
     .auction-row{
       display:flex;
       gap:24px;
       align-items:flex-start;
     }
-
     .field-label{
       font-size:16px;
       font-weight:700;
@@ -109,7 +107,8 @@
       flex-direction:column;
       gap:6px;
     }
-    .field input{
+    .field input,
+    .field select{
       width:100%;
       padding:12px 14px;
       border-radius:12px;
@@ -142,7 +141,7 @@
 <main class="container grid grid-2" style="margin-top:16px">
   <section class="card">
     <div class="auction-row">
-      <!-- LEFT: Auction buttons -->
+      <!-- Auction buttons -->
       <div class="auction-left">
         <div class="field-label">Auction</div>
         <div id="auctionButtons" class="auction-buttons" role="group" aria-label="Select auction">
@@ -156,7 +155,7 @@
       </div>
       <input type="hidden" id="auction" value="copart" />
 
-      <!-- RIGHT: Location -->
+      <!-- Location -->
       <div class="location-select">
         <label for="location">Auction location</label>
         <input type="text" id="locationSearch" placeholder="Search location..." />
@@ -180,7 +179,13 @@
     <div class="two-col-row">
       <div class="field">
         <div class="field-label">Engine type</div>
-        <input type="text" id="engineType" placeholder="Enter engine type..." />
+        <select id="engineType">
+          <option value="" disabled selected>Select engine type...</option>
+          <option>Gasoline</option>
+          <option>Hybrid</option>
+          <option>Diesel</option>
+          <option>Full electric</option>
+        </select>
       </div>
       <div class="field">
         <div class="field-label">Engine, sm³</div>
@@ -189,7 +194,7 @@
     </div>
   </section>
 
-  <!-- RIGHT: Result -->
+  <!-- Result -->
   <aside class="card">
     <h2>Result</h2>
     <table>
@@ -204,7 +209,6 @@
 </main>
 
 <script>
-  /* Locations list (shortened for now, but you can keep full list) */
   const LOCATIONS = [
     "CA-LOS ANGELES","CA-SAN DIEGO","CA-SAN JOSE",
     "NY-LONG ISLAND","NY-ROCHESTER","TX-DALLAS","TX-HOUSTON"
