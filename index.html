@@ -6,7 +6,7 @@
   <title>Car Auction Calculator</title>
   <meta name="color-scheme" content="light dark" />
   <style>
-    :root {
+    :root{
       --bg:#0c0f16; --fg:#e9eef5; --muted:#9aa8bc; --card:#121725;
       --line: color-mix(in oklab, var(--fg) 16%, transparent);
       --accent:#1a6cff; --active-red:#ff3030; --inactive:#cfd6e0;
@@ -21,17 +21,18 @@
     .nav{display:flex;justify-content:space-between;align-items:center;padding:14px 0}
     .brand{font-weight:800}
     .grid{display:grid;gap:16px}
-    @media(min-width:900px){.grid-2{grid-template-columns:1.2fr .8fr}}
     .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px}
     h2 { font-size:22px; font-weight:800; margin-bottom:12px; }
 
-    /* Auction row: two columns */
-    .auction-row{
-      display:flex;
-      gap:24px;
-      align-items:flex-start;
+    /* ---------- 2 equal columns helper ---------- */
+    .cols-2{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:24px;                /* same gap everywhere so edges align */
+      align-items:start;
     }
 
+    /* Shared label style */
     .field-label{
       font-size:16px;
       font-weight:700;
@@ -40,11 +41,10 @@
       margin-bottom:6px;
     }
 
-    /* Auction buttons */
+    /* Left column: auction area */
     .auction-left{
       display:flex;
       flex-direction:column;
-      align-items:center;
       gap:8px;
     }
     .auction-buttons{
@@ -52,7 +52,7 @@
       gap:12px;
       align-items:center;
       justify-content:center;
-      margin-top: 15px;
+      margin-top:15px;
     }
     .auction-buttons button{
       border:2px solid var(--inactive);
@@ -69,20 +69,13 @@
       border-color:var(--active-red);
       box-shadow:0 0 0 3px rgba(255,48,48,.2);
     }
-    .auction-buttons img{height:55px; width:auto; display:block;}
+    .auction-buttons img{height:55px;width:auto;display:block;}
 
-    /* Location */
+    /* Right column: location */
     .location-select{
-      flex:1;
       display:flex;
       flex-direction:column;
       gap:8px;
-    }
-    .location-select label{
-      font-size:16px;
-      font-weight:700;
-      color:var(--fg);
-      text-align:center;
     }
     .location-select input[type="text"],
     .location-select select{
@@ -97,13 +90,7 @@
       line-height:20px;
     }
 
-    /* Shared row for inputs */
-    .two-col-row{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:24px;
-      margin-top:16px;
-    }
+    /* Generic field block (for the two rows beneath) */
     .field{
       display:flex;
       flex-direction:column;
@@ -140,10 +127,10 @@
   </div>
 </header>
 
-<main class="container grid grid-2" style="margin-top:16px">
+<main class="container grid" style="margin-top:16px">
   <section class="card">
-    <div class="auction-row">
-      <!-- LEFT: Auction buttons -->
+    <!-- Row 1: Auction (left) | Auction location (right) -->
+    <div class="cols-2">
       <div class="auction-left">
         <div class="field-label">Auction</div>
         <div id="auctionButtons" class="auction-buttons" role="group" aria-label="Select auction">
@@ -155,33 +142,32 @@
           </button>
         </div>
       </div>
-      <input type="hidden" id="auction" value="copart" />
 
-      <!-- RIGHT: Location -->
       <div class="location-select">
-        <label for="location">Auction location</label>
+        <div class="field-label">Auction location</div>
         <input type="text" id="locationSearch" placeholder="Search location..." />
         <select id="location"></select>
       </div>
     </div>
 
-    <!-- Car Price + Production Year -->
-    <div class="two-col-row">
+    <input type="hidden" id="auction" value="copart" />
+
+    <!-- Row 2: Car price (left) | Production year (right) -->
+    <div class="cols-2" style="margin-top:16px">
       <div class="field">
         <div class="field-label">Car price</div>
         <input type="number" id="carPrice" placeholder="Enter price..." />
       </div>
       <div class="field">
         <div class="field-label">Production year</div>
-        <!-- switched to a SELECT; options are inserted by JS -->
         <select id="productionYear">
           <option value="" disabled selected>Select year...</option>
         </select>
       </div>
     </div>
 
-    <!-- Engine Type + Engine sm³ -->
-    <div class="two-col-row">
+    <!-- Row 3: Engine type (left) | Engine, sm³ (right) -->
+    <div class="cols-2" style="margin-top:16px">
       <div class="field">
         <div class="field-label">Engine type</div>
         <select id="engineType">
@@ -199,7 +185,6 @@
     </div>
   </section>
 
-  <!-- Result -->
   <aside class="card">
     <h2>Result</h2>
     <table>
@@ -214,7 +199,7 @@
 </main>
 
 <script>
-  /* Short location list kept for now (we can restore full list when you want) */
+  /* Short demo list; swap back to your full list when you’re ready */
   const LOCATIONS = [
     "CA-LOS ANGELES","CA-SAN DIEGO","CA-SAN JOSE",
     "NY-LONG ISLAND","NY-ROCHESTER","TX-DALLAS","TX-HOUSTON"
@@ -251,15 +236,11 @@
     activate('copart');
   }
 
-  /* Populate Production year: from 2013 up to current year */
+  /* Build Production year dropdown: 2013 -> current year */
   function populateYears(startYear = 2013) {
-    const now = new Date();
-    const current = now.getFullYear();
+    const current = new Date().getFullYear();
     const sel = document.getElementById('productionYear');
-
-    // Clear existing (keep placeholder if present)
     sel.querySelectorAll('option:not([disabled])').forEach(o => o.remove());
-
     for (let y = current; y >= startYear; y--) {
       const opt = document.createElement('option');
       opt.value = String(y);
