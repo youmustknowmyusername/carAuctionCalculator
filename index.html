@@ -29,15 +29,17 @@
     .auction-row {
       display: flex;
       gap: 16px;
-      align-items: center;
+      align-items: stretch;   /* make both sides equal height */
     }
 
     /* Auction logo buttons */
     .auction-buttons {
       display: flex;
+      flex-direction: column; /* stack vertically */
       gap: 12px;
       align-items: center;
-      justify-content: center;
+      justify-content: center; /* center relative to location block */
+      flex: 0 0 auto;
     }
     .auction-buttons button{
       border:2px solid var(--inactive);
@@ -234,4 +236,3 @@
 </script>
 </body>
 </html>
-
