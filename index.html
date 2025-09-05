@@ -134,8 +134,8 @@
       <div class="auction-left">
         <div class="field-label">Auction</div>
         <div id="auctionButtons" class="auction-buttons" role="group" aria-label="Select auction">
-          <button type="button" data-value="iaai" aria-pressed="false" title="IAAI">
-            <img src="assets/iaai.png" alt="IAAI">
+          <button type="button" data-value="iaa" aria-pressed="false" title="IAA">
+            <img src="assets/iaa.png" alt="IAA">
           </button>
           <button type="button" data-value="copart" aria-pressed="false" title="Copart">
             <img src="assets/copart.png" alt="Copart">
@@ -254,7 +254,7 @@
   const nf = new Intl.NumberFormat('en-US');
   function prettyAuction(val){
     if(!val) return '';
-    return val.toLowerCase() === 'iaai' ? 'IAAI' : 'Copart';
+    return val.toLowerCase() === 'iaa' ? 'IAA' : 'Copart';
   }
 
   function renderSummary(){
