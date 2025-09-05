@@ -304,6 +304,7 @@
         b.classList.toggle('active', on);
         b.setAttribute('aria-pressed', String(on));
       });
+      renderSummary(); // update result when auction changes
     }
     buttons.forEach(btn=> btn.addEventListener('click', ()=> activate(btn.dataset.value)));
     activate('copart');
@@ -312,7 +313,7 @@
   function populateYears(startYear = 2013) {
     const current = new Date().getFullYear();
     const sel = document.getElementById('productionYear');
-    sel.querySelectorAll('option:not([disabled])').forEach(o => o.remove());
+    sel.innerHTML = '<option value="" disabled selected>Select year...</option>';
     for (let y = current; y >= startYear; y--) {
       const opt = document.createElement('option');
       opt.value = String(y);
@@ -321,14 +322,61 @@
     }
   }
 
+  // Format helpers
+  const nf = new Intl.NumberFormat('en-US');
+  function prettyAuction(val){
+    if(!val) return '';
+    return val.toLowerCase() === 'iaai' ? 'IAA' : 'Copart';
+  }
+
+  // Render chosen values into the Result table
+  function renderSummary(){
+    const rows = [];
+
+    const auctionVal = document.getElementById('auction').value;
+    if (auctionVal) rows.push(['Auction', prettyAuction(auctionVal)]);
+
+    const locSel = document.getElementById('location');
+    if (locSel && locSel.value) rows.push(['Location', locSel.value]);
+
+    const price = document.getElementById('carPrice').value;
+    if (price) rows.push(['Car price', '$' + nf.format(Number(price))]);
+
+    const yearSel = document.getElementById('productionYear');
+    if (yearSel && yearSel.value) rows.push(['Production year', yearSel.value]);
+
+    const engType = document.getElementById('engineType');
+    if (engType && engType.value) rows.push(['Engine type', engType.value]);
+
+    const engCC = document.getElementById('engineCC').value;
+    if (engCC) rows.push(['Engine, sm³', nf.format(Number(engCC))]);
+
+    const tbody = document.getElementById('resultBody');
+    if (rows.length === 0) {
+      tbody.innerHTML = '<tr><td class="muted">Nothing to calculate yet.</td></tr>';
+    } else {
+      tbody.innerHTML = rows.map(([k,v]) =>
+        `<tr><td><strong>${k}:</strong> ${v}</td></tr>`
+      ).join('');
+    }
+  }
+
   document.addEventListener('DOMContentLoaded', ()=>{
     setupAuctionButtons();
     fillLocations();
     populateYears(2013);
+    renderSummary();
 
+    // Live updates
     document.getElementById('locationSearch').addEventListener('input', e=>{
       fillLocations(e.target.value);
+      renderSummary(); // keep summary stable; user still hasn't chosen a location
     });
+    document.getElementById('location').addEventListener('change', renderSummary);
+    document.getElementById('carPrice').addEventListener('input', renderSummary);
+    document.getElementById('productionYear').addEventListener('change', renderSummary);
+    document.getElementById('engineType').addEventListener('change', renderSummary);
+    document.getElementById('engineCC').addEventListener('input', renderSummary);
   });
 </script>
 </body>
