@@ -23,7 +23,13 @@
     .grid{display:grid;gap:16px}
     @media(min-width:900px){.grid-2{grid-template-columns:1.2fr .8fr}}
     .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px}
-    h2 { font-size:22px; font-weight:800; margin-bottom:12px; }
+    h2 {
+  font-size:22px;
+  font-weight:800;
+  margin-bottom:12px;
+  text-align:center;   /* ✅ Center the label */
+}
+
 
     /* Auction row */
     .auction-row{
