@@ -117,6 +117,12 @@
       -webkit-appearance:none; margin:0;
     }
 
+    /* Placeholder styling for dropdowns */
+    select:invalid {
+      color: var(--muted);
+      opacity: 1;
+    }
+
     table{width:100%;border-collapse:collapse}
     td{padding:8px;border-bottom:1px dashed var(--line)}
     .total{font-weight:800;font-size:clamp(22px,3vw,32px);text-align:right}
@@ -148,7 +154,9 @@
       <div class="location-select">
         <div class="field-label">Auction location</div>
         <input type="text" id="locationSearch" placeholder="Search location..." />
-        <select id="location"></select>
+        <select id="location" required>
+          <option value="" disabled selected hidden>Select location...</option>
+        </select>
       </div>
     </div>
 
@@ -162,8 +170,8 @@
       </div>
       <div class="field">
         <div class="field-label">Production year</div>
-        <select id="productionYear">
-          <option value="" disabled selected>Select year...</option>
+        <select id="productionYear" required>
+          <option value="" disabled selected hidden>Select year...</option>
         </select>
       </div>
     </div>
@@ -172,8 +180,8 @@
     <div class="fields-row">
       <div class="field">
         <div class="field-label">Engine type</div>
-        <select id="engineType">
-          <option value="" disabled selected>Select engine type...</option>
+        <select id="engineType" required>
+          <option value="" disabled selected hidden>Select engine type...</option>
           <option>Gasoline</option>
           <option>Hybrid</option>
           <option>Diesel</option>
@@ -201,92 +209,14 @@
 </main>
 
 <script>
-  /* Full location list (unchanged) */
   const LOCATIONS = [
-    "AL-BIRMINGHAM","AL-DOTHAN","AL-HUNTSVILLE","AL-MOBILE","AL-MONTGOMERY","AL-TANNER",
-    "AR-FAYETTEVILLE COPART","AR-FAYETTEVILLE IAA","AR-LITTLE ROCK COPART","AR-LITTLE ROCK IAA",
-    "AZ-PHOENIX","AZ-TUCSON",
-    "CA- ACE Carson","CA- ACE Perris","CA-ADELANTO","CA-ANAHEIM","CA-ANTELOPE","CA-BAKERSFIELD",
-    "CA-COLTON","CA-EAST BAY","CA-FONTANA","CA-FREMONT","CA-FRESNO","CA-HAYWARD","CA-HAYWARD DESERT VIEW",
-    "CA-HIGH DESERT","CA-LONG BEACH","CA-LOS ANGELES","CA-MARTINEZ","CA-NORTH HOLLYWOOD",
-    "CA-RANCHO CUCAMONGA","CA-RANCHO-DESERT VIEW","CA-REDDING","CA-RIVERSIDE","CA-SACRAMENTO",
-    "CA-SACRAMENTO-DESERT VIEW","CA-SAN BERNARDINO","CA-SAN DIEGO","CA-SAN DIEGO-DESERT VIEW",
-    "CA-SAN JOSE","CA-SANTA PAULA-DESERT VIEW","CA-SO SACRAMENTO","CA-SUN VALLEY","CA-VALLEJO","CA-VAN NUYS",
-    "CO-COLORADO SPRINGS","CO-DENVER","CO-DENVER CENTRAL","CO-DENVER EAST","CO-DENVER SOUTH","CO-WESTERN COLORADO",
-    "CT-HARTFORD","CT-HARTFORD SPRINGFIELD","CT-Hartford-South",
-    "DC-WASHINGTON DC-MD",
-    "DE-NEW CASTLE","DE-SEAFORD",
-    "FL-CAT Jacksonville Sub lot","FL-CAT Orlando Boggy Creek","FL-CLEARWATER","FL-Dover Sublot","FL-FORT MYERS",
-    "FL-FORT PIERCE","FL-FT.PIERCE","FL-JACKSONVILLE","FL-JACKSONVILLE EAST","FL-JACKSONVILLE WEST","FL-MIAMI",
-    "FL-MIAMI CENTRAL","FL-MIAMI NORTH","FL-MIAMI SOUTH","FL-OCALA","FL-ORLANDO","FL-ORLANDO NORTH","FL-ORLANDO SOUTH",
-    "FL-PENSACOLA","FL-PUNTA GORDA","FL-TALLAHASSEE","FL-TAMPA","FL-WEST PALM BEACH",
-    "GA-ATLANTA","GA-ATLANTA EAST","GA-ATLANTA NORTH","GA-ATLANTA SOUTH","GA-ATLANTA WEST","GA-CARTERSVILLE","GA-FAIRBURN",
-    "GA-MACON","GA-SAVANNAH","GA-TIFTON",
-    "HI-HONOLULU",
-    "IA-Crashedtoys Eldridge","IA-DAVENPORT","IA-DES MOINES",
-    "ID-BOISE",
-    "IL-CHICAGO NORTH","IL-CHICAGO SOUTH","IL-CHICAGO WEST","IL-LINCOLN","IL-PEORIA","IL-SOUTHERN ILLINOIS",
-    "IL-SPECIALTY DIVISION","IL-ST. LOUIS","IL-WHEELING",
-    "IN- IAA Indy Minnesota Street Sublot","IN-CICERO","IN-DYER","IN-FORT WAYNE","IN-HAMMOND","IN-HARTFORD CITY",
-    "IN-INDIANAPOLIS","IN-SOUTH BEND",
-    "KS-KANSAS CITY","KS-WICHITA",
-    "KY-ASHLAND","KY-BOWLING GREEN","KY-LEXINGTON EAST","KY-LEXINGTON WEST","KY-LOUISVILLE","KY-PADUCAH","KY-WALTON",
-    "LA- LAFAYETTE","LA- NEW ORLEANS EAST","LA-BATON ROUGE","LA-NEW ORLEANS","LA-SHREVEPORT",
-    "MA -TEMPLETON","MA-BOSTON SHIRLEY","MA-FREETOWN","MA-NORTH BOSTON","MA-SOUTH BOSTON","MA-TAUNTON","MA-WEST WARREN",
-    "MD White Plans Aux Lot","MD-BALTIMORE","MD-DUNDALK","MD-LAUREL","MD-METRO DC","MD-ROSEDALE",
-    "ME- Gray Sub lot","ME-LYMAN","ME-ORONO","ME-PORTLAND GORHAM",
-    "MI-DETROIT","MI-FLINT","MI-GRAND RAPIDS","MI-GREAT LAKES","MI-IONIA","MI-KINCHELOE","MI-LANSING",
-    "MN- IAA Faribault","MN-Big Lake Sub lot","MN-CRASHEDTOYS EAST BETHEL","MN-Ham lake Sun lot","MN-MINNEAPOLIS",
-    "MN-MINNEAPOLIS NORTH","MN-ST. CLOUD",
-    "MO-COLUMBIA","MO-SIKESTON","MO-SPRINGFIELD","MO-ST. LOUIS",
-    "MS-GRENADA","MS-GULF COAST","MS-JACKSON",
-    "MT-BILLINGS","MT-HELENA","MT-MISSOULA",
-    "NC-ASHEVILLE","NC-CHARLOTTE","NC-CHINA GROVE","NC-CONCORD","NC-GREENSBORO","NC-LUMBERTON","NC-MEBANE","NC-MOCKSVILLE",
-    "NC-RALEIGH","NC-WILMINGTON",
-    "ND-BISMARCK","ND-FARGO",
-    "NE-LINCOLN","NE-OMAHA",
-    "NH- Salem Sub lot","NH-CANDIA","NH-MANCHESTER","NH-WEBSTER",
-    "NJ-AVENEL NEW JERSEY","NJ-CENTRAL NEW JERSEY","NJ-ENGLISHTOWN","NJ-GLASSBORO EAST","NJ-GLASSBORO WEST",
-    "NJ-NORTHERN NEW JERSEY","NJ-SAYREVILLE","NJ-SOMERVILLE","NJ-SOUTHERN NEW JERSEY","NJ-TRENTON",
-    "NM-ALBUQUERQUE",
-    "NV-LAS VEGAS","NV-RENO",
-    "NY-ALBANY","NY-BUFFALO","NY-LONG ISLAND","NY-NEWBURGH","NY-ROCHESTER","NY-SYRACUSE",
-    "OH- IAAI Stimmel Rd Sub lot","OH- Vermillion North Ford Offsite lot","OH-AKRON CANTON","OH-CINCINNATI",
-    "OH-CLEVELAND","OH-CLEVELAND EAST","OH-CLEVELAND WEST","OH-COLUMBUS","OH-DAYTON",
-    "OK-OKLAHOMA CITY","OK-TULSA",
-    "OR-EUGENE","OR-PORTLAND","OR-PORTLAND NORTH","OR-PORTLAND SOUTH","OR-PORTLAND WEST","OR-WOODBURN",
-    "PA-ALTOONA","PA-BRIDGEPORT","PA-CHAMBERSBURG","PA-ERIE","PA-HARRISBURG","PA-PHILADELPHIA","PA-PHILADELPHIA EAST",
-    "PA-PITTSBURG","PA-PITTSBURG NORTH","PA-PITTSBURG SOUTH","PA-PITTSBURG WEST","PA-SCRANTON","PA-YORK HAVEN","PA-YORKS SPRINGS",
-    "RI-EXETER","RI-PROVIDENCE",
-    "SC-CHARLESTON","SC-COLUMBIA","SC-GREENVILLE","SC-LEXINGTON","SC-South Gaston Sublot","SC-SPARTANBURG","SC-Spartanburg sublot",
-    "SD-SIOUX FALLS",
-    "TN-CHATTANOOGA","TN-KNOXVILLE","TN-MEMPHIS","TN-NASHVILLE",
-    "TX-ABILENE","TX-AMARILLO","TX-ANDREWS","TX-AUSTIN","TX-CORPUS CHRISTI","TX-CRASHEDTOYS DALLAS","TX-DALLAS","TX-DALLAS SOUTH",
-    "TX-EL PASO","TX-FT. WORTH","TX-HOUSTON","TX-LONGVIEW","TX-LUBBOCK","TX-LUFKIN","TX-MCALLEN","TX-PERMIAN BASIN","TX-SAN ANTONIO","TX-WACO",
-    "UT-OGDEN","UT-SALT LAKE CITY",
-    "VA-CULPEPER","VA-DANVILLE","VA-FREDERICKSBURG","VA-FREDERICKSBURG-SOUTH","VA-HAMPTON","VA-NORTHERN VIRGINIA","VA-PULASKI",
-    "VA-RICHMOND","VA-ROANOKE","VA-SUFFOLK","VA-TIDEWATER",
-    "VT- Devil's Bowl Sub lot","VT-BURLINGTON","VT-FAIR HAVEN","VT-ORLEANS","VT-RUTLAND",
-    "WA- Seattle Puyallup","WA-GRAHAM","WA-NORTH SEATTLE","WA-PASCO","WA-SEATTLE","WA-SEATTLE-SOUTH","WA-SPOKANE",
-    "WI-APPLETON","WI-MADISON","WI-MILWAUKEE","WI-PORTAGE",
-    "WV-BUCKHANNON","WV-CHARLESTON","WV-SHADY SPRING",
-    "WY-CASPER"
+    "CA-LOS ANGELES","CA-SAN DIEGO","CA-SAN JOSE",
+    "NY-LONG ISLAND","NY-ROCHESTER","TX-DALLAS","TX-HOUSTON"
   ];
 
-  // UPDATED: show "Select location..." as the default placeholder (no auto-selection)
   function fillLocations(filter = "") {
     const sel = document.getElementById('location');
-    sel.innerHTML = '';
-
-    // Add placeholder first (disabled + selected)
-    const ph = document.createElement('option');
-    ph.value = "";
-    ph.textContent = "Select location...";
-    ph.disabled = true;
-    ph.selected = true;
-    sel.appendChild(ph);
-
-    // Add filtered options
+    sel.querySelectorAll('option:not([disabled])').forEach(o => o.remove());
     const filtered = LOCATIONS.filter(loc =>
       loc.toLowerCase().includes(filter.trim().toLowerCase())
     );
@@ -295,8 +225,6 @@
       opt.value = opt.textContent = loc;
       sel.appendChild(opt);
     });
-
-    // No auto-select anymore — placeholder stays until user chooses
   }
 
   function setupAuctionButtons(){
