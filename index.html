@@ -125,6 +125,35 @@
     td{padding:8px;border-bottom:1px dashed var(--line)}
     .total{font-weight:800;font-size:clamp(22px,3vw,32px);text-align:right}
     .muted{color:var(--muted);font-size:13px}
+
+    /* ===== Safari-friendly sizing/appearance patch (only this added) ===== */
+    html { -webkit-text-size-adjust: 100%; }
+    body { -webkit-font-smoothing: antialiased; }
+    input, select, button, textarea {
+      font: inherit;
+      line-height: 1.2;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+    /* ensure identical heights in Safari */
+    .location-select input[type="text"],
+    .location-select select,
+    .field input,
+    .field select {
+      height:44px;
+      padding:12px 14px;
+      border-radius:12px;
+    }
+    /* remove iOS tap highlight */
+    a, button, input, select, textarea { -webkit-tap-highlight-color: rgba(0,0,0,0); }
+    /* mobile layout tweaks so it doesn’t squash on Safari */
+    @media (max-width: 900px) {
+      .grid-2 { grid-template-columns: 1fr; }
+      .auction-row { flex-direction: column; gap: 16px; }
+      .auction-buttons { flex-wrap: wrap; }
+      .auction-buttons button { min-width: 120px; min-height: 52px; }
+      .fields-row { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
@@ -255,8 +284,8 @@
     "NM-ALBUQUERQUE",
     "NV-LAS VEGAS","NV-RENO",
     "NY-ALBANY","NY-BUFFALO","NY-LONG ISLAND","NY-NEWBURGH","NY-ROCHESTER","NY-SYRACUSE",
-    "OH- IAAI Stimmel Rd Sub lot","OH- Vermillion North Ford Offsite lot","OH-AKRON CANTON","OH-CINCINNATI",
-    "OH-CLEVELAND","OH-CLEVELAND EAST","OH-CLEVELAND WEST","OH-COLUMBUS","OH-DAYTON",
+    "OH- IAAI Stimmel Rd Sub lot","OH- Vermillion North Ford Offsite lot","OH-AKRON CANTON",
+    "OH-CINCINNATI","OH-CLEVELAND","OH-CLEVELAND EAST","OH-CLEVELAND WEST","OH-COLUMBUS","OH-DAYTON",
     "OK-OKLAHOMA CITY","OK-TULSA",
     "OR-EUGENE","OR-PORTLAND","OR-PORTLAND NORTH","OR-PORTLAND SOUTH","OR-PORTLAND WEST","OR-WOODBURN",
     "PA-ALTOONA","PA-BRIDGEPORT","PA-CHAMBERSBURG","PA-ERIE","PA-HARRISBURG","PA-PHILADELPHIA","PA-PHILADELPHIA EAST",
@@ -273,111 +302,6 @@
     "VT- Devil's Bowl Sub lot","VT-BURLINGTON","VT-FAIR HAVEN","VT-ORLEANS","VT-RUTLAND",
     "WA- Seattle Puyallup","WA-GRAHAM","WA-NORTH SEATTLE","WA-PASCO","WA-SEATTLE","WA-SEATTLE-SOUTH","WA-SPOKANE",
     "WI-APPLETON","WI-MADISON","WI-MILWAUKEE","WI-PORTAGE",
-    "WV-BUCKHANNON","WV-CHARLESTON","WV-SHADY SPRING",
-    "WY-CASPER"
-  ];
-  const LOCATIONS_SORTED = [...LOCATIONS].sort((a, b) => a.localeCompare(b));
+    "WV-BUCKHANNON","WV-CHARLESTON","WV
 
-  function fillLocations(filter = "") {
-    const sel = document.getElementById('location');
-    sel.innerHTML = '';
-    const ph = document.createElement('option');
-    ph.value = "";
-    ph.textContent = "Select location...";
-    ph.disabled = true;
-    ph.selected = true;
-    sel.appendChild(ph);
-
-    const filtered = LOCATIONS_SORTED.filter(loc =>
-      loc.toLowerCase().includes(filter.trim().toLowerCase())
-    );
-    filtered.forEach(loc => {
-      const opt = document.createElement('option');
-      opt.value = opt.textContent = loc;
-      sel.appendChild(opt);
-    });
-  }
-
-  function setupAuctionButtons(){
-    const buttons = document.querySelectorAll('#auctionButtons button');
-    const hidden  = document.getElementById('auction');
-    function activate(val){
-      hidden.value = val;
-      buttons.forEach(b=>{
-        const on = b.dataset.value === val;
-        b.classList.toggle('active', on);
-        b.setAttribute('aria-pressed', String(on));
-      });
-      renderSummary();
-    }
-    buttons.forEach(btn=> btn.addEventListener('click', ()=> activate(btn.dataset.value)));
-  }
-
-  function populateYears(startYear = 2013) {
-    const current = new Date().getFullYear();
-    const sel = document.getElementById('productionYear');
-    sel.innerHTML = '<option value="" disabled selected>Select year...</option>';
-    for (let y = current; y >= startYear; y--) {
-      const opt = document.createElement('option');
-      opt.value = String(y);
-      opt.textContent = y;
-      sel.appendChild(opt);
-    }
-  }
-
-  const nf = new Intl.NumberFormat('en-US');
-  function prettyAuction(val){
-    if(!val) return '';
-    return val.toLowerCase() === 'iaa' ? 'IAA' : 'Copart';
-  }
-
-  function renderSummary(){
-    const rows = [];
-
-    const auctionVal = document.getElementById('auction').value;
-    if (auctionVal) rows.push(['Auction', prettyAuction(auctionVal)]);
-
-    const locSel = document.getElementById('location');
-    if (locSel && locSel.value) rows.push(['Location', locSel.value]);
-
-    const price = document.getElementById('carPrice').value;
-    if (price) rows.push(['Car price', '$' + nf.format(Number(price))]);
-
-    const yearSel = document.getElementById('productionYear');
-    if (yearSel && yearSel.value) rows.push(['Production year', yearSel.value]);
-
-    const engType = document.getElementById('engineType');
-    if (engType && engType.value) rows.push(['Engine type', engType.value]);
-
-    const engCC = document.getElementById('engineCC').value;
-    if (engCC) rows.push(['Engine, sm³', nf.format(Number(engCC))]);
-
-    const tbody = document.getElementById('resultBody');
-    if (rows.length === 0) {
-      tbody.innerHTML = '<tr><td class="muted">Nothing to calculate yet.</td></tr>';
-    } else {
-      tbody.innerHTML = rows.map(([k,v]) =>
-        `<tr><td><strong>${k}:</strong> ${v}</td></tr>`
-      ).join('');
-    }
-  }
-
-  document.addEventListener('DOMContentLoaded', ()=>{
-    setupAuctionButtons();
-    fillLocations();
-    populateYears(2013);
-    renderSummary();
-
-    document.getElementById('locationSearch').addEventListener('input', e=>{
-      fillLocations(e.target.value);
-      renderSummary();
-    });
-    document.getElementById('location').addEventListener('change', renderSummary);
-    document.getElementById('carPrice').addEventListener('input', renderSummary);
-    document.getElementById('productionYear').addEventListener('change', renderSummary);
-    document.getElementById('engineType').addEventListener('change', renderSummary);
-    document.getElementById('engineCC').addEventListener('input', renderSummary);
-  });
-</script>
-</body>
-</html>
+    
