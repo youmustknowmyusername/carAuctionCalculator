@@ -16,43 +16,33 @@
     }
     *{box-sizing:border-box}
     body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.55 system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif}
-
-    /* 1) container smaller */
-    .container{max-width:900px;margin:auto;padding:16px}
-
+    .container{max-width:980px;margin:auto;padding:18px}          /* smaller overall width */
     header{position:sticky;top:0;z-index:10;background:color-mix(in oklab,var(--bg) 86%, transparent);border-bottom:1px solid var(--line);backdrop-filter:blur(8px)}
-    .nav{display:flex;justify-content:space-between;align-items:center;padding:14px 0}
+    .nav{display:flex;justify-content:space-between;align-items:center;padding:12px 0}
     .brand{font-weight:800}
-    .grid{display:grid;gap:16px}
-    @media(min-width:900px){.grid-2{grid-template-columns:1.2fr .8fr}}
-
-    /* 2) card tighter */
-    .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px}
-
-    /* 3) h2 a bit smaller */
+    .grid{display:grid;gap:14px}
+    @media(min-width:900px){.grid-2{grid-template-columns:1.15fr .85fr}} /* slightly tighter ratio */
+    .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px} /* slimmer padding */
     h2 {
-      font-size:18px;
+      font-size:22px;
       font-weight:800;
-      margin-bottom:10px;
+      margin-bottom:12px;
       margin-top:0px;
       text-align:center;
     }
 
     /* Auction row */
-    /* 4) smaller gap */
     .auction-row{
       display:flex;
-      gap:16px;
+      gap:24px;
       align-items:flex-start;
     }
-
-    /* 5) field label slightly smaller */
     .field-label{
-      font-size:14px;
+      font-size:16px;
       font-weight:700;
       color:var(--fg);
       text-align:center;
-      margin-bottom:4px;
+      margin-bottom:6px;
     }
     .auction-left{
       display:flex;
@@ -60,16 +50,13 @@
       align-items:center;
       gap:8px;
     }
-
-    /* 6) buttons row tighter */
     .auction-buttons{
       display:flex;
-      gap:10px;
+      gap:12px;
       align-items:center;
       justify-content:center;
-      margin-top:10px;
+      margin-top:15px;
     }
-
     .auction-buttons button{
       border:2px solid var(--inactive);
       background:#fff;
@@ -77,15 +64,13 @@
       padding:6px 10px;
       cursor:pointer;
       display:flex;align-items:center;justify-content:center;
-      /* 7) button size down */
-      min-width:110px; min-height:44px;
+      min-width:140px; min-height:56px;
     }
     .auction-buttons button.active{
       border-color:var(--active-red);
       box-shadow:0 0 0 3px rgba(255,48,48,.2);
     }
-    /* 8) logo smaller */
-    .auction-buttons img{height:40px;width:auto;display:block;}
+    .auction-buttons img{height:55px;width:auto;display:block;}
 
     .location-select{
       flex:1;
@@ -93,48 +78,43 @@
       flex-direction:column;
       gap:8px;
     }
-    /* 9) input/select slightly smaller */
     .location-select input[type="text"],
     .location-select select{
       width:100%;
-      padding:8px 12px;
-      border-radius:10px;
+      padding:12px 14px;
+      border-radius:12px;
       border:1px solid var(--line);
       background:#fff;
       color:#000;
-      font-size:13px;
-      height:38px;
-      line-height:18px;
+      font-size:14px;
+      height:44px;
+      line-height:20px;
     }
 
     /* Fields grid */
-    /* 10) fields-row gap smaller */
     .fields-row{
       display:grid;
       grid-template-columns: 1fr 1fr;
-      gap:16px;
-      margin-top:12px;
+      gap:24px;
+      margin-top:16px;
     }
     .field{
       display:flex;
       flex-direction:column;
       gap:6px;
     }
-
-    /* 11) field inputs match smaller controls */
     .field input,
     .field select{
       width:100%;
-      padding:8px 12px;
-      border-radius:10px;
+      padding:12px 14px;
+      border-radius:12px;
       border:1px solid var(--line);
       background:#fff;
       color:#000;
-      font-size:13px;
-      height:38px;
-      line-height:18px;
+      font-size:14px;
+      height:44px;
+      line-height:20px;
       -moz-appearance:textfield;
-      -webkit-appearance:none;
     }
     .field input::-webkit-outer-spin-button,
     .field input::-webkit-inner-spin-button{
@@ -142,24 +122,20 @@
     }
 
     table{width:100%;border-collapse:collapse}
-    /* 12) td padding smaller */
-    td{padding:6px;border-bottom:1px dashed var(--line)}
-
-    /* 13) total smaller */
-    .total{font-weight:800;font-size:clamp(18px,3vw,24px);text-align:right}
-
+    td{padding:8px;border-bottom:1px dashed var(--line)}
+    .total{font-weight:800;font-size:clamp(22px,3vw,32px);text-align:right}
     .muted{color:var(--muted);font-size:13px}
 
-    /* --- Safari-friendly patch (unchanged) --- */
+    /* --- Safari-friendly tweaks (no layout changes elsewhere) --- */
     @supports (-webkit-touch-callout: none) {
-      select, input {
-        font-size: 16px; /* avoid iOS zoom on focus */
-      }
-      select {
-        background-clip: padding-box;
-      }
+      .card { border-radius: 16px; }
+      select, input, button { font-size: 16px; } /* prevents iOS zoom-on-focus */
     }
   </style>
+
+  <!-- Choices.js (adds search box INSIDE the select) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css"/>
+  <script defer src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
 </head>
 <body>
 <header>
@@ -239,7 +215,7 @@
 </main>
 
 <script>
-  /* Full list, then sorted copy (unchanged) */
+  /* Full list, then sorted copy */
   const LOCATIONS = [
     "AL-BIRMINGHAM","AL-DOTHAN","AL-HUNTSVILLE","AL-MOBILE","AL-MONTGOMERY","AL-TANNER",
     "AR-FAYETTEVILLE COPART","AR-FAYETTEVILLE IAA","AR-LITTLE ROCK COPART","AR-LITTLE ROCK IAA",
@@ -310,26 +286,37 @@
     "WV-BUCKHANNON","WV-CHARLESTON","WV-SHADY SPRING",
     "WY-CASPER"
   ];
-  const LOCATIONS_SORTED = [...LOCATIONS].sort((a, b) => a.localeCompare(b));
+  const LOCATIONS_SORTED = [...LOCATIONS].sort((a,b)=>a.localeCompare(b));
+
+  /* Choices instance for the #location select */
+  let locationChoices = null;
 
   function fillLocations(filter = "") {
-    const sel = document.getElementById('location');
-    sel.innerHTML = '';
-    const ph = document.createElement('option');
-    ph.value = "";
-    ph.textContent = "Select location...";
-    ph.disabled = true;
-    ph.selected = true;
-    sel.appendChild(ph);
-
     const filtered = LOCATIONS_SORTED.filter(loc =>
       loc.toLowerCase().includes(filter.trim().toLowerCase())
     );
-    filtered.forEach(loc => {
-      const opt = document.createElement('option');
-      opt.value = opt.textContent = loc;
-      sel.appendChild(opt);
-    });
+
+    const choicesData = [
+      { value: "", label: "Select location...", selected: true, disabled: true },
+      ...filtered.map(loc => ({ value: loc, label: loc }))
+    ];
+
+    if (locationChoices) {
+      // Replace all items (true = remove existing)
+      locationChoices.setChoices(choicesData, 'value', 'label', true);
+    } else {
+      // Fallback (shouldn’t run after Choices init, but safe)
+      const sel = document.getElementById('location');
+      sel.innerHTML = '';
+      choicesData.forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c.value;
+        opt.textContent = c.label;
+        if (c.selected) opt.selected = true;
+        if (c.disabled) opt.disabled = true;
+        sel.appendChild(opt);
+      });
+    }
   }
 
   function setupAuctionButtons(){
@@ -398,14 +385,27 @@
 
   document.addEventListener('DOMContentLoaded', ()=>{
     setupAuctionButtons();
-    fillLocations();
+
+    // Initialize Choices on the #location select (adds search inside dropdown)
+    locationChoices = new Choices('#location', {
+      searchEnabled: true,
+      searchPlaceholderValue: 'Search location...',
+      itemSelectText: '',
+      shouldSort: false,
+      position: 'bottom',
+      allowHTML: false
+    });
+
+    fillLocations();              // populate options into Choices
     populateYears(2013);
     renderSummary();
 
+    // Keep your external search input working to filter the dropdown list
     document.getElementById('locationSearch').addEventListener('input', e=>{
       fillLocations(e.target.value);
       renderSummary();
     });
+
     document.getElementById('location').addEventListener('change', renderSummary);
     document.getElementById('carPrice').addEventListener('input', renderSummary);
     document.getElementById('productionYear').addEventListener('change', renderSummary);
@@ -415,4 +415,3 @@
 </script>
 </body>
 </html>
-
