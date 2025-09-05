@@ -59,9 +59,12 @@
       cursor:pointer;
       display:flex;align-items:center;justify-content:center;
       min-width:140px; min-height:56px;
-      transition:border-color .15s, box-shadow .15s, transform .05s;
+      /* removed: transition */
+      /* removed: hover transform */
     }
+    /* removed hover animation:
     .auction-buttons button:hover{transform:translateY(-1px)}
+    */
     .auction-buttons button.active{
       border-color:var(--active-red);
       box-shadow:0 0 0 3px rgba(255,48,48,.2);
@@ -370,7 +373,7 @@
     // Live updates
     document.getElementById('locationSearch').addEventListener('input', e=>{
       fillLocations(e.target.value);
-      renderSummary(); // keep summary stable; user still hasn't chosen a location
+      renderSummary();
     });
     document.getElementById('location').addEventListener('change', renderSummary);
     document.getElementById('carPrice').addEventListener('input', renderSummary);
