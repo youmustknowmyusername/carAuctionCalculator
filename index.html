@@ -194,6 +194,22 @@
         <input type="number" id="engineCC" placeholder="Enter engine size..." />
       </div>
     </div>
+
+    <!-- NEW ROW: Transport type (left) -->
+    <div class="fields-row">
+      <div class="field">
+        <div class="field-label">Transport type</div>
+        <select id="transportType">
+          <option value="" disabled selected>Select transport type...</option>
+          <option>Sedan</option>
+          <option>Pickup</option>
+          <option>SUV</option>
+          <option>Big SUV</option>
+          <option>Minivan</option>
+        </select>
+      </div>
+      <div class="field" aria-hidden="true"></div>
+    </div>
   </section>
 
   <aside class="card">
@@ -357,6 +373,9 @@
     const engCC = document.getElementById('engineCC').value;
     if (engCC) rows.push(['Engine, sm³', nf.format(Number(engCC))]);
 
+    const transport = document.getElementById('transportType').value;
+    if (transport) rows.push(['Transport type', transport]);
+
     const tbody = document.getElementById('resultBody');
     if (rows.length === 0) {
       tbody.innerHTML = '<tr><td class="muted">Nothing to calculate yet.</td></tr>';
@@ -382,6 +401,7 @@
     document.getElementById('productionYear').addEventListener('change', renderSummary);
     document.getElementById('engineType').addEventListener('change', renderSummary);
     document.getElementById('engineCC').addEventListener('input', renderSummary);
+    document.getElementById('transportType').addEventListener('change', renderSummary);
   });
 </script>
 </body>
