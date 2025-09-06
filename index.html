@@ -16,47 +16,20 @@
     }
     *{box-sizing:border-box}
     body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.55 system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif}
-    .container{max-width:1100px;margin:auto;padding:24px}
+    .container{max-width:980px;margin:auto;padding:24px} /* slightly smaller card as requested earlier */
     header{position:sticky;top:0;z-index:10;background:color-mix(in oklab,var(--bg) 86%, transparent);border-bottom:1px solid var(--line);backdrop-filter:blur(8px)}
     .nav{display:flex;justify-content:space-between;align-items:center;padding:14px 0}
     .brand{font-weight:800}
     .grid{display:grid;gap:16px}
     @media(min-width:900px){.grid-2{grid-template-columns:1.2fr .8fr}}
     .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px}
-    h2 {
-      font-size:22px;
-      font-weight:800;
-      margin-bottom:15px;
-      margin-top:0px;
-      text-align:center;
-    }
+    h2 {font-size:22px;font-weight:800;margin-bottom:15px;margin-top:0px;text-align:center;}
 
     /* Auction row */
-    .auction-row{
-      display:flex;
-      gap:24px;
-      align-items:flex-start;
-    }
-    .field-label{
-      font-size:16px;
-      font-weight:700;
-      color:var(--fg);
-      text-align:center;
-      margin-bottom:6px;
-    }
-    .auction-left{
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      gap:8px;
-    }
-    .auction-buttons{
-      display:flex;
-      gap:12px;
-      align-items:center;
-      justify-content:center;
-      margin-top:15px;
-    }
+    .auction-row{display:flex;gap:24px;align-items:flex-start;}
+    .field-label{font-size:16px;font-weight:700;color:var(--fg);text-align:center;margin-bottom:6px;}
+    .auction-left{display:flex;flex-direction:column;align-items:center;gap:8px;}
+    .auction-buttons{display:flex;gap:12px;align-items:center;justify-content:center;margin-top:15px;}
     .auction-buttons button{
       border:2px solid var(--inactive);
       background:#fff;
@@ -66,70 +39,39 @@
       display:flex;align-items:center;justify-content:center;
       min-width:140px; min-height:56px;
     }
-    .auction-buttons button.active{
-      border-color:var(--active-red);
-      box-shadow:0 0 0 3px rgba(255,48,48,.2);
-    }
+    .auction-buttons button.active{border-color:var(--active-red);box-shadow:0 0 0 3px rgba(255,48,48,.2);}
     .auction-buttons img{height:55px;width:auto;display:block;}
 
-    .location-select{
-      flex:1;
-      display:flex;
-      flex-direction:column;
-      gap:8px;
-    }
-    .location-select input[type="text"],
-    .location-select select{
-      width:100%;
-      padding:12px 14px;
-      border-radius:12px;
-      border:1px solid var(--line);
-      background:#fff;
-      color:#000;
-      font-size:14px;
-      height:44px;
-      line-height:20px;
+    .location-select{flex:1;display:flex;flex-direction:column;gap:8px;}
+    .location-select input[type="text"], .location-select select{
+      width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--line);
+      background:#fff;color:#000;font-size:14px;height:44px;line-height:20px;
     }
 
     /* Fields grid */
-    .fields-row{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap:24px;
-      margin-top:16px;
+    .fields-row{display:grid;grid-template-columns: 1fr 1fr;gap:24px;margin-top:16px;}
+    .field{display:flex;flex-direction:column;gap:6px;}
+    .field input, .field select{
+      width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--line);
+      background:#fff;color:#000;font-size:14px;height:44px;line-height:20px;-moz-appearance:textfield;
     }
-    .field{
-      display:flex;
-      flex-direction:column;
-      gap:6px;
+    .field input::-webkit-outer-spin-button,.field input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
+
+    /* Buttons row */
+    .buttons-row{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:16px;}
+    .buttons-row button{
+      height:44px;border:none;border-radius:12px;font-weight:700;color:#fff;cursor:pointer;
     }
-    .field input,
-    .field select{
-      width:100%;
-      padding:12px 14px;
-      border-radius:12px;
-      border:1px solid var(--line);
-      background:#fff;
-      color:#000;
-      font-size:14px;
-      height:44px;
-      line-height:20px;
-      -moz-appearance:textfield;
-    }
-    .field input::-webkit-outer-spin-button,
-    .field input::-webkit-inner-spin-button{
-      -webkit-appearance:none; margin:0;
-    }
+    #clearBtn{background:#ff3030;}
+    #calcBtn{background:#00007F;}
 
     table{width:100%;border-collapse:collapse}
     td{padding:8px;border-bottom:1px dashed var(--line)}
     .total{font-weight:800;font-size:clamp(22px,3vw,32px);text-align:right}
     .muted{color:var(--muted);font-size:13px}
 
-    /* Safari-friendly tweaks */
-    @supports (-webkit-touch-callout: none) {
-      select, input, button { font-size:16px; } /* prevent zoom on focus */
-    }
+    /* Safari touch zoom / form controls comfort */
+    @supports (-webkit-touch-callout: none) { select, input, button { font-size:16px; } }
   </style>
 </head>
 <body>
@@ -163,7 +105,6 @@
 
     <input type="hidden" id="auction" value="" />
 
-    <!-- Car price + Production year -->
     <div class="fields-row">
       <div class="field">
         <div class="field-label">Car price</div>
@@ -177,7 +118,6 @@
       </div>
     </div>
 
-    <!-- Engine type + Engine sm³ -->
     <div class="fields-row">
       <div class="field">
         <div class="field-label">Engine type</div>
@@ -195,7 +135,6 @@
       </div>
     </div>
 
-    <!-- NEW ROW: Transport type (left) -->
     <div class="fields-row">
       <div class="field">
         <div class="field-label">Transport type</div>
@@ -209,6 +148,11 @@
         </select>
       </div>
       <div class="field" aria-hidden="true"></div>
+    </div>
+
+    <div class="buttons-row">
+      <button id="clearBtn">Clear all</button>
+      <button id="calcBtn">Calculate</button>
     </div>
   </section>
 
@@ -226,7 +170,7 @@
 </main>
 
 <script>
-  /* Full locations list, then sorted copy */
+  /* ===== Full locations list from iaa.am (as provided earlier) ===== */
   const LOCATIONS = [
     "AL-BIRMINGHAM","AL-DOTHAN","AL-HUNTSVILLE","AL-MOBILE","AL-MONTGOMERY","AL-TANNER",
     "AR-FAYETTEVILLE COPART","AR-FAYETTEVILLE IAA","AR-LITTLE ROCK COPART","AR-LITTLE ROCK IAA",
@@ -299,24 +243,30 @@
   ];
   const LOCATIONS_SORTED = [...LOCATIONS].sort((a,b)=>a.localeCompare(b));
 
-  function fillLocations(filter = "") {
+  /* Build the select (with placeholder) and apply filter text */
+  function fillLocations(filter="") {
     const sel = document.getElementById('location');
+    const current = sel.value; // try to preserve current when filtering
     sel.innerHTML = '';
+
     const ph = document.createElement('option');
     ph.value = "";
     ph.textContent = "Select location...";
     ph.disabled = true;
-    ph.selected = true;
+    ph.selected = !filter; // keep placeholder selected unless user already picked
     sel.appendChild(ph);
 
-    const filtered = LOCATIONS_SORTED.filter(loc =>
-      loc.toLowerCase().includes(filter.trim().toLowerCase())
-    );
-    filtered.forEach(loc => {
+    const f = filter.trim().toLowerCase();
+    const pool = f ? LOCATIONS_SORTED.filter(loc => loc.toLowerCase().includes(f)) : LOCATIONS_SORTED;
+
+    pool.forEach(loc => {
       const opt = document.createElement('option');
       opt.value = opt.textContent = loc;
       sel.appendChild(opt);
     });
+
+    // Re-apply selection if still present in filtered set
+    if (current && [...sel.options].some(o => o.value === current)) sel.value = current;
   }
 
   function setupAuctionButtons(){
@@ -347,10 +297,7 @@
   }
 
   const nf = new Intl.NumberFormat('en-US');
-  function prettyAuction(val){
-    if(!val) return '';
-    return val.toLowerCase() === 'iaa' ? 'IAA' : 'Copart';
-  }
+  function prettyAuction(val){ if(!val) return ''; return val.toLowerCase()==='iaa'?'IAA':'Copart'; }
 
   function renderSummary(){
     const rows = [];
@@ -392,16 +339,35 @@
     populateYears(2013);
     renderSummary();
 
+    // Live search: filters the select options as you type
     document.getElementById('locationSearch').addEventListener('input', e=>{
       fillLocations(e.target.value);
       renderSummary();
     });
+
     document.getElementById('location').addEventListener('change', renderSummary);
     document.getElementById('carPrice').addEventListener('input', renderSummary);
     document.getElementById('productionYear').addEventListener('change', renderSummary);
     document.getElementById('engineType').addEventListener('change', renderSummary);
     document.getElementById('engineCC').addEventListener('input', renderSummary);
     document.getElementById('transportType').addEventListener('change', renderSummary);
+
+    // Clear all
+    document.getElementById('clearBtn').addEventListener('click', ()=>{
+      document.getElementById('auction').value="";
+      document.querySelectorAll('#auctionButtons button').forEach(b=>{b.classList.remove('active');b.setAttribute('aria-pressed','false');});
+      document.getElementById('locationSearch').value="";
+      fillLocations("");
+      document.getElementById('carPrice').value="";
+      document.getElementById('productionYear').selectedIndex=0;
+      document.getElementById('engineType').selectedIndex=0;
+      document.getElementById('engineCC').value="";
+      document.getElementById('transportType').selectedIndex=0;
+      renderSummary();
+    });
+
+    // Calculate (just refreshes the summary for now)
+    document.getElementById('calcBtn').addEventListener('click', renderSummary);
   });
 </script>
 </body>
