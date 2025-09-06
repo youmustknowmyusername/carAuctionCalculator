@@ -16,17 +16,17 @@
     }
     *{box-sizing:border-box}
     body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.55 system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif}
-    .container{max-width:980px;margin:auto;padding:18px}          /* smaller overall width */
+    .container{max-width:1100px;margin:auto;padding:24px}
     header{position:sticky;top:0;z-index:10;background:color-mix(in oklab,var(--bg) 86%, transparent);border-bottom:1px solid var(--line);backdrop-filter:blur(8px)}
-    .nav{display:flex;justify-content:space-between;align-items:center;padding:12px 0}
+    .nav{display:flex;justify-content:space-between;align-items:center;padding:14px 0}
     .brand{font-weight:800}
-    .grid{display:grid;gap:14px}
-    @media(min-width:900px){.grid-2{grid-template-columns:1.15fr .85fr}} /* slightly tighter ratio */
-    .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px} /* slimmer padding */
+    .grid{display:grid;gap:16px}
+    @media(min-width:900px){.grid-2{grid-template-columns:1.2fr .8fr}}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px}
     h2 {
       font-size:22px;
       font-weight:800;
-      margin-bottom:12px;
+      margin-bottom:15px;
       margin-top:0px;
       text-align:center;
     }
@@ -126,16 +126,11 @@
     .total{font-weight:800;font-size:clamp(22px,3vw,32px);text-align:right}
     .muted{color:var(--muted);font-size:13px}
 
-    /* --- Safari-friendly tweaks (no layout changes elsewhere) --- */
+    /* Safari-friendly tweaks */
     @supports (-webkit-touch-callout: none) {
-      .card { border-radius: 16px; }
-      select, input, button { font-size: 16px; } /* prevents iOS zoom-on-focus */
+      select, input, button { font-size:16px; } /* prevent zoom on focus */
     }
   </style>
-
-  <!-- Choices.js (adds search box INSIDE the select) -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css"/>
-  <script defer src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
 </head>
 <body>
 <header>
@@ -215,7 +210,7 @@
 </main>
 
 <script>
-  /* Full list, then sorted copy */
+  /* Full locations list, then sorted copy */
   const LOCATIONS = [
     "AL-BIRMINGHAM","AL-DOTHAN","AL-HUNTSVILLE","AL-MOBILE","AL-MONTGOMERY","AL-TANNER",
     "AR-FAYETTEVILLE COPART","AR-FAYETTEVILLE IAA","AR-LITTLE ROCK COPART","AR-LITTLE ROCK IAA",
@@ -288,35 +283,24 @@
   ];
   const LOCATIONS_SORTED = [...LOCATIONS].sort((a,b)=>a.localeCompare(b));
 
-  /* Choices instance for the #location select */
-  let locationChoices = null;
-
   function fillLocations(filter = "") {
+    const sel = document.getElementById('location');
+    sel.innerHTML = '';
+    const ph = document.createElement('option');
+    ph.value = "";
+    ph.textContent = "Select location...";
+    ph.disabled = true;
+    ph.selected = true;
+    sel.appendChild(ph);
+
     const filtered = LOCATIONS_SORTED.filter(loc =>
       loc.toLowerCase().includes(filter.trim().toLowerCase())
     );
-
-    const choicesData = [
-      { value: "", label: "Select location...", selected: true, disabled: true },
-      ...filtered.map(loc => ({ value: loc, label: loc }))
-    ];
-
-    if (locationChoices) {
-      // Replace all items (true = remove existing)
-      locationChoices.setChoices(choicesData, 'value', 'label', true);
-    } else {
-      // Fallback (shouldn’t run after Choices init, but safe)
-      const sel = document.getElementById('location');
-      sel.innerHTML = '';
-      choicesData.forEach(c => {
-        const opt = document.createElement('option');
-        opt.value = c.value;
-        opt.textContent = c.label;
-        if (c.selected) opt.selected = true;
-        if (c.disabled) opt.disabled = true;
-        sel.appendChild(opt);
-      });
-    }
+    filtered.forEach(loc => {
+      const opt = document.createElement('option');
+      opt.value = opt.textContent = loc;
+      sel.appendChild(opt);
+    });
   }
 
   function setupAuctionButtons(){
@@ -385,27 +369,14 @@
 
   document.addEventListener('DOMContentLoaded', ()=>{
     setupAuctionButtons();
-
-    // Initialize Choices on the #location select (adds search inside dropdown)
-    locationChoices = new Choices('#location', {
-      searchEnabled: true,
-      searchPlaceholderValue: 'Search location...',
-      itemSelectText: '',
-      shouldSort: false,
-      position: 'bottom',
-      allowHTML: false
-    });
-
-    fillLocations();              // populate options into Choices
+    fillLocations();
     populateYears(2013);
     renderSummary();
 
-    // Keep your external search input working to filter the dropdown list
     document.getElementById('locationSearch').addEventListener('input', e=>{
       fillLocations(e.target.value);
       renderSummary();
     });
-
     document.getElementById('location').addEventListener('change', renderSummary);
     document.getElementById('carPrice').addEventListener('input', renderSummary);
     document.getElementById('productionYear').addEventListener('change', renderSummary);
