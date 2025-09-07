@@ -16,7 +16,7 @@
     }
     *{box-sizing:border-box}
     body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.55 system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif}
-    .container{max-width:980px;margin:auto;padding:24px} /* slightly smaller card as requested earlier */
+    .container{max-width:980px;margin:auto;padding:24px}
     header{position:sticky;top:0;z-index:10;background:color-mix(in oklab,var(--bg) 86%, transparent);border-bottom:1px solid var(--line);backdrop-filter:blur(8px)}
     .nav{display:flex;justify-content:space-between;align-items:center;padding:14px 0}
     .brand{font-weight:800}
@@ -57,10 +57,11 @@
     }
     .field input::-webkit-outer-spin-button,.field input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
 
-    /* Buttons row */
-    .buttons-row{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:16px;}
-    .buttons-row button{
-      height:44px;border:none;border-radius:12px;font-weight:700;color:#fff;cursor:pointer;
+    /* === Buttons in the SAME row as Transport type === */
+    .fields-actions{grid-template-columns: 1fr 0.6fr 0.6fr;}       /* left = transport; right = two buttons */
+    .fields-actions .action{display:flex;align-items:flex-end;}    /* align buttons to input baseline */
+    .fields-actions button{
+      width:100%;height:44px;border:none;border-radius:12px;font-weight:700;color:#fff;cursor:pointer;
     }
     #clearBtn{background:#ff3030;}
     #calcBtn{background:#00007F;}
@@ -70,7 +71,7 @@
     .total{font-weight:800;font-size:clamp(22px,3vw,32px);text-align:right}
     .muted{color:var(--muted);font-size:13px}
 
-    /* Safari touch zoom / form controls comfort */
+    /* Safari comfort */
     @supports (-webkit-touch-callout: none) { select, input, button { font-size:16px; } }
   </style>
 </head>
@@ -105,6 +106,7 @@
 
     <input type="hidden" id="auction" value="" />
 
+    <!-- Car price + Production year -->
     <div class="fields-row">
       <div class="field">
         <div class="field-label">Car price</div>
@@ -118,6 +120,7 @@
       </div>
     </div>
 
+    <!-- Engine type + Engine sm³ -->
     <div class="fields-row">
       <div class="field">
         <div class="field-label">Engine type</div>
@@ -135,7 +138,8 @@
       </div>
     </div>
 
-    <div class="fields-row">
+    <!-- Transport type + buttons on same row -->
+    <div class="fields-row fields-actions">
       <div class="field">
         <div class="field-label">Transport type</div>
         <select id="transportType">
@@ -147,12 +151,12 @@
           <option>Minivan</option>
         </select>
       </div>
-      <div class="field" aria-hidden="true"></div>
-    </div>
-
-    <div class="buttons-row">
-      <button id="clearBtn">Clear all</button>
-      <button id="calcBtn">Calculate</button>
+      <div class="action">
+        <button id="clearBtn">Clear all</button>
+      </div>
+      <div class="action">
+        <button id="calcBtn">Calculate</button>
+      </div>
     </div>
   </section>
 
@@ -170,7 +174,7 @@
 </main>
 
 <script>
-  /* ===== Full locations list from iaa.am (as provided earlier) ===== */
+  /* Full locations list (sorted) */
   const LOCATIONS = [
     "AL-BIRMINGHAM","AL-DOTHAN","AL-HUNTSVILLE","AL-MOBILE","AL-MONTGOMERY","AL-TANNER",
     "AR-FAYETTEVILLE COPART","AR-FAYETTEVILLE IAA","AR-LITTLE ROCK COPART","AR-LITTLE ROCK IAA",
@@ -243,17 +247,16 @@
   ];
   const LOCATIONS_SORTED = [...LOCATIONS].sort((a,b)=>a.localeCompare(b));
 
-  /* Build the select (with placeholder) and apply filter text */
   function fillLocations(filter="") {
     const sel = document.getElementById('location');
-    const current = sel.value; // try to preserve current when filtering
+    const current = sel.value;
     sel.innerHTML = '';
 
     const ph = document.createElement('option');
     ph.value = "";
     ph.textContent = "Select location...";
     ph.disabled = true;
-    ph.selected = !filter; // keep placeholder selected unless user already picked
+    ph.selected = !current;
     sel.appendChild(ph);
 
     const f = filter.trim().toLowerCase();
@@ -265,7 +268,6 @@
       sel.appendChild(opt);
     });
 
-    // Re-apply selection if still present in filtered set
     if (current && [...sel.options].some(o => o.value === current)) sel.value = current;
   }
 
@@ -339,12 +341,10 @@
     populateYears(2013);
     renderSummary();
 
-    // Live search: filters the select options as you type
     document.getElementById('locationSearch').addEventListener('input', e=>{
       fillLocations(e.target.value);
       renderSummary();
     });
-
     document.getElementById('location').addEventListener('change', renderSummary);
     document.getElementById('carPrice').addEventListener('input', renderSummary);
     document.getElementById('productionYear').addEventListener('change', renderSummary);
@@ -366,7 +366,7 @@
       renderSummary();
     });
 
-    // Calculate (just refreshes the summary for now)
+    // Calculate (no heavy calc yet — just refresh)
     document.getElementById('calcBtn').addEventListener('click', renderSummary);
   });
 </script>
