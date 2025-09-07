@@ -273,30 +273,47 @@
     "WY-CASPER"
   ];
   const LOCATIONS_SORTED = [...LOCATIONS].sort((a,b)=>a.localeCompare(b));
+function fillLocations(filter = "") {
+  const sel = document.getElementById('location');
+  const hadValue = sel.value;     // remember old value
+  sel.innerHTML = '';
 
-  function fillLocations(filter="") {
-    const sel = document.getElementById('location');
-    const current = sel.value;
-    sel.innerHTML = '';
+  // Placeholder
+  const ph = document.createElement('option');
+  ph.value = "";
+  ph.textContent = "Select location...";
+  ph.disabled = true;
+  ph.selected = true;             // always show placeholder when filtering
+  sel.appendChild(ph);
 
-    const ph = document.createElement('option');
-    ph.value = "";
-    ph.textContent = "Select location...";
-    ph.disabled = true;
-    ph.selected = !current;
-    sel.appendChild(ph);
+  // Normalized search: remove non-alphanumerics, ignore case/spaces/dashes
+  const norm = s => s.toLowerCase().replace(/[^a-z0-9]/g, '');
+  const f = norm(filter);
 
-    const f = filter.trim().toLowerCase();
-    const pool = f ? LOCATIONS_SORTED.filter(loc => loc.toLowerCase().includes(f)) : LOCATIONS_SORTED;
+  const pool = (f ? LOCATIONS_SORTED.filter(loc => norm(loc).includes(f)) : LOCATIONS_SORTED);
 
-    pool.forEach(loc => {
-      const opt = document.createElement('option');
-      opt.value = opt.textContent = loc;
-      sel.appendChild(opt);
-    });
-
-    if (current && [...sel.options].some(o => o.value === current)) sel.value = current;
+  if (pool.length === 0) {
+    const opt = document.createElement('option');
+    opt.value = "";
+    opt.textContent = "No matches";
+    opt.disabled = true;
+    sel.appendChild(opt);
+    return;
   }
+
+  pool.forEach(loc => {
+    const opt = document.createElement('option');
+    opt.value = opt.textContent = loc;
+    sel.appendChild(opt);
+  });
+
+  // If not filtering, re-select previous value if it still exists
+  if (!f && hadValue && [...sel.options].some(o => o.value === hadValue)) {
+    sel.value = hadValue;
+    ph.selected = false;
+  }
+}
+
 
   function setupAuctionButtons(){
     const buttons = document.querySelectorAll('#auctionButtons button');
