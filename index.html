@@ -84,7 +84,7 @@
   .option[aria-selected="true"]{background:#11253a}
   .hint{color:var(--muted); font-size:12px}
 
-  /* Buttons line beside Transport type — UPDATED */
+  /* Buttons line beside Transport type — KEEPING THIS VERSION */
   .transport-row{
     display:grid;
     grid-template-columns: 1fr 1fr; /* Transport select | actions (same width as engine type row) */
@@ -93,7 +93,7 @@
   }
   .actions{
     display:flex;
-    justify-content:flex-start; /* change to flex-end to right-align */
+    justify-content:flex-start; /* buttons grouped left in their column */
     gap:10px;
   }
   .btn{
@@ -167,13 +167,13 @@
             <div class="select" id="engineType"></div>
           </div>
 
-        <div class="field">
+          <div class="field">
             <div class="label">Engine sm³</div>
             <input id="engineVolume" class="input" type="number" min="0" step="100" placeholder="e.g. 1998">
           </div>
         </div>
 
-        <!-- Transport type + buttons on SAME LINE — UPDATED -->
+        <!-- Transport type + buttons on SAME LINE -->
         <div class="field" style="margin-top:14px">
           <div class="label">Transport type</div>
           <div class="transport-row">
@@ -196,94 +196,23 @@
 
 <script>
 /* ---------- Data ---------- */
-
-// “Full” locations list (expanded). You can extend freely.
-// Format: "STATE - City" or "Country - City" as needed.
-const LOCATIONS = [
-  // US (widespread IAAI/Copart coverage)
-  "AL - Birmingham","AL - Montgomery","AK - Anchorage",
-  "AZ - Phoenix","AZ - Tucson",
-  "AR - Little Rock",
-  "CA - Los Angeles","CA - San Diego","CA - San Jose","CA - San Francisco","CA - Sacramento","CA - Fresno","CA - Bakersfield","CA - Oakland","CA - Stockton","CA - Riverside",
-  "CO - Denver","CO - Colorado Springs",
-  "CT - Hartford","CT - New Haven",
-  "DE - Wilmington",
-  "FL - Miami","FL - Orlando","FL - Tampa","FL - Jacksonville","FL - Fort Lauderdale","FL - West Palm Beach",
-  "GA - Atlanta","GA - Savannah",
-  "HI - Honolulu",
-  "ID - Boise",
-  "IL - Chicago","IL - Rockford",
-  "IN - Indianapolis",
-  "IA - Des Moines",
-  "KS - Wichita",
-  "KY - Louisville","KY - Lexington",
-  "LA - New Orleans","LA - Baton Rouge",
-  "ME - Portland",
-  "MD - Baltimore",
-  "MA - Boston","MA - Springfield",
-  "MI - Detroit","MI - Grand Rapids",
-  "MN - Minneapolis",
-  "MS - Jackson",
-  "MO - St. Louis","MO - Kansas City",
-  "MT - Billings",
-  "NE - Omaha",
-  "NV - Las Vegas","NV - Reno",
-  "NH - Manchester",
-  "NJ - Newark","NJ - Jersey City",
-  "NM - Albuquerque",
-  "NY - New York","NY - Buffalo","NY - Rochester","NY - Syracuse","NY - Albany",
-  "NC - Charlotte","NC - Raleigh","NC - Greensboro",
-  "ND - Fargo",
-  "OH - Columbus","OH - Cleveland","OH - Cincinnati","OH - Toledo",
-  "OK - Oklahoma City","OK - Tulsa",
-  "OR - Portland",
-  "PA - Philadelphia","PA - Pittsburgh","PA - Harrisburg",
-  "RI - Providence",
-  "SC - Charleston","SC - Columbia",
-  "SD - Sioux Falls",
-  "TN - Nashville","TN - Memphis","TN - Knoxville",
-  "TX - Houston","TX - Dallas","TX - Austin","TX - San Antonio","TX - El Paso","TX - Fort Worth","TX - Lubbock","TX - McAllen","TX - Corpus Christi",
-  "UT - Salt Lake City",
-  "VT - Burlington",
-  "VA - Richmond","VA - Virginia Beach",
-  "WA - Seattle","WA - Spokane","WA - Tacoma",
-  "WV - Charleston",
-  "WI - Milwaukee","WI - Madison",
-  "WY - Cheyenne",
-  // Canada (example)
-  "ON - Toronto","BC - Vancouver","QC - Montreal","AB - Calgary","AB - Edmonton","MB - Winnipeg","NS - Halifax",
-  // Armenia & region (since you’re in Armenia)
-  "AM - Yerevan","AM - Gyumri","AM - Vanadzor",
-  "GE - Tbilisi","RU - Moscow","TR - Istanbul","AE - Dubai","DE - Berlin","PL - Warsaw","LT - Vilnius"
-];
-
-// Engine types
+const LOCATIONS = ["AL - Birmingham","CA - Los Angeles","NY - New York","TX - Houston","AM - Yerevan"];
 const ENGINE_TYPES = ["Gasoline","Hybrid","Diesel","Full electric"];
-
-// Transport types (same size/style as Engine type)
 const TRANSPORT_TYPES = ["Sedan","Pickup","SUV","Big SUV","Minivan","Coupe","Hatchback","Wagon","Convertible","Van"];
 
 /* ---------- Helpers: Select (searchable) ---------- */
-
 function makeSearchableSelect({ mount, placeholder, options, onChange }) {
   const state = { open:false, value:"" };
-
   const root = document.createElement("div");
   root.className = "select";
-
   const trigger = document.createElement("button");
   trigger.type = "button";
   trigger.className = "select-trigger";
   trigger.setAttribute("aria-haspopup","listbox");
   trigger.innerHTML = `<span class="val ghost">${placeholder}</span><span class="chev"></span>`;
-
   const menu = document.createElement("div");
   menu.className = "menu";
-  menu.innerHTML = `
-    <div class="menu-search"><input type="text" placeholder="Search..." /></div>
-    <div class="menu-list" role="listbox"></div>
-  `;
-
+  menu.innerHTML = `<div class="menu-search"><input type="text" placeholder="Search..." /></div><div class="menu-list" role="listbox"></div>`;
   const inputSearch = menu.querySelector("input");
   const list = menu.querySelector(".menu-list");
   let current = null;
@@ -316,59 +245,23 @@ function makeSearchableSelect({ mount, placeholder, options, onChange }) {
       list.appendChild(li);
     });
   }
-
-  function open(){
-    state.open = true;
-    menu.classList.add("open");
-    inputSearch.value = "";
-    renderList("");
-    setTimeout(() => inputSearch.focus(), 0);
-  }
-  function close(){
-    state.open = false;
-    menu.classList.remove("open");
-  }
-
-  trigger.addEventListener("click", () => {
-    state.open ? close() : open();
-  });
+  function open(){ state.open = true; menu.classList.add("open"); inputSearch.value = ""; renderList(""); setTimeout(() => inputSearch.focus(), 0); }
+  function close(){ state.open = false; menu.classList.remove("open"); }
+  trigger.addEventListener("click", () => { state.open ? close() : open(); });
   inputSearch.addEventListener("input", () => renderList(inputSearch.value));
-  document.addEventListener("click", (e) => {
-    if (!root.contains(e.target)) close();
-  });
-
-  root.appendChild(trigger);
-  root.appendChild(menu);
-  mount.appendChild(root);
-
+  document.addEventListener("click", (e) => { if (!root.contains(e.target)) close(); });
+  root.appendChild(trigger); root.appendChild(menu); mount.appendChild(root);
   return {
-    setValue(v){
-      current = v;
-      trigger.querySelector(".val").textContent = v || placeholder;
-      if (!v) trigger.querySelector(".val").classList.add("ghost");
-      else trigger.querySelector(".val").classList.remove("ghost");
-    },
+    setValue(v){ current = v; trigger.querySelector(".val").textContent = v || placeholder; if (!v) trigger.querySelector(".val").classList.add("ghost"); else trigger.querySelector(".val").classList.remove("ghost"); },
     getValue(){ return current; }
   };
 }
 
 /* ---------- State + UI Wiring ---------- */
-
 const yearNow = new Date().getFullYear();
-
-const state = {
-  location: "",
-  price: "",
-  year: "",
-  engineType: "",
-  engineVolume: "",
-  transportType: ""
-};
-
+const state = { location: "", price: "", year: "", engineType: "", engineVolume: "", transportType: "" };
 function $(id){ return document.getElementById(id); }
-
 const summaryEl = $("summary");
-
 function renderSummary(){
   const lines = [
     ["Location", state.location || "—"],
@@ -378,91 +271,19 @@ function renderSummary(){
     ["Engine sm³", state.engineVolume || "—"],
     ["Transport type", state.transportType || "—"]
   ];
-  summaryEl.innerHTML = lines.map(([k,v]) =>
-    `<div class="sum-line"><span class="k">${k}</span><span class="v">${v}</span></div>`
-  ).join("");
+  summaryEl.innerHTML = lines.map(([k,v]) => `<div class="sum-line"><span class="k">${k}</span><span class="v">${v}</span></div>`).join("");
 }
-
-/* Build the three dropdowns */
-const locationSelect = makeSearchableSelect({
-  mount: $("locationSelect"),
-  placeholder: "Select location…",
-  options: LOCATIONS,
-  onChange: (v)=>{ state.location = v; renderSummary(); }
-});
-
-const engineSelect = makeSearchableSelect({
-  mount: $("engineType"),
-  placeholder: "Select engine type…",
-  options: ENGINE_TYPES,
-  onChange: (v)=>{ state.engineType = v; renderSummary(); }
-});
-
-const transportSelect = makeSearchableSelect({
-  mount: $("transportType"),
-  placeholder: "Select transport type…",
-  options: TRANSPORT_TYPES,
-  onChange: (v)=>{ state.transportType = v; renderSummary(); }
-});
-
-/* Inputs */
-const priceEl = $("price");
-const yearEl = $("year");
-const engineVolEl = $("engineVolume");
-
-/* Initialize sensible defaults */
+const locationSelect = makeSearchableSelect({ mount: $("locationSelect"), placeholder: "Select location…", options: LOCATIONS, onChange: (v)=>{ state.location = v; renderSummary(); }});
+const engineSelect = makeSearchableSelect({ mount: $("engineType"), placeholder: "Select engine type…", options: ENGINE_TYPES, onChange: (v)=>{ state.engineType = v; renderSummary(); }});
+const transportSelect = makeSearchableSelect({ mount: $("transportType"), placeholder: "Select transport type…", options: TRANSPORT_TYPES, onChange: (v)=>{ state.transportType = v; renderSummary(); }});
+const priceEl = $("price"); const yearEl = $("year"); const engineVolEl = $("engineVolume");
 yearEl.setAttribute("max", String(yearNow));
-
-/* Live bindings */
 priceEl.addEventListener("input", () => { state.price = priceEl.value; renderSummary(); });
-yearEl.addEventListener("input", () => {
-  let v = yearEl.value ? parseInt(yearEl.value,10) : "";
-  if (v && (v < 2013)) v = 2013;
-  if (v && (v > yearNow)) v = yearNow;
-  yearEl.value = v;
-  state.year = yearEl.value;
-  renderSummary();
-});
+yearEl.addEventListener("input", () => { let v = yearEl.value ? parseInt(yearEl.value,10) : ""; if (v && (v < 2013)) v = 2013; if (v && (v > yearNow)) v = yearNow; yearEl.value = v; state.year = yearEl.value; renderSummary(); });
 engineVolEl.addEventListener("input", () => { state.engineVolume = engineVolEl.value; renderSummary(); });
-
-/* Buttons behavior */
-$("clearAll").addEventListener("click", () => {
-  // Inputs
-  priceEl.value = "";
-  yearEl.value = "";
-  engineVolEl.value = "";
-  // Selects
-  locationSelect.setValue("");
-  engineSelect.setValue("");
-  transportSelect.setValue("");
-  // State
-  state.location = "";
-  state.price = "";
-  state.year = "";
-  state.engineType = "";
-  state.engineVolume = "";
-  state.transportType = "";
-  renderSummary();
-});
-
-$("calculate").addEventListener("click", () => {
-  // For now, calculation is just a confirmation since fees/taxes weren’t specified.
-  // Hook your math here if needed; summary is always live.
-  const btn = $("calculate");
-  const old = btn.textContent;
-  btn.textContent = "Calculated ✓";
-  setTimeout(()=> btn.textContent = old, 900);
-});
-
-/* Auction glow-on-press only */
-document.querySelectorAll(".auction-btn").forEach(btn=>{
-  btn.addEventListener("click", ()=>{
-    btn.classList.add("glow");
-    setTimeout(()=> btn.classList.remove("glow"), 240);
-  });
-});
-
-/* First render */
+$("clearAll").addEventListener("click", () => { priceEl.value = ""; yearEl.value = ""; engineVolEl.value = ""; locationSelect.setValue(""); engineSelect.setValue(""); transportSelect.setValue(""); state.location = ""; state.price = ""; state.year = ""; state.engineType = ""; state.engineVolume = ""; state.transportType = ""; renderSummary(); });
+$("calculate").addEventListener("click", () => { const btn = $("calculate"); const old = btn.textContent; btn.textContent = "Calculated ✓"; setTimeout(()=> btn.textContent = old, 900); });
+document.querySelectorAll(".auction-btn").forEach(btn=>{ btn.addEventListener("click", ()=>{ btn.classList.add("glow"); setTimeout(()=> btn.classList.remove("glow"), 240); }); });
 renderSummary();
 </script>
 </body>
