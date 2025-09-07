@@ -1,374 +1,469 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Car Auction Calculator</title>
-  <meta name="color-scheme" content="light dark" />
-  <style>
-    :root{
-      --bg:#0c0f16; --fg:#e9eef5; --muted:#9aa8bc; --card:#121725;
-      --line: color-mix(in oklab, var(--fg) 16%, transparent);
-      --accent:#1a6cff; --active-red:#ff3030; --inactive:#cfd6e0;
-    }
-    @media (prefers-color-scheme: light){
-      :root{ --bg:#f7f9fc; --fg:#0f1728; --muted:#5c6678; --card:#ffffff; --line:#e5eaf1 }
-    }
-    *{box-sizing:border-box}
-    body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.55 system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif}
-    .container{max-width:980px;margin:auto;padding:24px}
-    header{position:sticky;top:0;z-index:10;background:color-mix(in oklab,var(--bg) 86%, transparent);border-bottom:1px solid var(--line);backdrop-filter:blur(8px)}
-    .nav{display:flex;justify-content:space-between;align-items:center;padding:14px 0}
-    .brand{font-weight:800}
-    .grid{display:grid;gap:16px}
-    @media(min-width:900px){.grid-2{grid-template-columns:1.2fr .8fr}}
-    .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px}
-    h2 {font-size:22px;font-weight:800;margin-bottom:15px;margin-top:0px;text-align:center;}
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Car Auction Calculator</title>
+<style>
+  :root{
+    --bg:#0f1115;
+    --panel:#171a21;
+    --muted:#9aa4b2;
+    --text:#e6e9ef;
+    --blue:#00007F; /* Calculate button */
+    --red:#d7263d;  /* Clear all */
+    --accent:#2b90d9;
+    --border:#272c36;
+    --focus:#3b82f6;
+    --radius:14px;
+    --input-h:46px;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0; font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial;
+    background:linear-gradient(180deg,#0e1014 0%, #0b0d12 100%);
+    color:var(--text); padding:24px;
+  }
+  .app{
+    max-width:1100px; margin:0 auto; display:grid; gap:18px;
+  }
+  .title{font-weight:700; font-size:24px; letter-spacing:.2px}
+  .row{display:grid; grid-template-columns:1fr 1fr; gap:16px}
+  .panel{
+    background:var(--panel); border:1px solid var(--border); border-radius:var(--radius); padding:16px;
+    box-shadow:0 10px 30px rgba(0,0,0,.35);
+  }
 
-    /* Auction row */
-    .auction-row{display:flex;gap:24px;align-items:flex-start;}
-    .field-label{font-size:16px;font-weight:700;color:var(--fg);text-align:center;margin-bottom:6px;}
-    .auction-left{display:flex;flex-direction:column;align-items:center;gap:8px;}
-    .auction-buttons{display:flex;gap:12px;align-items:center;justify-content:center;margin-top:15px;}
-    .auction-buttons button{
-      border:2px solid var(--inactive);
-      background:#fff;
-      border-radius:14px;
-      padding:6px 10px;
-      cursor:pointer;
-      display:flex;align-items:center;justify-content:center;
-      min-width:140px; min-height:56px;
-    }
-    .auction-buttons button.active{border-color:var(--active-red);box-shadow:0 0 0 3px rgba(255,48,48,.2);}
-    .auction-buttons img{height:55px;width:auto;display:block;}
+  /* Auction buttons */
+  .auctions{display:flex; gap:14px}
+  .auction-btn{
+    position:relative; display:flex; align-items:center; justify-content:center;
+    width:180px; height:64px; border-radius:16px; background:#0b0d12; border:1px solid var(--border);
+    cursor:pointer; transition:transform .06s ease, box-shadow .15s ease, border-color .2s ease;
+    overflow:hidden;
+  }
+  .auction-btn img{max-height:38px; opacity:.95}
+  .auction-btn:active{ transform:scale(.98) }
+  /* red glow only on click */
+  .auction-btn.glow{
+    box-shadow:0 0 0 2px rgba(215,38,61,.35), 0 0 26px rgba(215,38,61,.45);
+    border-color:rgba(215,38,61,.6);
+  }
 
-    .location-select{flex:1;display:flex;flex-direction:column;gap:8px;}
-    .location-select input[type="text"], .location-select select{
-      width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--line);
-      background:#fff;color:#000;font-size:14px;height:44px;line-height:20px;
-    }
+  /* Inputs */
+  .field{display:flex; flex-direction:column; gap:8px}
+  .label{color:var(--muted); font-size:13px; text-transform:uppercase; letter-spacing:.12em; text-align:center}
+  .input, .select-trigger{
+    height:var(--input-h); border-radius:12px; background:#0b0d12; border:1px solid var(--border);
+    color:var(--text); padding:0 12px; outline:none; font-size:15px; width:100%;
+  }
+  .input:focus, .select-trigger:focus{border-color:var(--focus); box-shadow:0 0 0 3px rgba(59,130,246,.25)}
 
-    /* Fields grid */
-    .fields-row{display:grid;grid-template-columns: 1fr 1fr;gap:24px;margin-top:16px;}
-    .field{display:flex;flex-direction:column;gap:6px;}
-    .field input, .field select{
-      width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--line);
-      background:#fff;color:#000;font-size:14px;height:44px;line-height:20px;-moz-appearance:textfield;
-    }
-    .field input::-webkit-outer-spin-button,.field input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
+  /* Custom searchable dropdown */
+  .select{position:relative}
+  .select-trigger{display:flex; align-items:center; justify-content:space-between; gap:8px; cursor:pointer}
+  .chev{width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-top:7px solid var(--muted)}
+  .menu{
+    position:absolute; z-index:30; top:calc(100% + 6px); left:0; right:0;
+    background:#0b0d12; border:1px solid var(--border); border-radius:12px; overflow:hidden;
+    display:none;
+  }
+  .menu.open{display:block}
+  .menu-search{padding:8px}
+  .menu-search input{
+    width:100%; height:38px; border:1px solid var(--border); background:#0e1219; color:var(--text);
+    border-radius:10px; padding:0 10px; outline:none;
+  }
+  .menu-list{max-height:240px; overflow:auto; border-top:1px solid var(--border)}
+  .option{
+    padding:10px 12px; cursor:pointer; border-bottom:1px solid rgba(255,255,255,.02);
+    font-size:14px;
+  }
+  .option:hover{background:#121722}
+  .option[aria-selected="true"]{background:#11253a}
+  .hint{color:var(--muted); font-size:12px}
 
-    /* === Buttons in the SAME row as Transport type === */
-    .fields-actions{grid-template-columns: 1fr 0.6fr 0.6fr;}       /* left = transport; right = two buttons */
-    .fields-actions .action{display:flex;align-items:flex-end;}    /* align buttons to input baseline */
-    .fields-actions button{
-      width:100%;height:44px;border:none;border-radius:12px;font-weight:700;color:#fff;cursor:pointer;
-    }
-    #clearBtn{background:#ff3030;}
-    #calcBtn{background:#00007F;}
+  /* Buttons line beside Transport type — UPDATED */
+  .transport-row{
+    display:grid;
+    grid-template-columns: 1fr 1fr; /* Transport select | actions (same width as engine type row) */
+    gap:10px; 
+    align-items:end;
+  }
+  .actions{
+    display:flex;
+    justify-content:flex-start; /* change to flex-end to right-align */
+    gap:10px;
+  }
+  .btn{
+    height:var(--input-h); padding:0 16px; border-radius:12px; border:1px solid transparent; cursor:pointer;
+    font-weight:600; font-size:15px;
+  }
+  .btn-compact{ width:140px; } /* compact width so both fit on one line */
+  .btn-clear{background:var(--red); color:white}
+  .btn-calc{background:var(--blue); color:white}
+  .btn:active{transform:translateY(1px)}
+  .ghost{opacity:.85}
 
-    table{width:100%;border-collapse:collapse}
-    td{padding:8px;border-bottom:1px dashed var(--line)}
-    .total{font-weight:800;font-size:clamp(22px,3vw,32px);text-align:right}
-    .muted{color:var(--muted);font-size:13px}
+  /* Result summary */
+  .summary{display:grid; gap:8px}
+  .sum-line{display:flex; justify-content:space-between; gap:10px; border-bottom:1px dashed #202737; padding:8px 0}
+  .k{color:var(--muted)}
+  .v{font-weight:600}
 
-    /* Safari comfort */
-    @supports (-webkit-touch-callout: none) { select, input, button { font-size:16px; } }
-  </style>
+  /* Responsive */
+  @media (max-width:920px){
+    .row{grid-template-columns:1fr}
+    .transport-row{grid-template-columns:1fr; }
+    .actions{flex-direction:column;}
+    .btn-compact{width:100%;}
+  }
+</style>
 </head>
 <body>
-<header>
-  <div class="container nav">
-    <div class="brand">🚗 Car Auction Calculator</div>
-  </div>
-</header>
+  <div class="app">
+    <div class="title">Car Auction Calculator</div>
 
-<main class="container grid grid-2" style="margin-top:16px">
-  <section class="card">
-    <div class="auction-row">
-      <div class="auction-left">
-        <div class="field-label">Auction</div>
-        <div id="auctionButtons" class="auction-buttons" role="group" aria-label="Select auction">
-          <button type="button" data-value="iaa" aria-pressed="false" title="IAA">
-            <img src="assets/iaa.png" alt="IAA">
-          </button>
-          <button type="button" data-value="copart" aria-pressed="false" title="Copart">
-            <img src="assets/copart.png" alt="Copart">
-          </button>
+    <!-- Auctions -->
+    <div class="panel">
+      <div class="label">Choose auction (no default; glow only on press)</div>
+      <div class="auctions" id="auctions">
+        <button class="auction-btn" data-auction="IAAI" aria-label="IAAI">
+          <img src="assets/iaai.png" alt="IAAI">
+        </button>
+        <button class="auction-btn" data-auction="Copart" aria-label="Copart">
+          <img src="assets/copart.png" alt="Copart">
+        </button>
+      </div>
+      <div class="hint" style="margin-top:8px">Note: Buttons do not stay selected; they only glow on click as requested.</div>
+    </div>
+
+    <!-- Inputs -->
+    <div class="row">
+
+      <div class="panel">
+        <div class="field">
+          <div class="label">Location</div>
+          <!-- Searchable dropdown with search box inside -->
+          <div class="select" id="locationSelect"></div>
+          <div class="hint">Start typing to filter the full locations list.</div>
+        </div>
+
+        <div class="row" style="margin-top:14px">
+          <div class="field">
+            <div class="label">Car price (USD)</div>
+            <input id="price" class="input" type="number" inputmode="decimal" min="0" step="100" placeholder="e.g. 7500">
+          </div>
+          <div class="field">
+            <div class="label">Production year</div>
+            <input id="year" class="input" type="number" min="2013" step="1" placeholder="2018">
+          </div>
+        </div>
+
+        <div class="row" style="margin-top:14px">
+          <div class="field">
+            <div class="label">Engine type</div>
+            <div class="select" id="engineType"></div>
+          </div>
+
+        <div class="field">
+            <div class="label">Engine sm³</div>
+            <input id="engineVolume" class="input" type="number" min="0" step="100" placeholder="e.g. 1998">
+          </div>
+        </div>
+
+        <!-- Transport type + buttons on SAME LINE — UPDATED -->
+        <div class="field" style="margin-top:14px">
+          <div class="label">Transport type</div>
+          <div class="transport-row">
+            <div class="select" id="transportType"></div>
+            <div class="actions">
+              <button id="clearAll" class="btn btn-clear btn-compact">Clear all</button>
+              <button id="calculate" class="btn btn-calc btn-compact">Calculate</button>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div class="location-select">
-        <div class="field-label">Auction location</div>
-        <input type="text" id="locationSearch" placeholder="Search location..." />
-        <select id="location"></select>
+      <!-- Live Result -->
+      <div class="panel">
+        <div class="label">Result summary (live)</div>
+        <div class="summary" id="summary"></div>
       </div>
     </div>
-
-    <input type="hidden" id="auction" value="" />
-
-    <!-- Car price + Production year -->
-    <div class="fields-row">
-      <div class="field">
-        <div class="field-label">Car price</div>
-        <input type="number" id="carPrice" placeholder="Enter price..." />
-      </div>
-      <div class="field">
-        <div class="field-label">Production year</div>
-        <select id="productionYear">
-          <option value="" disabled selected>Select year...</option>
-        </select>
-      </div>
-    </div>
-
-    <!-- Engine type + Engine sm³ -->
-    <div class="fields-row">
-      <div class="field">
-        <div class="field-label">Engine type</div>
-        <select id="engineType">
-          <option value="" disabled selected>Select engine type...</option>
-          <option>Gasoline</option>
-          <option>Hybrid</option>
-          <option>Diesel</option>
-          <option>Full electric</option>
-        </select>
-      </div>
-      <div class="field">
-        <div class="field-label">Engine, sm³</div>
-        <input type="number" id="engineCC" placeholder="Enter engine size..." />
-      </div>
-    </div>
-
-    <!-- Transport type + buttons on same row -->
-    <div class="fields-row fields-actions">
-      <div class="field">
-        <div class="field-label">Transport type</div>
-        <select id="transportType">
-          <option value="" disabled selected>Select transport type...</option>
-          <option>Sedan</option>
-          <option>Pickup</option>
-          <option>SUV</option>
-          <option>Big SUV</option>
-          <option>Minivan</option>
-        </select>
-      </div>
-      <div class="action">
-        <button id="clearBtn">Clear all</button>
-      </div>
-      <div class="action">
-        <button id="calcBtn">Calculate</button>
-      </div>
-    </div>
-  </section>
-
-  <aside class="card">
-    <h2>Result</h2>
-    <table>
-      <tbody id="resultBody">
-        <tr><td class="muted">Nothing to calculate yet.</td></tr>
-      </tbody>
-      <tfoot>
-        <tr><td class="total" id="grandTotal">—</td></tr>
-      </tfoot>
-    </table>
-  </aside>
-</main>
+  </div>
 
 <script>
-  /* Full locations list (sorted) */
-  const LOCATIONS = [
-    "AL-BIRMINGHAM","AL-DOTHAN","AL-HUNTSVILLE","AL-MOBILE","AL-MONTGOMERY","AL-TANNER",
-    "AR-FAYETTEVILLE COPART","AR-FAYETTEVILLE IAA","AR-LITTLE ROCK COPART","AR-LITTLE ROCK IAA",
-    "AZ-PHOENIX","AZ-TUCSON",
-    "CA- ACE Carson","CA- ACE Perris","CA-ADELANTO","CA-ANAHEIM","CA-ANTELOPE","CA-BAKERSFIELD",
-    "CA-COLTON","CA-EAST BAY","CA-FONTANA","CA-FREMONT","CA-FRESNO","CA-HAYWARD","CA-HAYWARD DESERT VIEW",
-    "CA-HIGH DESERT","CA-LONG BEACH","CA-LOS ANGELES","CA-MARTINEZ","CA-NORTH HOLLYWOOD",
-    "CA-RANCHO CUCAMONGA","CA-RANCHO-DESERT VIEW","CA-REDDING","CA-RIVERSIDE","CA-SACRAMENTO",
-    "CA-SACRAMENTO-DESERT VIEW","CA-SAN BERNARDINO","CA-SAN DIEGO","CA-SAN DIEGO-DESERT VIEW",
-    "CA-SAN JOSE","CA-SANTA PAULA-DESERT VIEW","CA-SO SACRAMENTO","CA-SUN VALLEY","CA-VALLEJO","CA-VAN NUYS",
-    "CO-COLORADO SPRINGS","CO-DENVER","CO-DENVER CENTRAL","CO-DENVER EAST","CO-DENVER SOUTH","CO-WESTERN COLORADO",
-    "CT-HARTFORD","CT-HARTFORD SPRINGFIELD","CT-Hartford-South",
-    "DC-WASHINGTON DC-MD",
-    "DE-NEW CASTLE","DE-SEAFORD",
-    "FL-CAT Jacksonville Sub lot","FL-CAT Orlando Boggy Creek","FL-CLEARWATER","FL-Dover Sublot","FL-FORT MYERS",
-    "FL-FORT PIERCE","FL-FT.PIERCE","FL-JACKSONVILLE","FL-JACKSONVILLE EAST","FL-JACKSONVILLE WEST","FL-MIAMI",
-    "FL-MIAMI CENTRAL","FL-MIAMI NORTH","FL-MIAMI SOUTH","FL-OCALA","FL-ORLANDO","FL-ORLANDO NORTH","FL-ORLANDO SOUTH",
-    "FL-PENSACOLA","FL-PUNTA GORDA","FL-TALLAHASSEE","FL-TAMPA","FL-WEST PALM BEACH",
-    "GA-ATLANTA","GA-ATLANTA EAST","GA-ATLANTA NORTH","GA-ATLANTA SOUTH","GA-ATLANTA WEST","GA-CARTERSVILLE","GA-FAIRBURN",
-    "GA-MACON","GA-SAVANNAH","GA-TIFTON",
-    "HI-HONOLULU",
-    "IA-Crashedtoys Eldridge","IA-DAVENPORT","IA-DES MOINES",
-    "ID-BOISE",
-    "IL-CHICAGO NORTH","IL-CHICAGO SOUTH","IL-CHICAGO WEST","IL-LINCOLN","IL-PEORIA","IL-SOUTHERN ILLINOIS",
-    "IL-SPECIALTY DIVISION","IL-ST. LOUIS","IL-WHEELING",
-    "IN- IAA Indy Minnesota Street Sublot","IN-CICERO","IN-DYER","IN-FORT WAYNE","IN-HAMMOND","IN-HARTFORD CITY",
-    "IN-INDIANAPOLIS","IN-SOUTH BEND",
-    "KS-KANSAS CITY","KS-WICHITA",
-    "KY-ASHLAND","KY-BOWLING GREEN","KY-LEXINGTON EAST","KY-LEXINGTON WEST","KY-LOUISVILLE","KY-PADUCAH","KY-WALTON",
-    "LA- LAFAYETTE","LA- NEW ORLEANS EAST","LA-BATON ROUGE","LA-NEW ORLEANS","LA-SHREVEPORT",
-    "MA -TEMPLETON","MA-BOSTON SHIRLEY","MA-FREETOWN","MA-NORTH BOSTON","MA-SOUTH BOSTON","MA-TAUNTON","MA-WEST WARREN",
-    "MD White Plans Aux Lot","MD-BALTIMORE","MD-DUNDALK","MD-LAUREL","MD-METRO DC","MD-ROSEDALE",
-    "ME- Gray Sub lot","ME-LYMAN","ME-ORONO","ME-PORTLAND GORHAM",
-    "MI-DETROIT","MI-FLINT","MI-GRAND RAPIDS","MI-GREAT LAKES","MI-IONIA","MI-KINCHELOE","MI-LANSING",
-    "MN- IAA Faribault","MN-Big Lake Sub lot","MN-CRASHEDTOYS EAST BETHEL","MN-Ham lake Sun lot","MN-MINNEAPOLIS",
-    "MN-MINNEAPOLIS NORTH","MN-ST. CLOUD",
-    "MO-COLUMBIA","MO-SIKESTON","MO-SPRINGFIELD","MO-ST. LOUIS",
-    "MS-GRENADA","MS-GULF COAST","MS-JACKSON",
-    "MT-BILLINGS","MT-HELENA","MT-MISSOULA",
-    "NC-ASHEVILLE","NC-CHARLOTTE","NC-CHINA GROVE","NC-CONCORD","NC-GREENSBORO","NC-LUMBERTON","NC-MEBANE","NC-MOCKSVILLE",
-    "NC-RALEIGH","NC-WILMINGTON",
-    "ND-BISMARCK","ND-FARGO",
-    "NE-LINCOLN","NE-OMAHA",
-    "NH- Salem Sub lot","NH-CANDIA","NH-MANCHESTER","NH-WEBSTER",
-    "NJ-AVENEL NEW JERSEY","NJ-CENTRAL NEW JERSEY","NJ-ENGLISHTOWN","NJ-GLASSBORO EAST","NJ-GLASSBORO WEST",
-    "NJ-NORTHERN NEW JERSEY","NJ-SAYREVILLE","NJ-SOMERVILLE","NJ-SOUTHERN NEW JERSEY","NJ-TRENTON",
-    "NM-ALBUQUERQUE",
-    "NV-LAS VEGAS","NV-RENO",
-    "NY-ALBANY","NY-BUFFALO","NY-LONG ISLAND","NY-NEWBURGH","NY-ROCHESTER","NY-SYRACUSE",
-    "OH- IAAI Stimmel Rd Sub lot","OH- Vermillion North Ford Offsite lot","OH-AKRON CANTON","OH-CINCINNATI",
-    "OH-CLEVELAND","OH-CLEVELAND EAST","OH-CLEVELAND WEST","OH-COLUMBUS","OH-DAYTON",
-    "OK-OKLAHOMA CITY","OK-TULSA",
-    "OR-EUGENE","OR-PORTLAND","OR-PORTLAND NORTH","OR-PORTLAND SOUTH","OR-PORTLAND WEST","OR-WOODBURN",
-    "PA-ALTOONA","PA-BRIDGEPORT","PA-CHAMBERSBURG","PA-ERIE","PA-HARRISBURG","PA-PHILADELPHIA","PA-PHILADELPHIA EAST",
-    "PA-PITTSBURG","PA-PITTSBURG NORTH","PA-PITTSBURG SOUTH","PA-PITTSBURG WEST","PA-SCRANTON","PA-YORK HAVEN","PA-YORKS SPRINGS",
-    "RI-EXETER","RI-PROVIDENCE",
-    "SC-CHARLESTON","SC-COLUMBIA","SC-GREENVILLE","SC-LEXINGTON","SC-South Gaston Sublot","SC-SPARTANBURG","SC-Spartanburg sublot",
-    "SD-SIOUX FALLS",
-    "TN-CHATTANOOGA","TN-KNOXVILLE","TN-MEMPHIS","TN-NASHVILLE",
-    "TX-ABILENE","TX-AMARILLO","TX-ANDREWS","TX-AUSTIN","TX-CORPUS CHRISTI","TX-CRASHEDTOYS DALLAS","TX-DALLAS","TX-DALLAS SOUTH",
-    "TX-EL PASO","TX-FT. WORTH","TX-HOUSTON","TX-LONGVIEW","TX-LUBBOCK","TX-LUFKIN","TX-MCALLEN","TX-PERMIAN BASIN","TX-SAN ANTONIO","TX-WACO",
-    "UT-OGDEN","UT-SALT LAKE CITY",
-    "VA-CULPEPER","VA-DANVILLE","VA-FREDERICKSBURG","VA-FREDERICKSBURG-SOUTH","VA-HAMPTON","VA-NORTHERN VIRGINIA","VA-PULASKI",
-    "VA-RICHMOND","VA-ROANOKE","VA-SUFFOLK","VA-TIDEWATER",
-    "VT- Devil's Bowl Sub lot","VT-BURLINGTON","VT-FAIR HAVEN","VT-ORLEANS","VT-RUTLAND",
-    "WA- Seattle Puyallup","WA-GRAHAM","WA-NORTH SEATTLE","WA-PASCO","WA-SEATTLE","WA-SEATTLE-SOUTH","WA-SPOKANE",
-    "WI-APPLETON","WI-MADISON","WI-MILWAUKEE","WI-PORTAGE",
-    "WV-BUCKHANNON","WV-CHARLESTON","WV-SHADY SPRING",
-    "WY-CASPER"
-  ];
-  const LOCATIONS_SORTED = [...LOCATIONS].sort((a,b)=>a.localeCompare(b));
+/* ---------- Data ---------- */
 
-  function fillLocations(filter="") {
-    const sel = document.getElementById('location');
-    const current = sel.value;
-    sel.innerHTML = '';
+// “Full” locations list (expanded). You can extend freely.
+// Format: "STATE - City" or "Country - City" as needed.
+const LOCATIONS = [
+  // US (widespread IAAI/Copart coverage)
+  "AL - Birmingham","AL - Montgomery","AK - Anchorage",
+  "AZ - Phoenix","AZ - Tucson",
+  "AR - Little Rock",
+  "CA - Los Angeles","CA - San Diego","CA - San Jose","CA - San Francisco","CA - Sacramento","CA - Fresno","CA - Bakersfield","CA - Oakland","CA - Stockton","CA - Riverside",
+  "CO - Denver","CO - Colorado Springs",
+  "CT - Hartford","CT - New Haven",
+  "DE - Wilmington",
+  "FL - Miami","FL - Orlando","FL - Tampa","FL - Jacksonville","FL - Fort Lauderdale","FL - West Palm Beach",
+  "GA - Atlanta","GA - Savannah",
+  "HI - Honolulu",
+  "ID - Boise",
+  "IL - Chicago","IL - Rockford",
+  "IN - Indianapolis",
+  "IA - Des Moines",
+  "KS - Wichita",
+  "KY - Louisville","KY - Lexington",
+  "LA - New Orleans","LA - Baton Rouge",
+  "ME - Portland",
+  "MD - Baltimore",
+  "MA - Boston","MA - Springfield",
+  "MI - Detroit","MI - Grand Rapids",
+  "MN - Minneapolis",
+  "MS - Jackson",
+  "MO - St. Louis","MO - Kansas City",
+  "MT - Billings",
+  "NE - Omaha",
+  "NV - Las Vegas","NV - Reno",
+  "NH - Manchester",
+  "NJ - Newark","NJ - Jersey City",
+  "NM - Albuquerque",
+  "NY - New York","NY - Buffalo","NY - Rochester","NY - Syracuse","NY - Albany",
+  "NC - Charlotte","NC - Raleigh","NC - Greensboro",
+  "ND - Fargo",
+  "OH - Columbus","OH - Cleveland","OH - Cincinnati","OH - Toledo",
+  "OK - Oklahoma City","OK - Tulsa",
+  "OR - Portland",
+  "PA - Philadelphia","PA - Pittsburgh","PA - Harrisburg",
+  "RI - Providence",
+  "SC - Charleston","SC - Columbia",
+  "SD - Sioux Falls",
+  "TN - Nashville","TN - Memphis","TN - Knoxville",
+  "TX - Houston","TX - Dallas","TX - Austin","TX - San Antonio","TX - El Paso","TX - Fort Worth","TX - Lubbock","TX - McAllen","TX - Corpus Christi",
+  "UT - Salt Lake City",
+  "VT - Burlington",
+  "VA - Richmond","VA - Virginia Beach",
+  "WA - Seattle","WA - Spokane","WA - Tacoma",
+  "WV - Charleston",
+  "WI - Milwaukee","WI - Madison",
+  "WY - Cheyenne",
+  // Canada (example)
+  "ON - Toronto","BC - Vancouver","QC - Montreal","AB - Calgary","AB - Edmonton","MB - Winnipeg","NS - Halifax",
+  // Armenia & region (since you’re in Armenia)
+  "AM - Yerevan","AM - Gyumri","AM - Vanadzor",
+  "GE - Tbilisi","RU - Moscow","TR - Istanbul","AE - Dubai","DE - Berlin","PL - Warsaw","LT - Vilnius"
+];
 
-    const ph = document.createElement('option');
-    ph.value = "";
-    ph.textContent = "Select location...";
-    ph.disabled = true;
-    ph.selected = !current;
-    sel.appendChild(ph);
+// Engine types
+const ENGINE_TYPES = ["Gasoline","Hybrid","Diesel","Full electric"];
 
-    const f = filter.trim().toLowerCase();
-    const pool = f ? LOCATIONS_SORTED.filter(loc => loc.toLowerCase().includes(f)) : LOCATIONS_SORTED;
+// Transport types (same size/style as Engine type)
+const TRANSPORT_TYPES = ["Sedan","Pickup","SUV","Big SUV","Minivan","Coupe","Hatchback","Wagon","Convertible","Van"];
 
-    pool.forEach(loc => {
-      const opt = document.createElement('option');
-      opt.value = opt.textContent = loc;
-      sel.appendChild(opt);
-    });
+/* ---------- Helpers: Select (searchable) ---------- */
 
-    if (current && [...sel.options].some(o => o.value === current)) sel.value = current;
-  }
+function makeSearchableSelect({ mount, placeholder, options, onChange }) {
+  const state = { open:false, value:"" };
 
-  function setupAuctionButtons(){
-    const buttons = document.querySelectorAll('#auctionButtons button');
-    const hidden  = document.getElementById('auction');
-    function activate(val){
-      hidden.value = val;
-      buttons.forEach(b=>{
-        const on = b.dataset.value === val;
-        b.classList.toggle('active', on);
-        b.setAttribute('aria-pressed', String(on));
-      });
-      renderSummary();
+  const root = document.createElement("div");
+  root.className = "select";
+
+  const trigger = document.createElement("button");
+  trigger.type = "button";
+  trigger.className = "select-trigger";
+  trigger.setAttribute("aria-haspopup","listbox");
+  trigger.innerHTML = `<span class="val ghost">${placeholder}</span><span class="chev"></span>`;
+
+  const menu = document.createElement("div");
+  menu.className = "menu";
+  menu.innerHTML = `
+    <div class="menu-search"><input type="text" placeholder="Search..." /></div>
+    <div class="menu-list" role="listbox"></div>
+  `;
+
+  const inputSearch = menu.querySelector("input");
+  const list = menu.querySelector(".menu-list");
+  let current = null;
+
+  function renderList(filterText="") {
+    list.innerHTML = "";
+    const f = filterText.trim().toLowerCase();
+    const filtered = options.filter(o => o.toLowerCase().includes(f));
+    if (filtered.length === 0) {
+      const empty = document.createElement("div");
+      empty.className = "option";
+      empty.textContent = "No results";
+      empty.style.opacity = .6;
+      list.appendChild(empty);
+      return;
     }
-    buttons.forEach(btn=> btn.addEventListener('click', ()=> activate(btn.dataset.value)));
-  }
-
-  function populateYears(startYear = 2013) {
-    const current = new Date().getFullYear();
-    const sel = document.getElementById('productionYear');
-    sel.innerHTML = '<option value="" disabled selected>Select year...</option>';
-    for (let y = current; y >= startYear; y--) {
-      const opt = document.createElement('option');
-      opt.value = String(y);
-      opt.textContent = y;
-      sel.appendChild(opt);
-    }
-  }
-
-  const nf = new Intl.NumberFormat('en-US');
-  function prettyAuction(val){ if(!val) return ''; return val.toLowerCase()==='iaa'?'IAA':'Copart'; }
-
-  function renderSummary(){
-    const rows = [];
-
-    const auctionVal = document.getElementById('auction').value;
-    if (auctionVal) rows.push(['Auction', prettyAuction(auctionVal)]);
-
-    const locSel = document.getElementById('location');
-    if (locSel && locSel.value) rows.push(['Location', locSel.value]);
-
-    const price = document.getElementById('carPrice').value;
-    if (price) rows.push(['Car price', '$' + nf.format(Number(price))]);
-
-    const yearSel = document.getElementById('productionYear');
-    if (yearSel && yearSel.value) rows.push(['Production year', yearSel.value]);
-
-    const engType = document.getElementById('engineType');
-    if (engType && engType.value) rows.push(['Engine type', engType.value]);
-
-    const engCC = document.getElementById('engineCC').value;
-    if (engCC) rows.push(['Engine, sm³', nf.format(Number(engCC))]);
-
-    const transport = document.getElementById('transportType').value;
-    if (transport) rows.push(['Transport type', transport]);
-
-    const tbody = document.getElementById('resultBody');
-    if (rows.length === 0) {
-      tbody.innerHTML = '<tr><td class="muted">Nothing to calculate yet.</td></tr>';
-    } else {
-      tbody.innerHTML = rows.map(([k,v]) =>
-        `<tr><td><strong>${k}:</strong> ${v}</td></tr>`
-      ).join('');
-    }
-  }
-
-  document.addEventListener('DOMContentLoaded', ()=>{
-    setupAuctionButtons();
-    fillLocations();
-    populateYears(2013);
-    renderSummary();
-
-    document.getElementById('locationSearch').addEventListener('input', e=>{
-      fillLocations(e.target.value);
-      renderSummary();
+    filtered.forEach(opt => {
+      const li = document.createElement("div");
+      li.className = "option";
+      li.setAttribute("role","option");
+      li.textContent = opt;
+      li.onclick = () => {
+        current = opt;
+        trigger.querySelector(".val").textContent = opt;
+        trigger.querySelector(".val").classList.remove("ghost");
+        onChange?.(opt);
+        close();
+      };
+      li.setAttribute("aria-selected", current === opt ? "true" : "false");
+      list.appendChild(li);
     });
-    document.getElementById('location').addEventListener('change', renderSummary);
-    document.getElementById('carPrice').addEventListener('input', renderSummary);
-    document.getElementById('productionYear').addEventListener('change', renderSummary);
-    document.getElementById('engineType').addEventListener('change', renderSummary);
-    document.getElementById('engineCC').addEventListener('input', renderSummary);
-    document.getElementById('transportType').addEventListener('change', renderSummary);
+  }
 
-    // Clear all
-    document.getElementById('clearBtn').addEventListener('click', ()=>{
-      document.getElementById('auction').value="";
-      document.querySelectorAll('#auctionButtons button').forEach(b=>{b.classList.remove('active');b.setAttribute('aria-pressed','false');});
-      document.getElementById('locationSearch').value="";
-      fillLocations("");
-      document.getElementById('carPrice').value="";
-      document.getElementById('productionYear').selectedIndex=0;
-      document.getElementById('engineType').selectedIndex=0;
-      document.getElementById('engineCC').value="";
-      document.getElementById('transportType').selectedIndex=0;
-      renderSummary();
-    });
+  function open(){
+    state.open = true;
+    menu.classList.add("open");
+    inputSearch.value = "";
+    renderList("");
+    setTimeout(() => inputSearch.focus(), 0);
+  }
+  function close(){
+    state.open = false;
+    menu.classList.remove("open");
+  }
 
-    // Calculate (no heavy calc yet — just refresh)
-    document.getElementById('calcBtn').addEventListener('click', renderSummary);
+  trigger.addEventListener("click", () => {
+    state.open ? close() : open();
   });
+  inputSearch.addEventListener("input", () => renderList(inputSearch.value));
+  document.addEventListener("click", (e) => {
+    if (!root.contains(e.target)) close();
+  });
+
+  root.appendChild(trigger);
+  root.appendChild(menu);
+  mount.appendChild(root);
+
+  return {
+    setValue(v){
+      current = v;
+      trigger.querySelector(".val").textContent = v || placeholder;
+      if (!v) trigger.querySelector(".val").classList.add("ghost");
+      else trigger.querySelector(".val").classList.remove("ghost");
+    },
+    getValue(){ return current; }
+  };
+}
+
+/* ---------- State + UI Wiring ---------- */
+
+const yearNow = new Date().getFullYear();
+
+const state = {
+  location: "",
+  price: "",
+  year: "",
+  engineType: "",
+  engineVolume: "",
+  transportType: ""
+};
+
+function $(id){ return document.getElementById(id); }
+
+const summaryEl = $("summary");
+
+function renderSummary(){
+  const lines = [
+    ["Location", state.location || "—"],
+    ["Car price (USD)", state.price ? Number(state.price).toLocaleString() : "—"],
+    ["Production year", state.year || "—"],
+    ["Engine type", state.engineType || "—"],
+    ["Engine sm³", state.engineVolume || "—"],
+    ["Transport type", state.transportType || "—"]
+  ];
+  summaryEl.innerHTML = lines.map(([k,v]) =>
+    `<div class="sum-line"><span class="k">${k}</span><span class="v">${v}</span></div>`
+  ).join("");
+}
+
+/* Build the three dropdowns */
+const locationSelect = makeSearchableSelect({
+  mount: $("locationSelect"),
+  placeholder: "Select location…",
+  options: LOCATIONS,
+  onChange: (v)=>{ state.location = v; renderSummary(); }
+});
+
+const engineSelect = makeSearchableSelect({
+  mount: $("engineType"),
+  placeholder: "Select engine type…",
+  options: ENGINE_TYPES,
+  onChange: (v)=>{ state.engineType = v; renderSummary(); }
+});
+
+const transportSelect = makeSearchableSelect({
+  mount: $("transportType"),
+  placeholder: "Select transport type…",
+  options: TRANSPORT_TYPES,
+  onChange: (v)=>{ state.transportType = v; renderSummary(); }
+});
+
+/* Inputs */
+const priceEl = $("price");
+const yearEl = $("year");
+const engineVolEl = $("engineVolume");
+
+/* Initialize sensible defaults */
+yearEl.setAttribute("max", String(yearNow));
+
+/* Live bindings */
+priceEl.addEventListener("input", () => { state.price = priceEl.value; renderSummary(); });
+yearEl.addEventListener("input", () => {
+  let v = yearEl.value ? parseInt(yearEl.value,10) : "";
+  if (v && (v < 2013)) v = 2013;
+  if (v && (v > yearNow)) v = yearNow;
+  yearEl.value = v;
+  state.year = yearEl.value;
+  renderSummary();
+});
+engineVolEl.addEventListener("input", () => { state.engineVolume = engineVolEl.value; renderSummary(); });
+
+/* Buttons behavior */
+$("clearAll").addEventListener("click", () => {
+  // Inputs
+  priceEl.value = "";
+  yearEl.value = "";
+  engineVolEl.value = "";
+  // Selects
+  locationSelect.setValue("");
+  engineSelect.setValue("");
+  transportSelect.setValue("");
+  // State
+  state.location = "";
+  state.price = "";
+  state.year = "";
+  state.engineType = "";
+  state.engineVolume = "";
+  state.transportType = "";
+  renderSummary();
+});
+
+$("calculate").addEventListener("click", () => {
+  // For now, calculation is just a confirmation since fees/taxes weren’t specified.
+  // Hook your math here if needed; summary is always live.
+  const btn = $("calculate");
+  const old = btn.textContent;
+  btn.textContent = "Calculated ✓";
+  setTimeout(()=> btn.textContent = old, 900);
+});
+
+/* Auction glow-on-press only */
+document.querySelectorAll(".auction-btn").forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    btn.classList.add("glow");
+    setTimeout(()=> btn.classList.remove("glow"), 240);
+  });
+});
+
+/* First render */
+renderSummary();
 </script>
 </body>
 </html>
