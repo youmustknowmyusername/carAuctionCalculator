@@ -275,31 +275,41 @@
   const LOCATIONS_SORTED = [...LOCATIONS].sort((a,b)=>a.localeCompare(b));
 function fillLocations(filter = "") {
   const sel = document.getElementById('location');
-  const hadValue = sel.value;     // remember old value
+  const hadValue = sel.value;
   sel.innerHTML = '';
 
-  // Placeholder
+  // Placeholder always at top
   const ph = document.createElement('option');
   ph.value = "";
   ph.textContent = "Select location...";
   ph.disabled = true;
-  ph.selected = true;             // always show placeholder when filtering
+  ph.selected = !hadValue;
   sel.appendChild(ph);
 
-  // Normalized search: remove non-alphanumerics, ignore case/spaces/dashes
-  const norm = s => s.toLowerCase().replace(/[^a-z0-9]/g, '');
-  const f = norm(filter);
-
-  const pool = (f ? LOCATIONS_SORTED.filter(loc => norm(loc).includes(f)) : LOCATIONS_SORTED);
-
-  if (pool.length === 0) {
-    const opt = document.createElement('option');
-    opt.value = "";
-    opt.textContent = "No matches";
-    opt.disabled = true;
-    sel.appendChild(opt);
-    return;
+  // If there is text typed in the search box, add it as the first real option
+  if (filter.trim() !== "") {
+    const custom = document.createElement('option');
+    custom.value = filter;
+    custom.textContent = filter + " (custom)";
+    sel.appendChild(custom);
   }
+
+  // Normalized filtering of the official list
+  const f = filter.trim().toLowerCase();
+  const pool = f ? LOCATIONS_SORTED.filter(loc => loc.toLowerCase().includes(f)) : LOCATIONS_SORTED;
+
+  pool.forEach(loc => {
+    const opt = document.createElement('option');
+    opt.value = opt.textContent = loc;
+    sel.appendChild(opt);
+  });
+
+  // Restore selection if still valid
+  if (hadValue && [...sel.options].some(o => o.value === hadValue)) {
+    sel.value = hadValue;
+  }
+}
+
 
   pool.forEach(loc => {
     const opt = document.createElement('option');
