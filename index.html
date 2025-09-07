@@ -137,7 +137,7 @@
     <div class="fields-row">
       <div class="field">
         <div class="field-label">Car price</div>
-        <input type="number" id="carPrice" placeholder="Enter price..." />
+       <input type="number" id="carPrice" inputmode="numeric" pattern="\d*" placeholder="Enter price..." />
       </div>
       <div class="field">
         <div class="field-label">Production year</div>
@@ -161,7 +161,7 @@
       </div>
       <div class="field">
         <div class="field-label">Engine, sm³</div>
-        <input type="number" id="engineCC" placeholder="Enter engine size..." />
+<input type="number" id="engineCC" inputmode="numeric" pattern="\d*" placeholder="Enter engine size..." />
       </div>
     </div>
 
@@ -392,6 +392,16 @@
       document.getElementById('transportType').selectedIndex=0;
       renderSummary();
     });
+
+    // Force only digits for carPrice and engineCC
+['carPrice', 'engineCC'].forEach(id => {
+  document.getElementById(id).addEventListener('keypress', e => {
+    if (!/[0-9]/.test(e.key)) {
+      e.preventDefault();
+    }
+  });
+});
+
 
     // Calculate (no heavy calc yet — just refresh)
     document.getElementById('calcBtn').addEventListener('click', renderSummary);
