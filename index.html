@@ -420,6 +420,59 @@ function fillLocations(filter = "") {
       renderSummary();
     });
 
+    function fillLocations(filter = "") {
+  const sel = document.getElementById('location');
+  sel.innerHTML = '';
+
+  // Placeholder
+  const ph = document.createElement('option');
+  ph.value = "";
+  ph.textContent = "Select location...";
+  ph.disabled = true;
+  ph.selected = true;
+  sel.appendChild(ph);
+
+  // Add matching items from LOCATIONS
+  const f = filter.trim().toLowerCase();
+  const pool = f ? LOCATIONS_SORTED.filter(loc => loc.toLowerCase().includes(f)) : LOCATIONS_SORTED;
+
+  if (pool.length === 0) {
+    const opt = document.createElement('option');
+    opt.value = "";
+    opt.textContent = "No matches found";
+    opt.disabled = true;
+    sel.appendChild(opt);
+    return;
+  }
+
+  pool.forEach(loc => {
+    const opt = document.createElement('option');
+    opt.value = opt.textContent = loc;
+    sel.appendChild(opt);
+  });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  setupAuctionButtons();
+  fillLocations(); // <-- shows the full list at start
+  populateYears(2013);
+  renderSummary();
+
+  // Update as you type in search box
+  document.getElementById('locationSearch').addEventListener('input', e => {
+    fillLocations(e.target.value);
+    renderSummary();
+  });
+
+  document.getElementById('location').addEventListener('change', renderSummary);
+  document.getElementById('carPrice').addEventListener('input', renderSummary);
+  document.getElementById('productionYear').addEventListener('change', renderSummary);
+  document.getElementById('engineType').addEventListener('change', renderSummary);
+  document.getElementById('engineCC').addEventListener('input', renderSummary);
+  document.getElementById('transportType').addEventListener('change', renderSummary);
+});
+
+
     // Force only digits for carPrice and engineCC
 ['carPrice', 'engineCC'].forEach(id => {
   document.getElementById(id).addEventListener('keypress', e => {
