@@ -273,26 +273,7 @@
     "WY-CASPER"
   ];
   const LOCATIONS_SORTED = [...LOCATIONS].sort((a,b)=>a.localeCompare(b));
-function fillLocations(filter = "") {
-  const sel = document.getElementById('location');
-  const hadValue = sel.value;
-  sel.innerHTML = '';
-
-  // Placeholder always at top
-  const ph = document.createElement('option');
-  ph.value = "";
-  ph.textContent = "Select location...";
-  ph.disabled = true;
-  ph.selected = !hadValue;
-  sel.appendChild(ph);
-
-  // If there is text typed in the search box, add it as the first real option
-  if (filter.trim() !== "") {
-    const custom = document.createElement('option');
-    custom.value = filter;
-    custom.textContent = filter + " (custom)";
-    sel.appendChild(custom);
-  }
+fillLocations
 
   // Normalized filtering of the official list
   const f = filter.trim().toLowerCase();
