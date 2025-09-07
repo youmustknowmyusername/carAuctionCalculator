@@ -417,15 +417,6 @@ fillLocations
   const f = filter.trim().toLowerCase();
   const pool = f ? LOCATIONS_SORTED.filter(loc => loc.toLowerCase().includes(f)) : LOCATIONS_SORTED;
 
-  if (pool.length === 0) {
-    const opt = document.createElement('option');
-    opt.value = "";
-    opt.textContent = "No matches found";
-    opt.disabled = true;
-    sel.appendChild(opt);
-    return;
-  }
-
   pool.forEach(loc => {
     const opt = document.createElement('option');
     opt.value = opt.textContent = loc;
@@ -435,7 +426,6 @@ fillLocations
 
 document.addEventListener('DOMContentLoaded', () => {
   setupAuctionButtons();
-  fillLocations(); // <-- shows the full list at start
   populateYears(2013);
   renderSummary();
 
@@ -445,7 +435,10 @@ document.addEventListener('DOMContentLoaded', () => {
     renderSummary();
   });
 
-  document.getElementById('location').addEventListener('change', renderSummary);
+document.getElementById('locationSearch').addEventListener('input', e=>{
+  fillLocations(e.target.value);
+  renderSummary();
+});
   document.getElementById('carPrice').addEventListener('input', renderSummary);
   document.getElementById('productionYear').addEventListener('change', renderSummary);
   document.getElementById('engineType').addEventListener('change', renderSummary);
