@@ -100,6 +100,7 @@
   /* Ensure space for the arrow so text doesn't overlap */
   padding-right: 32px;
 }
+
   </style>
 </head>
 <body>
@@ -137,7 +138,7 @@
     <div class="fields-row">
       <div class="field">
         <div class="field-label">Car price</div>
-       <input type="number" id="carPrice" inputmode="numeric" pattern="\d*" placeholder="Enter price..." />
+        <input type="number" id="carPrice" placeholder="Enter price..." />
       </div>
       <div class="field">
         <div class="field-label">Production year</div>
@@ -161,7 +162,7 @@
       </div>
       <div class="field">
         <div class="field-label">Engine, sm³</div>
-<input type="number" id="engineCC" inputmode="numeric" pattern="\d*" placeholder="Enter engine size..." />
+        <input type="number" id="engineCC" placeholder="Enter engine size..." />
       </div>
     </div>
 
@@ -273,38 +274,30 @@
     "WY-CASPER"
   ];
   const LOCATIONS_SORTED = [...LOCATIONS].sort((a,b)=>a.localeCompare(b));
-fillLocations
 
-  // Normalized filtering of the official list
-  const f = filter.trim().toLowerCase();
-  const pool = f ? LOCATIONS_SORTED.filter(loc => loc.toLowerCase().includes(f)) : LOCATIONS_SORTED;
+  function fillLocations(filter="") {
+    const sel = document.getElementById('location');
+    const current = sel.value;
+    sel.innerHTML = '';
 
-  pool.forEach(loc => {
-    const opt = document.createElement('option');
-    opt.value = opt.textContent = loc;
-    sel.appendChild(opt);
-  });
+    const ph = document.createElement('option');
+    ph.value = "";
+    ph.textContent = "Select location...";
+    ph.disabled = true;
+    ph.selected = !current;
+    sel.appendChild(ph);
 
-  // Restore selection if still valid
-  if (hadValue && [...sel.options].some(o => o.value === hadValue)) {
-    sel.value = hadValue;
+    const f = filter.trim().toLowerCase();
+    const pool = f ? LOCATIONS_SORTED.filter(loc => loc.toLowerCase().includes(f)) : LOCATIONS_SORTED;
+
+    pool.forEach(loc => {
+      const opt = document.createElement('option');
+      opt.value = opt.textContent = loc;
+      sel.appendChild(opt);
+    });
+
+    if (current && [...sel.options].some(o => o.value === current)) sel.value = current;
   }
-}
-
-
-  pool.forEach(loc => {
-    const opt = document.createElement('option');
-    opt.value = opt.textContent = loc;
-    sel.appendChild(opt);
-  });
-
-  // If not filtering, re-select previous value if it still exists
-  if (!f && hadValue && [...sel.options].some(o => o.value === hadValue)) {
-    sel.value = hadValue;
-    ph.selected = false;
-  }
-}
-
 
   function setupAuctionButtons(){
     const buttons = document.querySelectorAll('#auctionButtons button');
@@ -400,62 +393,6 @@ fillLocations
       document.getElementById('transportType').selectedIndex=0;
       renderSummary();
     });
-
-    function fillLocations(filter = "") {
-  const sel = document.getElementById('location');
-  sel.innerHTML = '';
-
-  // Placeholder
-  const ph = document.createElement('option');
-  ph.value = "";
-  ph.textContent = "Select location...";
-  ph.disabled = true;
-  ph.selected = true;
-  sel.appendChild(ph);
-
-  // Add matching items from LOCATIONS
-  const f = filter.trim().toLowerCase();
-  const pool = f ? LOCATIONS_SORTED.filter(loc => loc.toLowerCase().includes(f)) : LOCATIONS_SORTED;
-
-  pool.forEach(loc => {
-    const opt = document.createElement('option');
-    opt.value = opt.textContent = loc;
-    sel.appendChild(opt);
-  });
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-  setupAuctionButtons();
-  populateYears(2013);
-  renderSummary();
-
-  // Update as you type in search box
-  document.getElementById('locationSearch').addEventListener('input', e => {
-    fillLocations(e.target.value);
-    renderSummary();
-  });
-
-document.getElementById('locationSearch').addEventListener('input', e=>{
-  fillLocations(e.target.value);
-  renderSummary();
-});
-  document.getElementById('carPrice').addEventListener('input', renderSummary);
-  document.getElementById('productionYear').addEventListener('change', renderSummary);
-  document.getElementById('engineType').addEventListener('change', renderSummary);
-  document.getElementById('engineCC').addEventListener('input', renderSummary);
-  document.getElementById('transportType').addEventListener('change', renderSummary);
-});
-
-
-    // Force only digits for carPrice and engineCC
-['carPrice', 'engineCC'].forEach(id => {
-  document.getElementById(id).addEventListener('keypress', e => {
-    if (!/[0-9]/.test(e.key)) {
-      e.preventDefault();
-    }
-  });
-});
-
 
     // Calculate (no heavy calc yet — just refresh)
     document.getElementById('calcBtn').addEventListener('click', renderSummary);
