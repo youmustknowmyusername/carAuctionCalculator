@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,14 +6,8 @@
   <title>Car Auction Calculator</title>
   <meta name="color-scheme" content="light dark" />
   <style>
-    :root{
-      --bg:#0c0f16; --fg:#e9eef5; --muted:#9aa8bc; --card:#121725;
-      --line: color-mix(in oklab, var(--fg) 16%, transparent);
-      --accent:#1a6cff; --active-red:#ff3030; --inactive:#cfd6e0;
-    }
-    @media (prefers-color-scheme: light){
-      :root{ --bg:#f7f9fc; --fg:#0f1728; --muted:#5c6678; --card:#ffffff; --line:#e5eaf1 }
-    }
+    :root{--bg:#0c0f16;--fg:#e9eef5;--muted:#9aa8bc;--card:#121725;--line:color-mix(in oklab,var(--fg) 16%,transparent);--accent:#1a6cff;--active-red:#ff3030;--inactive:#cfd6e0}
+    @media (prefers-color-scheme: light){:root{--bg:#f7f9fc;--fg:#0f1728;--muted:#5c6678;--card:#fff;--line:#e5eaf1}}
     *{box-sizing:border-box}
     body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.55 system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif}
     .container{max-width:980px;margin:auto;padding:24px}
@@ -24,7 +17,7 @@
     .grid{display:grid;gap:16px}
     @media(min-width:900px){.grid-2{grid-template-columns:1.2fr .8fr}}
     .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px}
-    h2 {font-size:22px;font-weight:800;margin-bottom:15px;margin-top:0px;text-align:center;}
+    h2{font-size:22px;font-weight:800;margin:0 0 15px;text-align:center}
 
     /* Auction row */
     .auction-row{display:flex;gap:24px;align-items:flex-start;}
@@ -33,13 +26,8 @@
     .auction-buttons{display:flex;gap:12px;align-items:center;justify-content:center;margin-top:15px;}
     .auction-buttons button{
       border:2px solid var(--inactive);
-      background:#fff;
-      border-radius:14px;
-      padding:6px 10px;
-      cursor:pointer;
-      display:flex;align-items:center;justify-content:center;
-      min-width:115px; 
-      min-height:56px;
+      background:#fff;border-radius:14px;padding:6px 10px;cursor:pointer;
+      display:flex;align-items:center;justify-content:center;min-width:115px;min-height:56px;
     }
     .auction-buttons button.active{border-color:var(--active-red);box-shadow:0 0 0 3px rgba(255,48,48,.2);}
     .auction-buttons img{height:55px;width:auto;display:block;}
@@ -59,18 +47,10 @@
     }
     .field input::-webkit-outer-spin-button,.field input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
 
-    /* === Buttons in the SAME row as Transport type === */
-    .fields-actions{grid-template-columns: 1fr 0.45fr 0.45fr;}       /* left = transport; right = two buttons */
-    .fields-actions .action{display:flex;align-items:flex-end;}    /* align buttons to input baseline */
-    .fields-actions button{
-      width:100%;
-      height:44px;
-      border:none;
-      border-radius:12px;
-      font-weight:700;
-      color:#fff;
-      cursor:pointer;
-    }
+    /* Buttons in SAME row as Transport type */
+    .fields-actions{grid-template-columns: 1fr 0.45fr 0.45fr;}
+    .fields-actions .action{display:flex;align-items:flex-end;}
+    .fields-actions button{width:100%;height:44px;border:none;border-radius:12px;font-weight:700;color:#fff;cursor:pointer;}
     #clearBtn{background:#ff3030;}
     #calcBtn{background:#00007F;}
 
@@ -82,84 +62,32 @@
     /* Safari comfort */
     @supports (-webkit-touch-callout: none) { select, input, button { font-size:16px; } }
 
-    /* --------------------------------------------------
-       Custom dropdown arrow (moved more to the RIGHT)
-       Applies to all <select> fields, including location
-       -------------------------------------------------- */
-    .field select,
-    .location-select select{
-      appearance:none;
-      -webkit-appearance:none;
-      -moz-appearance:none;
-
-      /* Add our own arrow (black chevron) */
-      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23000' d='M7 10l5 5 5-5z'/></svg>");
-      background-repeat: no-repeat;
-      background-size: 14px;
-      background-position: right 8px center; /* closer to right edge */
-
-      /* Ensure space for the arrow so text doesn't overlap */
-      padding-right: 32px;
+    /* Custom dropdown arrow on selects (kept; harmless if no select used here) */
+    .field select, .location-select select{
+      appearance:none;-webkit-appearance:none;-moz-appearance:none;
+      background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23000' d='M7 10l5 5 5-5z'/></svg>");
+      background-repeat:no-repeat;background-size:14px;background-position:right 8px center;padding-right:32px;
     }
 
-    /* ===== Mobile polish (add-only) ===== */
+    /* Mobile polish (already in base) */
     @media (max-width: 700px) {
       .container { padding: 16px; }
-
-      /* Stack auction column above location selector */
-      .auction-row {
-        flex-direction: column;
-        gap: 16px;
-      }
-
-      /* Let IAA/Copart wrap nicely; keep good spacing */
-      .auction-buttons {
-        flex-wrap: wrap;
-        gap: 10px 12px;
-      }
-      .auction-buttons button {
-        min-width: 140px;   /* readable tap target */
-        min-height: 52px;
-      }
-      .auction-buttons img {
-        height: 48px;
-      }
-
-      /* Fields: single column on small screens */
-      .fields-row { 
-        grid-template-columns: 1fr;
-        gap: 14px;
-        margin-top: 12px;
-      }
-
-      /* Transport + action buttons row becomes 1 column */
-      .fields-actions { 
-        grid-template-columns: 1fr;
-      }
-      .fields-actions .action button {
-        height: 44px;       /* consistent tap height */
-      }
-
-      /* Inputs: a bit tighter horizontally, comfy vertically */
+      .auction-row { flex-direction: column; gap: 16px; }
+      .auction-buttons { flex-wrap: wrap; gap: 10px 12px; }
+      .auction-buttons button { min-width: 140px; min-height: 52px; }
+      .auction-buttons img { height: 48px; }
+      .fields-row { grid-template-columns: 1fr; gap: 14px; margin-top: 12px; }
+      .fields-actions { grid-template-columns: 1fr; }
+      .fields-actions .action button { height: 44px; }
       .field input, .field select,
       .location-select input[type="text"], .location-select select {
-        height: 46px;
-        padding: 11px 14px;
-        font-size: 16px;    /* avoids iOS zoom */
+        height: 46px; padding: 11px 14px; font-size: 16px;
       }
-
-      /* Table readability */
       .muted { font-size: 12px; }
       .total { font-size: clamp(22px, 6vw, 30px); }
-
-      /* Header spacing */
       h2 { font-size: 20px; margin-bottom: 12px; }
-
-      /* Ensure any images never overflow their card */
       img { max-width: 100%; height: auto; }
     }
-
-    /* Slightly denser layout for mid screens (tablets) */
     @media (min-width: 701px) and (max-width: 900px) {
       .container { padding: 20px; }
       .fields-row { gap: 18px; }
@@ -190,8 +118,11 @@
 
       <div class="location-select">
         <div class="field-label">Auction location</div>
-        <input type="text" id="locationSearch" placeholder="Search location..." />
-        <select id="location"></select>
+
+        <!-- REPLACED: search + select -->
+        <!-- NOW: a single input with datalist -->
+        <input type="text" id="locationSearch" list="locations" placeholder="Search location..." />
+        <datalist id="locations"></datalist>
       </div>
     </div>
 
@@ -336,45 +267,32 @@
     "WV-BUCKHANNON","WV-CHARLESTON","WV-SHADY SPRING",
     "WY-CASPER"
   ];
-  const LOCATIONS_SORTED = [...LOCATIONS].sort((a,b)=>a.localeCompare(b));
+  const LOCATIONS_SORTED = [...LOCATIONS].sort((a, b) => a.localeCompare(b));
 
-  function fillLocations(filter="") {
-    const sel = document.getElementById('location');
-    const current = sel.value;
-    sel.innerHTML = '';
-
-    const ph = document.createElement('option');
-    ph.value = "";
-    ph.textContent = "Select location...";
-    ph.disabled = true;
-    ph.selected = !current;
-    sel.appendChild(ph);
-
-    const f = filter.trim().toLowerCase();
-    const pool = f ? LOCATIONS_SORTED.filter(loc => loc.toLowerCase().includes(f)) : LOCATIONS_SORTED;
-
-    for (const loc of pool) {
+  // Build datalist once (browser will handle filtering)
+  function buildLocationDatalist() {
+    const dl = document.getElementById('locations');
+    dl.innerHTML = '';
+    for (const loc of LOCATIONS_SORTED) {
       const opt = document.createElement('option');
-      opt.value = opt.textContent = loc;
-      sel.appendChild(opt);
+      opt.value = loc;
+      dl.appendChild(opt);
     }
-
-    if (current && [...sel.options].some(o => o.value === current)) sel.value = current;
   }
 
-  function setupAuctionButtons(){
+  function setupAuctionButtons() {
     const buttons = document.querySelectorAll('#auctionButtons button');
     const hidden  = document.getElementById('auction');
     function activate(val){
       hidden.value = val;
-      buttons.forEach(b=>{
+      buttons.forEach(b => {
         const on = b.dataset.value === val;
         b.classList.toggle('active', on);
         b.setAttribute('aria-pressed', String(on));
       });
       renderSummary();
     }
-    buttons.forEach(btn=> btn.addEventListener('click', ()=> activate(btn.dataset.value)));
+    buttons.forEach(btn => btn.addEventListener('click', () => activate(btn.dataset.value)));
   }
 
   function populateYears(startYear = 2013) {
@@ -392,36 +310,35 @@
   const nf = new Intl.NumberFormat('en-US');
   function formatCurrency(val){ return val ? '$' + nf.format(Number(val)) : ''; }
   function formatNumber(val){ return val ? nf.format(Number(val)) : ''; }
-  function prettyAuction(val){ if(!val) return ''; return val.toLowerCase()==='iaa'?'IAA':'Copart'; }
+  function prettyAuction(val){ if(!val) return ''; return val.toLowerCase()==='iaa' ? 'IAA' : 'Copart'; }
 
   function renderSummary(){
     const rows = [
-      ['Auction',          prettyAuction(document.getElementById('auction').value)],
-      ['Location',         document.getElementById('location').value],
-      ['Car price',        formatCurrency(document.getElementById('carPrice').value)],
-      ['Production year',  document.getElementById('productionYear').value],
-      ['Engine type',      document.getElementById('engineType').value],
-      ['Engine, sm³',      formatNumber(document.getElementById('engineCC').value)],
-      ['Transport type',   document.getElementById('transportType').value]
-    ].filter(([,v]) => v);
+      ['Auction',         prettyAuction(document.getElementById('auction').value)],
+      // CHANGED: take location from the input (datalist), not a select
+      ['Location',        document.getElementById('locationSearch').value],
+      ['Car price',       formatCurrency(document.getElementById('carPrice').value)],
+      ['Production year', document.getElementById('productionYear').value],
+      ['Engine type',     document.getElementById('engineType').value],
+      ['Engine, sm³',     formatNumber(document.getElementById('engineCC').value)],
+      ['Transport type',  document.getElementById('transportType').value]
+    ].filter(([, v]) => v);
 
     const tbody = document.getElementById('resultBody');
     tbody.innerHTML = rows.length === 0
       ? '<tr><td class="muted">Nothing to calculate yet.</td></tr>'
-      : rows.map(([k,v]) => `<tr><td><strong>${k}:</strong> ${v}</td></tr>`).join('');
+      : rows.map(([k, v]) => `<tr><td><strong>${k}:</strong> ${v}</td></tr>`).join('');
   }
 
-  document.addEventListener('DOMContentLoaded', ()=>{
+  document.addEventListener('DOMContentLoaded', () => {
     setupAuctionButtons();
-    fillLocations();
+    buildLocationDatalist();         // new
     populateYears(2013);
     renderSummary();
 
-    document.getElementById('locationSearch').addEventListener('input', e=>{
-      fillLocations(e.target.value);
-      renderSummary();
-    });
-    document.getElementById('location').addEventListener('change', renderSummary);
+    // Location input: just re-render on input
+    document.getElementById('locationSearch').addEventListener('input', renderSummary);
+
     document.getElementById('carPrice').addEventListener('input', renderSummary);
     document.getElementById('productionYear').addEventListener('change', renderSummary);
     document.getElementById('engineType').addEventListener('change', renderSummary);
@@ -429,23 +346,25 @@
     document.getElementById('transportType').addEventListener('change', renderSummary);
 
     // Clear all
-    document.getElementById('clearBtn').addEventListener('click', ()=>{
-      document.getElementById('auction').value="";
-      document.querySelectorAll('#auctionButtons button').forEach(b=>{b.classList.remove('active');b.setAttribute('aria-pressed','false');});
-      document.getElementById('locationSearch').value="";
-      fillLocations("");
-      document.getElementById('carPrice').value="";
-      document.getElementById('productionYear').selectedIndex=0;
-      document.getElementById('engineType').selectedIndex=0;
-      document.getElementById('engineCC').value="";
-      document.getElementById('transportType').selectedIndex=0;
+    document.getElementById('clearBtn').addEventListener('click', () => {
+      document.getElementById('auction').value = "";
+      document.querySelectorAll('#auctionButtons button').forEach(b => {
+        b.classList.remove('active');
+        b.setAttribute('aria-pressed','false');
+      });
+      document.getElementById('locationSearch').value = ""; // input is enough
+      document.getElementById('carPrice').value = "";
+      document.getElementById('productionYear').selectedIndex = 0;
+      document.getElementById('engineType').selectedIndex = 0;
+      document.getElementById('engineCC').value = "";
+      document.getElementById('transportType').selectedIndex = 0;
       renderSummary();
     });
 
     // Calculate (no heavy calc yet — just refresh)
     document.getElementById('calcBtn').addEventListener('click', renderSummary);
 
-    // ✅ Strict numeric: strip non-digits on input (covers paste/autofill)
+    // Strict numeric: strip non-digits on input (covers paste/autofill)
     ['carPrice', 'engineCC'].forEach(id => {
       const field = document.getElementById(id);
       field.addEventListener('input', () => {
