@@ -21,12 +21,7 @@
 
     /* Auction row */
     .auction-row{display:flex;gap:24px;align-items:flex-start;}
-    .field-label {
-  font-size:16px;
-  font-weight:700;
-  color:var(--fg);
-  text-align:center;
-}
+    .field-label{font-size:16px;font-weight:700;color:var(--fg);text-align:center;margin-bottom:6px;}
     .auction-left{display:flex;flex-direction:column;align-items:center;gap:8px;}
     .auction-buttons{display:flex;gap:12px;align-items:center;justify-content:center;margin-top:15px;}
     .auction-buttons button{
@@ -45,11 +40,7 @@
 
     /* Fields grid */
     .fields-row{display:grid;grid-template-columns: 1fr 1fr;gap:24px;margin-top:16px;}
-.field {
-  display:flex;
-  flex-direction:column;
-  gap:10px; /* ✅ consistent spacing between label + input */
-}
+    .field{display:flex;flex-direction:column;gap:6px;}
     .field input, .field select{
       width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--line);
       background:#fff;color:#000;font-size:14px;height:44px;line-height:20px;-moz-appearance:textfield;
@@ -92,13 +83,19 @@
       margin-left:12px;
     }
     .combo-panel{
-      position:absolute;left:0;right:0;top:calc(100% + 18px);z-index:20; /* moved lower */
+      position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:20;
       background:#fff; opacity:1; backdrop-filter:none; color:#000;
       border:2px solid #000;
       border-radius:12px;
       box-shadow:0 8px 26px rgba(0,0,0,.14);
       padding:10px;max-height:280px;overflow:auto;
+
+      /* Hide scrollbar only in this dropdown */
+      scrollbar-width: none; /* Firefox */
     }
+    /* Chrome/Safari/Edge */
+    .combo-panel::-webkit-scrollbar { display:none; }
+
     .combo-input{
       width:100%;height:38px;border:1px solid var(--line);border-radius:10px;
       padding:8px 12px;margin-bottom:8px;font-size:14px;background:#fff;color:#000;
@@ -134,13 +131,6 @@
       .container { padding: 20px; }
       .fields-row { gap: 18px; }
     }
-
-    /* ===== Scrollbar: show only thumb ===== */
-    ::-webkit-scrollbar { width: 8px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: #666; border-radius: 4px; }
-    ::-webkit-scrollbar-button { display: none; }
-    * { scrollbar-width: thin; scrollbar-color: #666 transparent; }
   </style>
 </head>
 <body>
@@ -380,7 +370,7 @@
       display.setAttribute('aria-expanded','false');
     }
     function renderList(items){
-      list.innerHTML = items.map(loc => <li role="option" data-value="${loc}">${loc}</li>).join('');
+      list.innerHTML = items.map(loc => `<li role="option" data-value="${loc}">${loc}</li>`).join('');
     }
 
     display.addEventListener('click', ()=>{
@@ -439,7 +429,7 @@
     const tbody = document.getElementById('resultBody');
     tbody.innerHTML = rows.length === 0
       ? '<tr><td class="muted">Nothing to calculate yet.</td></tr>'
-      : rows.map(([k, v]) => <tr><td><strong>${k}:</strong> ${v}</td></tr>).join('');
+      : rows.map(([k, v]) => `<tr><td><strong>${k}:</strong> ${v}</td></tr>`).join('');
   }
 
   document.addEventListener('DOMContentLoaded', () => {
