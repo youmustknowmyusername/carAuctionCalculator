@@ -85,7 +85,6 @@
     .combo-panel{
       position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:20;
       background:#fff; opacity:1; backdrop-filter:none; color:#000;
-      /* CHANGED: 2px solid black border for dropdown menu */
       border:2px solid #000;
       border-radius:12px;
       box-shadow:0 8px 26px rgba(0,0,0,.14);
@@ -126,6 +125,13 @@
       .container { padding: 20px; }
       .fields-row { gap: 18px; }
     }
+
+    /* ===== Scrollbar: show only thumb ===== */
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #666; border-radius: 4px; }
+    ::-webkit-scrollbar-button { display: none; }
+    * { scrollbar-width: thin; scrollbar-color: #666 transparent; }
   </style>
 </head>
 <body>
