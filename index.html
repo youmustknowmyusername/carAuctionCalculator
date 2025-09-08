@@ -126,11 +126,18 @@
       .fields-row { gap: 18px; }
     }
 
-    /* ===== Scrollbar: show only thumb ===== */
+    /* ===== Scrollbar: show only thumb (no arrows) ===== */
     ::-webkit-scrollbar { width: 8px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: #666; border-radius: 4px; }
-    ::-webkit-scrollbar-button { display: none; }
+    /* Hide all scrollbar buttons in WebKit/Blink */
+    ::-webkit-scrollbar-button,
+    ::-webkit-scrollbar-button:single-button,
+    ::-webkit-scrollbar-button:start:decrement,
+    ::-webkit-scrollbar-button:end:increment {
+      display: none; width: 0; height: 0; background: transparent;
+    }
+    /* Firefox */
     * { scrollbar-width: thin; scrollbar-color: #666 transparent; }
   </style>
 </head>
