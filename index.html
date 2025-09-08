@@ -62,14 +62,45 @@
     /* Safari comfort */
     @supports (-webkit-touch-callout: none) { select, input, button { font-size:16px; } }
 
-    /* Custom dropdown arrow on selects (kept; harmless if no select used here) */
+    /* Custom dropdown arrow for native selects */
     .field select, .location-select select{
       appearance:none;-webkit-appearance:none;-moz-appearance:none;
       background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23000' d='M7 10l5 5 5-5z'/></svg>");
       background-repeat:no-repeat;background-size:14px;background-position:right 8px center;padding-right:32px;
     }
 
-    /* Mobile polish (already in base) */
+    /* ===== Custom searchable dropdown (looks like a select) ===== */
+    .combo{position:relative}
+    .combo-display{
+      width:100%;height:44px;display:flex;align-items:center;justify-content:space-between;
+      border:1px solid var(--line);border-radius:12px;background:#fff;color:#000;
+      padding:0 14px;cursor:pointer;user-select:none;
+    }
+    .combo-display .combo-text{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .combo-display .combo-arrow{
+      width:14px;height:14px;flex:0 0 14px;
+      background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23000' d='M7 10l5 5 5-5z'/></svg>") no-repeat center/14px;
+      margin-left:12px;
+    }
+    .combo-panel{
+      position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:20;
+      background:#fff;color:#000;border:1px solid var(--line);border-radius:12px;
+      box-shadow:0 8px 26px rgba(0,0,0,.14);
+      padding:10px;max-height:280px;overflow:auto;
+    }
+    .combo-input{
+      width:100%;height:38px;border:1px solid var(--line);border-radius:10px;
+      padding:8px 12px;margin-bottom:8px;font-size:14px;
+    }
+    .combo-list{list-style:none;margin:0;padding:4px 0}
+    .combo-list li{
+      padding:8px 10px;border-radius:8px;cursor:pointer;
+    }
+    .combo-list li:hover,.combo-list li[aria-selected="true"]{
+      background:rgba(26,108,255,.1);
+    }
+
+    /* Mobile polish */
     @media (max-width: 700px) {
       .container { padding: 16px; }
       .auction-row { flex-direction: column; gap: 16px; }
@@ -119,10 +150,17 @@
       <div class="location-select">
         <div class="field-label">Auction location</div>
 
-        <!-- REPLACED: search + select -->
-        <!-- NOW: a single input with datalist -->
-        <input type="text" id="locationSearch" list="locations" placeholder="Search location..." />
-        <datalist id="locations"></datalist>
+        <!-- REPLACED datalist with custom searchable dropdown -->
+        <div class="combo" id="locationCombo">
+          <div class="combo-display" id="locationSearch" role="button" tabindex="0" aria-haspopup="listbox" aria-expanded="false" data-value="">
+            <span class="combo-text">Select location...</span>
+            <span class="combo-arrow" aria-hidden="true"></span>
+          </div>
+          <div class="combo-panel" id="locationPanel" hidden>
+            <input type="text" class="combo-input" id="locationFilter" placeholder="Search location..."/>
+            <ul class="combo-list" id="locationList" role="listbox" aria-label="Locations"></ul>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -269,17 +307,6 @@
   ];
   const LOCATIONS_SORTED = [...LOCATIONS].sort((a, b) => a.localeCompare(b));
 
-  // Build datalist once (browser will handle filtering)
-  function buildLocationDatalist() {
-    const dl = document.getElementById('locations');
-    dl.innerHTML = '';
-    for (const loc of LOCATIONS_SORTED) {
-      const opt = document.createElement('option');
-      opt.value = loc;
-      dl.appendChild(opt);
-    }
-  }
-
   function setupAuctionButtons() {
     const buttons = document.querySelectorAll('#auctionButtons button');
     const hidden  = document.getElementById('auction');
@@ -312,11 +339,86 @@
   function formatNumber(val){ return val ? nf.format(Number(val)) : ''; }
   function prettyAuction(val){ if(!val) return ''; return val.toLowerCase()==='iaa' ? 'IAA' : 'Copart'; }
 
+  /* === Custom searchable dropdown: Location === */
+  function initLocationCombo(){
+    const combo   = document.getElementById('locationCombo');
+    const display = document.getElementById('locationSearch');    // faux select (button-like)
+    const panel   = document.getElementById('locationPanel');
+    const filter  = document.getElementById('locationFilter');
+    const list    = document.getElementById('locationList');
+    const textEl  = display.querySelector('.combo-text');
+
+    let currentValue = ""; // selected value
+
+    function openPanel(){
+      panel.hidden = false;
+      display.setAttribute('aria-expanded','true');
+      filter.value = "";
+      renderList(LOCATIONS_SORTED);
+      // focus after open for mobile
+      setTimeout(()=>filter.focus(), 0);
+    }
+    function closePanel(){
+      panel.hidden = true;
+      display.setAttribute('aria-expanded','false');
+    }
+
+    function renderList(items){
+      list.innerHTML = items.map(loc => `<li role="option" data-value="${loc}">${loc}</li>`).join('');
+    }
+
+    // Toggle open/close
+    display.addEventListener('click', (e)=>{
+      const isOpen = display.getAttribute('aria-expanded') === 'true';
+      isOpen ? closePanel() : openPanel();
+    });
+    display.addEventListener('keydown',(e)=>{
+      if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); display.click(); }
+      if(e.key === 'Escape'){ closePanel(); }
+    });
+
+    // Filter as you type
+    filter.addEventListener('input', ()=>{
+      const q = filter.value.trim().toLowerCase();
+      const items = q ? LOCATIONS_SORTED.filter(l=> l.toLowerCase().includes(q)) : LOCATIONS_SORTED;
+      renderList(items);
+    });
+
+    // Click to select
+    list.addEventListener('click', (e)=>{
+      const li = e.target.closest('li[data-value]');
+      if(!li) return;
+      currentValue = li.dataset.value;
+      display.dataset.value = currentValue;       // <-- store selected
+      textEl.textContent = currentValue || 'Select location...';
+      closePanel();
+      renderSummary();
+    });
+
+    // Click outside closes panel
+    document.addEventListener('click', (e)=>{
+      if (!combo.contains(e.target)) closePanel();
+    });
+
+    // Expose a reset method for "Clear all"
+    combo.reset = function(){
+      currentValue = "";
+      display.dataset.value = "";
+      textEl.textContent = 'Select location...';
+      closePanel();
+    }
+  }
+
+  function getSelectedLocation(){
+    // Read from faux select's dataset (set in initLocationCombo)
+    const el = document.getElementById('locationSearch');
+    return el?.dataset?.value || "";
+  }
+
   function renderSummary(){
     const rows = [
       ['Auction',         prettyAuction(document.getElementById('auction').value)],
-      // CHANGED: take location from the input (datalist), not a select
-      ['Location',        document.getElementById('locationSearch').value],
+      ['Location',        getSelectedLocation()],   // read from custom combo
       ['Car price',       formatCurrency(document.getElementById('carPrice').value)],
       ['Production year', document.getElementById('productionYear').value],
       ['Engine type',     document.getElementById('engineType').value],
@@ -332,12 +434,11 @@
 
   document.addEventListener('DOMContentLoaded', () => {
     setupAuctionButtons();
-    buildLocationDatalist();         // new
+    initLocationCombo();              // NEW: initialize custom searchable dropdown
     populateYears(2013);
     renderSummary();
 
-    // Location input: just re-render on input
-    document.getElementById('locationSearch').addEventListener('input', renderSummary);
+    // (No locationSearch input event now; value comes from combo selection)
 
     document.getElementById('carPrice').addEventListener('input', renderSummary);
     document.getElementById('productionYear').addEventListener('change', renderSummary);
@@ -352,7 +453,11 @@
         b.classList.remove('active');
         b.setAttribute('aria-pressed','false');
       });
-      document.getElementById('locationSearch').value = ""; // input is enough
+
+      // reset custom combo
+      const combo = document.getElementById('locationCombo');
+      combo.reset?.();
+
       document.getElementById('carPrice').value = "";
       document.getElementById('productionYear').selectedIndex = 0;
       document.getElementById('engineType').selectedIndex = 0;
