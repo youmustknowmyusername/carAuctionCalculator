@@ -22,11 +22,11 @@
     /* Auction row */
     .auction-row{display:flex;gap:24px;align-items:flex-start;}
     .field-label {
-      font-size:16px;
-      font-weight:700;
-      color:var(--fg);
-      text-align:center;
-    }
+  font-size:16px;
+  font-weight:700;
+  color:var(--fg);
+  text-align:center;
+}
     .auction-left{display:flex;flex-direction:column;align-items:center;gap:8px;}
     .auction-buttons{display:flex;gap:12px;align-items:center;justify-content:center;margin-top:15px;}
     .auction-buttons button{
@@ -37,7 +37,7 @@
     .auction-buttons button.active{border-color:var(--active-red);box-shadow:0 0 0 3px rgba(255,48,48,.2);}
     .auction-buttons img{height:55px;width:auto;display:block;}
 
-    .location-select{flex:1;display:flex;flex-direction:column;gap:10px;}
+    .location-select{flex:1;display:flex;flex-direction:column;gap:8px;}
     .location-select input[type="text"], .location-select select{
       width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--line);
       background:#fff;color:#000;font-size:14px;height:44px;line-height:20px;
@@ -45,11 +45,11 @@
 
     /* Fields grid */
     .fields-row{display:grid;grid-template-columns: 1fr 1fr;gap:24px;margin-top:16px;}
-    .field {
-      display:flex;
-      flex-direction:column;
-      gap:10px; /* consistent spacing between label + input */
-    }
+.field {
+  display:flex;
+  flex-direction:column;
+  gap:10px; /* ✅ consistent spacing between label + input */
+}
     .field input, .field select{
       width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--line);
       background:#fff;color:#000;font-size:14px;height:44px;line-height:20px;-moz-appearance:textfield;
@@ -81,14 +81,9 @@
     /* ===== Custom searchable dropdown (looks like a select) ===== */
     .combo{position:relative}
     .combo-display{
-      width:100%;
-      /* was: height:44px; padding:0 14px; */
-      min-height:44px;               /* ✅ matches input height on Safari */
-      padding:12px 14px;             /* ✅ same vertical padding as inputs/selects */
+      width:100%;height:44px;display:flex;align-items:center;justify-content:space-between;
       border:1px solid var(--line);border-radius:12px;background:#fff;color:#000;
-      display:flex;align-items:center;justify-content:space-between;
-      cursor:pointer;user-select:none;
-      font-size:14px;                /* ✅ match input font-size */
+      padding:0 14px;cursor:pointer;user-select:none;
     }
     .combo-display .combo-text{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .combo-display .combo-arrow{
@@ -97,7 +92,7 @@
       margin-left:12px;
     }
     .combo-panel{
-      position:absolute;left:0;right:0;top:calc(100% + 18px);z-index:20; /* sits a bit lower */
+      position:absolute;left:0;right:0;top:calc(100% + 18px);z-index:20; /* moved lower */
       background:#fff; opacity:1; backdrop-filter:none; color:#000;
       border:2px solid #000;
       border-radius:12px;
@@ -385,7 +380,7 @@
       display.setAttribute('aria-expanded','false');
     }
     function renderList(items){
-      list.innerHTML = items.map(loc => `<li role="option" data-value="${loc}">${loc}</li>`).join('');
+      list.innerHTML = items.map(loc => <li role="option" data-value="${loc}">${loc}</li>).join('');
     }
 
     display.addEventListener('click', ()=>{
@@ -444,7 +439,7 @@
     const tbody = document.getElementById('resultBody');
     tbody.innerHTML = rows.length === 0
       ? '<tr><td class="muted">Nothing to calculate yet.</td></tr>'
-      : rows.map(([k, v]) => `<tr><td><strong>${k}:</strong> ${v}</td></tr>`).join('');
+      : rows.map(([k, v]) => <tr><td><strong>${k}:</strong> ${v}</td></tr>).join('');
   }
 
   document.addEventListener('DOMContentLoaded', () => {
