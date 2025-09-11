@@ -39,7 +39,7 @@
 
     .location-select{flex:1;display:flex;flex-direction:column;gap:8px;}
     .location-select input[type="text"], .location-select select{
-      width:100%;padding:12px 14px;border-radius:12px;border:15px solid var(--line);
+      width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--line);
       background:#fff;color:#000;font-size:14px;height:44px;line-height:20px;
     }
     /* keep the custom location dropdown a bit lower (your change) */
@@ -81,7 +81,7 @@
     }
 
     /* ===== Custom searchable dropdown (looks like a select) ===== */
-    .combo{position:relative;width:100%} /* ← ONLY CHANGE: force full width */
+    .combo{position:relative;width:100%} /* ← added width:100% */
     .combo-display{
       width:100%;height:44px;display:flex;align-items:center;justify-content:space-between;
       border:1px solid var(--line);border-radius:12px;background:#fff;color:#000;
@@ -141,6 +141,19 @@
     @media (min-width: 701px) and (max-width: 900px) {
       .container { padding: 20px; }
       .fields-row { gap: 18px; }
+    }
+
+    /* === ONLY ADDITION to force full width on mobile Safari/Android === */
+    .auction-row > .location-select { width:100%; }
+    .location-select .combo,
+    .location-select .combo-display { width:100% !important; }
+    @supports (-webkit-touch-callout: none) {
+      .location-select,
+      .location-select .combo,
+      .location-select .combo-display {
+        width:-webkit-fill-available;
+        max-width:100%;
+      }
     }
   </style>
 </head>
