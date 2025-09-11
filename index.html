@@ -214,7 +214,8 @@
             <span class="combo-arrow" aria-hidden="true"></span>
           </div>
           <div class="combo-panel" id="yearPanel" hidden>
-            <input type="text" class="combo-input" id="yearFilter" placeholder="Search year..."/>
+            <!-- CHANGED: numeric-only attributes -->
+            <input type="text" class="combo-input" id="yearFilter" placeholder="Search year..." inputmode="numeric" pattern="[0-9]*"/>
             <ul class="combo-list" id="yearList" role="listbox" aria-label="Years"></ul>
           </div>
         </div>
@@ -486,7 +487,12 @@
       if(e.key === 'Escape'){ closePanel(); }
     });
 
+    // CHANGED: numeric-only enforcement for year search box
     filter.addEventListener('input', ()=>{
+      // strip anything that's not a digit
+      const clean = filter.value.replace(/\D/g,'');
+      if (filter.value !== clean) filter.value = clean;
+
       const q = filter.value.trim();
       const items = q ? YEARS.filter(y => y.includes(q)) : YEARS;
       renderList(items);
