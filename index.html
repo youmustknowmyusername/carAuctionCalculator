@@ -137,17 +137,13 @@
       .total { font-size: clamp(22px, 6vw, 30px); }
       h2 { font-size: 20px; margin-bottom: 12px; }
       img { max-width: 100%; height: auto; }
-
-      /* >>> NEW: truly center auction buttons on mobile <<< */
-      .auction-left{ width:100%; }
-      .auction-buttons{ width:100%; justify-content:center; }
     }
     @media (min-width: 701px) and (max-width: 900px) {
       .container { padding: 20px; }
       .fields-row { gap: 18px; }
     }
 
-    /* === ONLY ADDITION from earlier to force full width on mobile Safari/Android === */
+    /* === ONLY ADDITION to force full width on mobile Safari/Android === */
     .auction-row > .location-select { width:100%; }
     .location-select .combo,
     .location-select .combo-display { width:100% !important; }
@@ -208,26 +204,41 @@
         <div class="field-label">Car price</div>
         <input type="text" id="carPrice" inputmode="numeric" pattern="[0-9]*" placeholder="Enter price..." />
       </div>
+
+      <!-- Production year: custom searchable combo -->
       <div class="field">
         <div class="field-label">Production year</div>
-        <select id="productionYear">
-          <option value="" disabled selected>Select year...</option>
-        </select>
+        <div class="combo" id="yearCombo">
+          <div class="combo-display" id="yearSearch" role="button" tabindex="0" aria-haspopup="listbox" aria-expanded="false" data-value="">
+            <span class="combo-text">Select year...</span>
+            <span class="combo-arrow" aria-hidden="true"></span>
+          </div>
+          <div class="combo-panel" id="yearPanel" hidden>
+            <!-- CHANGED: numeric-only attributes -->
+            <input type="text" class="combo-input" id="yearFilter" placeholder="Search year..." inputmode="numeric" pattern="[0-9]*"/>
+            <ul class="combo-list" id="yearList" role="listbox" aria-label="Years"></ul>
+          </div>
+        </div>
       </div>
     </div>
 
     <!-- Engine type + Engine sm³ -->
     <div class="fields-row">
+      <!-- Engine type: custom searchable combo -->
       <div class="field">
         <div class="field-label">Engine type</div>
-        <select id="engineType">
-          <option value="" disabled selected>Select engine type...</option>
-          <option>Gasoline</option>
-          <option>Hybrid</option>
-          <option>Diesel</option>
-          <option>Full electric</option>
-        </select>
+        <div class="combo" id="engineCombo">
+          <div class="combo-display" id="engineSearch" role="button" tabindex="0" aria-haspopup="listbox" aria-expanded="false" data-value="">
+            <span class="combo-text">Select engine type...</span>
+            <span class="combo-arrow" aria-hidden="true"></span>
+          </div>
+          <div class="combo-panel" id="enginePanel" hidden>
+            <input type="text" class="combo-input" id="engineFilter" placeholder="Search engine type..."/>
+            <ul class="combo-list" id="engineList" role="listbox" aria-label="Engine types"></ul>
+          </div>
+        </div>
       </div>
+
       <div class="field">
         <div class="field-label">Engine, sm³</div>
         <input type="text" id="engineCC" inputmode="numeric" pattern="[0-9]*" placeholder="Enter engine size..." />
@@ -236,17 +247,21 @@
 
     <!-- Transport type + buttons on same row -->
     <div class="fields-row fields-actions">
+      <!-- Transport type: custom searchable combo -->
       <div class="field">
         <div class="field-label">Transport type</div>
-        <select id="transportType">
-          <option value="" disabled selected>Select transport type...</option>
-          <option>Sedan</option>
-          <option>Pickup</option>
-          <option>SUV</option>
-          <option>Big SUV</option>
-          <option>Minivan</option>
-        </select>
+        <div class="combo" id="transportCombo">
+          <div class="combo-display" id="transportSearch" role="button" tabindex="0" aria-haspopup="listbox" aria-expanded="false" data-value="">
+            <span class="combo-text">Select transport type...</span>
+            <span class="combo-arrow" aria-hidden="true"></span>
+          </div>
+          <div class="combo-panel" id="transportPanel" hidden>
+            <input type="text" class="combo-input" id="transportFilter" placeholder="Search transport type..."/>
+            <ul class="combo-list" id="transportList" role="listbox" aria-label="Transport types"></ul>
+          </div>
+        </div>
       </div>
+
       <div class="action">
         <button id="clearBtn">Clear all</button>
       </div>
@@ -299,4 +314,413 @@
     "IN- IAA Indy Minnesota Street Sublot","IN-CICERO","IN-DYER","IN-FORT WAYNE","IN-HAMMOND","IN-HARTFORD CITY",
     "IN-INDIANAPOLIS","IN-SOUTH BEND",
     "KS-KANSAS CITY","KS-WICHITA",
-    "KY
+    "KY-ASHLAND","KY-BOWLING GREEN","KY-LEXINGTON EAST","KY-LEXINGTON WEST","KY-LOUISVILLE","KY-PADUCAH","KY-WALTON",
+    "LA- LAFAYETTE","LA- NEW ORLEANS EAST","LA-BATON ROUGE","LA-NEW ORLEANS","LA-SHREVEPORT",
+    "MA -TEMPLETON","MA-BOSTON SHIRLEY","MA-FREETOWN","MA-NORTH BOSTON","MA-SOUTH BOSTON","MA-TAUNTON","MA-WEST WARREN",
+    "MD White Plans Aux Lot","MD-BALTIMORE","MD-DUNDALK","MD-LAUREL","MD-METRO DC","MD-ROSEDALE",
+    "ME- Gray Sub lot","ME-LYMAN","ME-ORONO","ME-PORTLAND GORHAM",
+    "MI-DETROIT","MI-FLINT","MI-GRAND RAPIDS","MI-GREAT LAKES","MI-IONIA","MI-KINCHELOE","MI-LANSING",
+    "MN- IAA Faribault","MN-Big Lake Sub lot","MN-CRASHEDTOYS EAST BETHEL","MN-Ham lake Sun lot","MN-MINNEAPOLIS",
+    "MN-MINNEAPOLIS NORTH","MN-ST. CLOUD",
+    "MO-COLUMBIA","MO-SIKESTON","MO-SPRINGFIELD","MO-ST. LOUIS",
+    "MS-GRENADA","MS-GULF COAST","MS-JACKSON",
+    "MT-BILLINGS","MT-HELENA","MT-MISSOULA",
+    "NC-ASHEVILLE","NC-CHARLOTTE","NC-CHINA GROVE","NC-CONCORD","NC-GREENSBORO","NC-LUMBERTON","NC-MEBANE","NC-MOCKSVILLE",
+    "NC-RALEIGH","NC-WILMINGTON",
+    "ND-BISMARCK","ND-FARGO",
+    "NE-LINCOLN","NE-OMAHA",
+    "NH- Salem Sub lot","NH-CANDIA","NH-MANCHESTER","NH-WEBSTER",
+    "NJ-AVENEL NEW JERSEY","NJ-CENTRAL NEW JERSEY","NJ-ENGLISHTOWN","NJ-GLASSBORO EAST","NJ-GLASSBORO WEST",
+    "NJ-NORTHERN NEW JERSEY","NJ-SAYREVILLE","NJ-SOMERVILLE","NJ-SOUTHERN NEW JERSEY","NJ-TRENTON",
+    "NM-ALBUQUERQUE",
+    "NV-LAS VEGAS","NV-RENO",
+    "NY-ALBANY","NY-BUFFALO","NY-LONG ISLAND","NY-NEWBURGH","NY-ROCHESTER","NY-SYRACUSE",
+    "OH- IAAI Stimmel Rd Sub lot","OH- Vermillion North Ford Offsite lot","OH-AKRON CANTON","OH-CINCINNATI",
+    "OH-CLEVELAND","OH-CLEVELAND EAST","OH-CLEVELAND WEST","OH-COLUMBUS","OH-DAYTON",
+    "OK-OKLAHOMA CITY","OK-TULSA",
+    "OR-EUGENE","OR-PORTLAND","OR-PORTLAND NORTH","OR-PORTLAND SOUTH","OR-PORTLAND WEST","OR-WOODBURN",
+    "PA-ALTOONA","PA-BRIDGEPORT","PA-CHAMBERSBURG","PA-ERIE","PA-HARRISBURG","PA-PHILADELPHIA","PA-PHILADELPHIA EAST",
+    "PA-PITTSBURG","PA-PITTSBURG NORTH","PA-PITTSBURG SOUTH","PA-PITTSBURG WEST","PA-SCRANTON","PA-YORK HAVEN","PA-YORKS SPRINGS",
+    "RI-EXETER","RI-PROVIDENCE",
+    "SC-CHARLESTON","SC-COLUMBIA","SC-GREENVILLE","SC-LEXINGTON","SC-South Gaston Sublot","SC-SPARTANBURG","SC-Spartanburg sublot",
+    "SD-SIOUX FALLS",
+    "TN-CHATTANOOGA","TN-KNOXVILLE","TN-MEMPHIS","TN-NASHVILLE",
+    "TX-ABILENE","TX-AMARILLO","TX-ANDREWS","TX-AUSTIN","TX-CORPUS CHRISTI","TX-CRASHEDTOYS DALLAS","TX-DALLAS","TX-DALLAS SOUTH",
+    "TX-EL PASO","TX-FT. WORTH","TX-HOUSTON","TX-LONGVIEW","TX-LUBBOCK","TX-LUFKIN","TX-MCALLEN","TX-PERMIAN BASIN","TX-SAN ANTONIO","TX-WACO",
+    "UT-OGDEN","UT-SALT LAKE CITY",
+    "VA-CULPEPER","VA-DANVILLE","VA-FREDERICKSBURG","VA-FREDERICKSBURG-SOUTH","VA-HAMPTON","VA-NORTHERN VIRGINIA","VA-PULASKI",
+    "VA-RICHMOND","VA-ROANOKE","VA-SUFFOLK","VA-TIDEWATER",
+    "VT- Devil's Bowl Sub lot","VT-BURLINGTON","VT-FAIR HAVEN","VT-ORLEANS","VT-RUTLAND",
+    "WA- Seattle Puyallup","WA-GRAHAM","WA-NORTH SEATTLE","WA-PASCO","WA-SEATTLE","WA-SEATTLE-SOUTH","WA-SPOKANE",
+    "WI-APPLETON","WI-MADISON","WI-MILWAUKEE","WI-PORTAGE",
+    "WV-BUCKHANNON","WV-CHARLESTON","WV-SHADY SPRING",
+    "WY-CASPER"
+  ];
+  const LOCATIONS_SORTED = [...LOCATIONS].sort((a, b) => a.localeCompare(b));
+
+  // New datasets for the custom combos
+  const YEARS = (() => {
+    const current = new Date().getFullYear();
+    const out = [];
+    for (let y = current; y >= 2013; y--) out.push(String(y));
+    return out;
+  })();
+
+  const ENGINE_TYPES = ["Gasoline","Hybrid","Diesel","Full electric"];
+  const TRANSPORT_TYPES = ["Sedan","Pickup","SUV","Big SUV","Minivan"];
+
+  function setupAuctionButtons() {
+    const buttons = document.querySelectorAll('#auctionButtons button');
+    const hidden  = document.getElementById('auction');
+    function activate(val){
+      hidden.value = val;
+      buttons.forEach(b => {
+        const on = b.dataset.value === val;
+        b.classList.toggle('active', on);
+        b.setAttribute('aria-pressed', String(on));
+      });
+      renderSummary();
+    }
+    buttons.forEach(btn => btn.addEventListener('click', () => activate(btn.dataset.value)));
+  }
+
+  const nf = new Intl.NumberFormat('en-US');
+  function formatCurrency(val){ return val ? '$' + nf.format(Number(val)) : ''; }
+  function formatNumber(val){ return val ? nf.format(Number(val)) : ''; }
+  function prettyAuction(val){ if(!val) return ''; return val.toLowerCase()==='iaa' ? 'IAA' : 'Copart'; }
+
+  /* === Custom searchable dropdown: Location === */
+  function initLocationCombo(){
+    const combo   = document.getElementById('locationCombo');
+    const display = document.getElementById('locationSearch');
+    const panel   = document.getElementById('locationPanel');
+    const filter  = document.getElementById('locationFilter');
+    const list    = document.getElementById('locationList');
+    const textEl  = display.querySelector('.combo-text');
+
+    let currentValue = "";
+
+    function openPanel(){
+      panel.hidden = false;
+      display.setAttribute('aria-expanded','true');
+      filter.value = "";
+      renderList(LOCATIONS_SORTED);
+      setTimeout(()=>filter.focus(), 0);
+    }
+    function closePanel(){
+      panel.hidden = true;
+      display.setAttribute('aria-expanded','false');
+    }
+    function renderList(items){
+      list.innerHTML = items.map(loc => `<li role="option" data-value="${loc}">${loc}</li>`).join('');
+    }
+
+    display.addEventListener('click', ()=>{
+      const isOpen = display.getAttribute('aria-expanded') === 'true';
+      isOpen ? closePanel() : openPanel();
+    });
+    display.addEventListener('keydown',(e)=>{
+      if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); display.click(); }
+      if(e.key === 'Escape'){ closePanel(); }
+    });
+
+    filter.addEventListener('input', ()=>{
+      const q = filter.value.trim().toLowerCase();
+      const items = q ? LOCATIONS_SORTED.filter(l=> l.toLowerCase().includes(q)) : LOCATIONS_SORTED;
+      renderList(items);
+    });
+
+    list.addEventListener('click', (e)=>{
+      const li = e.target.closest('li[data-value]');
+      if(!li) return;
+      currentValue = li.dataset.value;
+      display.dataset.value = currentValue;
+      textEl.textContent = currentValue || 'Select location...';
+      closePanel();
+      renderSummary();
+    });
+
+    document.addEventListener('click', (e)=>{
+      if (!combo.contains(e.target)) closePanel();
+    });
+
+    combo.reset = function(){
+      currentValue = "";
+      display.dataset.value = "";
+      textEl.textContent = 'Select location...';
+      closePanel();
+    }
+  }
+
+  // === New: Year combo
+  function initYearCombo(){
+    const combo   = document.getElementById('yearCombo');
+    const display = document.getElementById('yearSearch');
+    const panel   = document.getElementById('yearPanel');
+    const filter  = document.getElementById('yearFilter');
+    const list    = document.getElementById('yearList');
+    const textEl  = display.querySelector('.combo-text');
+
+    let currentValue = "";
+
+    function openPanel(){
+      panel.hidden = false;
+      display.setAttribute('aria-expanded','true');
+      filter.value = "";
+      renderList(YEARS);
+      setTimeout(()=>filter.focus(), 0);
+    }
+    function closePanel(){
+      panel.hidden = true;
+      display.setAttribute('aria-expanded','false');
+    }
+    function renderList(items){
+      list.innerHTML = items.map(v => `<li role="option" data-value="${v}">${v}</li>`).join('');
+    }
+
+    display.addEventListener('click', ()=>{
+      const isOpen = display.getAttribute('aria-expanded') === 'true';
+      isOpen ? closePanel() : openPanel();
+    });
+    display.addEventListener('keydown',(e)=>{
+      if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); display.click(); }
+      if(e.key === 'Escape'){ closePanel(); }
+    });
+
+    // CHANGED: numeric-only enforcement for year search box
+    filter.addEventListener('input', ()=>{
+      // strip anything that's not a digit
+      const clean = filter.value.replace(/\D/g,'');
+      if (filter.value !== clean) filter.value = clean;
+
+      const q = filter.value.trim();
+      const items = q ? YEARS.filter(y => y.includes(q)) : YEARS;
+      renderList(items);
+    });
+
+    list.addEventListener('click', (e)=>{
+      const li = e.target.closest('li[data-value]');
+      if(!li) return;
+      currentValue = li.dataset.value;
+      display.dataset.value = currentValue;
+      textEl.textContent = currentValue || 'Select year...';
+      closePanel();
+      renderSummary();
+    });
+
+    document.addEventListener('click', (e)=>{
+      if (!combo.contains(e.target)) closePanel();
+    });
+
+    combo.reset = function(){
+      currentValue = "";
+      display.dataset.value = "";
+      textEl.textContent = 'Select year...';
+      closePanel();
+    }
+  }
+
+  // === New: Engine type combo
+  function initEngineCombo(){
+    const combo   = document.getElementById('engineCombo');
+    const display = document.getElementById('engineSearch');
+    const panel   = document.getElementById('enginePanel');
+    const filter  = document.getElementById('engineFilter');
+    const list    = document.getElementById('engineList');
+    const textEl  = display.querySelector('.combo-text');
+
+    let currentValue = "";
+
+    function openPanel(){
+      panel.hidden = false;
+      display.setAttribute('aria-expanded','true');
+      filter.value = "";
+      renderList(ENGINE_TYPES);
+      setTimeout(()=>filter.focus(), 0);
+    }
+    function closePanel(){
+      panel.hidden = true;
+      display.setAttribute('aria-expanded','false');
+    }
+    function renderList(items){
+      list.innerHTML = items.map(v => `<li role="option" data-value="${v}">${v}</li>`).join('');
+    }
+
+    display.addEventListener('click', ()=>{
+      const isOpen = display.getAttribute('aria-expanded') === 'true';
+      isOpen ? closePanel() : openPanel();
+    });
+    display.addEventListener('keydown',(e)=>{
+      if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); display.click(); }
+      if(e.key === 'Escape'){ closePanel(); }
+    });
+
+    filter.addEventListener('input', ()=>{
+      const q = filter.value.trim().toLowerCase();
+      const items = q ? ENGINE_TYPES.filter(v => v.toLowerCase().includes(q)) : ENGINE_TYPES;
+      renderList(items);
+    });
+
+    list.addEventListener('click', (e)=>{
+      const li = e.target.closest('li[data-value]');
+      if(!li) return;
+      currentValue = li.dataset.value;
+      display.dataset.value = currentValue;
+      textEl.textContent = currentValue || 'Select engine type...';
+      closePanel();
+      renderSummary();
+    });
+
+    document.addEventListener('click', (e)=>{
+      if (!combo.contains(e.target)) closePanel();
+    });
+
+    combo.reset = function(){
+      currentValue = "";
+      display.dataset.value = "";
+      textEl.textContent = 'Select engine type...';
+      closePanel();
+    }
+  }
+
+  // === New: Transport type combo
+  function initTransportCombo(){
+    const combo   = document.getElementById('transportCombo');
+    const display = document.getElementById('transportSearch');
+    const panel   = document.getElementById('transportPanel');
+    const filter  = document.getElementById('transportFilter');
+    const list    = document.getElementById('transportList');
+    const textEl  = display.querySelector('.combo-text');
+
+    let currentValue = "";
+
+    function openPanel(){
+      panel.hidden = false;
+      display.setAttribute('aria-expanded','true');
+      filter.value = "";
+      renderList(TRANSPORT_TYPES);
+      setTimeout(()=>filter.focus(), 0);
+    }
+    function closePanel(){
+      panel.hidden = true;
+      display.setAttribute('aria-expanded','false');
+    }
+    function renderList(items){
+      list.innerHTML = items.map(v => `<li role="option" data-value="${v}">${v}</li>`).join('');
+    }
+
+    display.addEventListener('click', ()=>{
+      const isOpen = display.getAttribute('aria-expanded') === 'true';
+      isOpen ? closePanel() : openPanel();
+    });
+    display.addEventListener('keydown',(e)=>{
+      if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); display.click(); }
+      if(e.key === 'Escape'){ closePanel(); }
+    });
+
+    filter.addEventListener('input', ()=>{
+      const q = filter.value.trim().toLowerCase();
+      const items = q ? TRANSPORT_TYPES.filter(v => v.toLowerCase().includes(q)) : TRANSPORT_TYPES;
+      renderList(items);
+    });
+
+    list.addEventListener('click', (e)=>{
+      const li = e.target.closest('li[data-value]');
+      if(!li) return;
+      currentValue = li.dataset.value;
+      display.dataset.value = currentValue;
+      textEl.textContent = currentValue || 'Select transport type...';
+      closePanel();
+      renderSummary();
+    });
+
+    document.addEventListener('click', (e)=>{
+      if (!combo.contains(e.target)) closePanel();
+    });
+
+    combo.reset = function(){
+      currentValue = "";
+      display.dataset.value = "";
+      textEl.textContent = 'Select transport type...';
+      closePanel();
+    }
+  }
+
+  function getSelectedLocation(){
+    const el = document.getElementById('locationSearch');
+    return el?.dataset?.value || "";
+  }
+  function getSelectedYear(){
+    const el = document.getElementById('yearSearch');
+    return el?.dataset?.value || "";
+  }
+  function getSelectedEngine(){
+    const el = document.getElementById('engineSearch');
+    return el?.dataset?.value || "";
+  }
+  function getSelectedTransport(){
+    const el = document.getElementById('transportSearch');
+    return el?.dataset?.value || "";
+  }
+
+  function renderSummary(){
+    const rows = [
+      ['Auction',         prettyAuction(document.getElementById('auction').value)],
+      ['Location',        getSelectedLocation()],
+      ['Car price',       formatCurrency(document.getElementById('carPrice').value)],
+      ['Production year', getSelectedYear()],
+      ['Engine type',     getSelectedEngine()],
+      ['Engine, sm³',     formatNumber(document.getElementById('engineCC').value)],
+      ['Transport type',  getSelectedTransport()]
+    ].filter(([, v]) => v);
+
+    const tbody = document.getElementById('resultBody');
+    tbody.innerHTML = rows.length === 0
+      ? '<tr><td class="muted">Nothing to calculate yet.</td></tr>'
+      : rows.map(([k, v]) => `<tr><td><strong>${k}:</strong> ${v}</td></tr>`).join('');
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    setupAuctionButtons();
+    initLocationCombo();
+    initYearCombo();
+    initEngineCombo();
+    initTransportCombo();
+    renderSummary();
+
+    document.getElementById('carPrice').addEventListener('input', renderSummary);
+    document.getElementById('engineCC').addEventListener('input', renderSummary);
+
+    // Clear all
+    document.getElementById('clearBtn').addEventListener('click', () => {
+      document.getElementById('auction').value = "";
+      document.querySelectorAll('#auctionButtons button').forEach(b => {
+        b.classList.remove('active');
+        b.setAttribute('aria-pressed','false');
+      });
+
+      // reset custom combos
+      document.getElementById('locationCombo').reset?.();
+      document.getElementById('yearCombo').reset?.();
+      document.getElementById('engineCombo').reset?.();
+      document.getElementById('transportCombo').reset?.();
+
+      document.getElementById('carPrice').value = "";
+      document.getElementById('engineCC').value = "";
+      renderSummary();
+    });
+
+    // Calculate (no heavy calc yet — just refresh)
+    document.getElementById('calcBtn').addEventListener('click', renderSummary);
+
+    // Strict numeric: strip non-digits
+    ['carPrice', 'engineCC'].forEach(id => {
+      const field = document.getElementById(id);
+      field.addEventListener('input', () => {
+        field.value = field.value.replace(/\D/g, '');
+      });
+    });
+  });
+</script>
+</body>
+</html>
