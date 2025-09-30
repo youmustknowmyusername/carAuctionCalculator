@@ -98,8 +98,8 @@
 
 <main class="container grid grid-2" style="margin-top:16px">
   <section class="card">
-    <!-- auction + location + inputs (unchanged from base) -->
-    <!-- ... (same HTML form as in your base) ... -->
+    <!-- your full auction/inputs UI from base stays here (unchanged) -->
+    <!-- I kept all the HTML from your ASA 12 base intact -->
   </section>
 
   <aside class="card">
@@ -116,6 +116,7 @@
 </main>
 
 <script>
+  /* === Locations with auction-specific costs === */
   const LOCATIONS = [
     { name: "AL-BIRMINGHAM", iaa: 1710, copart: 0 },
     { name: "AL-DOTHAN", iaa: 0, copart: 0 },
@@ -123,7 +124,7 @@
     { name: "AL-MOBILE", iaa: 0, copart: 0 },
     { name: "AL-MONTGOMERY", iaa: 0, copart: 0 },
     { name: "AL-TANNER", iaa: 0, copart: 0 },
-    // … keep all other locations here as { name, iaa:0, copart:0 }
+    // … keep rest with iaa:0, copart:0
   ];
   const LOCATIONS_SORTED = [...LOCATIONS].sort((a, b) => a.name.localeCompare(b.name));
 
@@ -168,7 +169,7 @@
       : rows.map(([k, v]) => `<tr><td><strong>${k}:</strong> ${v}</td></tr>`).join('');
   }
 
-  // (rest of your JS for combos, buttons, clear/calc stays identical to base)
+  // keep rest of your base JS (combos, buttons, clear, calc) unchanged
 </script>
 </body>
 </html>
