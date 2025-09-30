@@ -1,3 +1,5 @@
+chat here is the base code lets name it ASA 12
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -18,46 +20,143 @@
     .grid{display:grid;gap:16px}
     .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px}
     h2{font-size:22px;font-weight:800;margin:0 0 15px;text-align:center}
+
+    /* Auction row */
     .auction-row{display:flex;gap:24px;align-items:flex-start;}
-    .field-label{font-size:16px;font-weight:700;color:var(--fg);text-align:center;}
+    .field-label {
+      font-size:16px;
+      font-weight:700;
+      color:var(--fg);
+      text-align:center;
+    }
     .auction-left{display:flex;flex-direction:column;align-items:center;gap:8px;}
     .auction-buttons{display:flex;gap:12px;align-items:center;justify-content:center;margin-top:15px;}
-    .auction-buttons button{border:2px solid var(--inactive);background:#fff;border-radius:14px;padding:6px 10px;cursor:pointer;display:flex;align-items:center;justify-content:center;min-width:115px;min-height:56px;}
+    .auction-buttons button{
+      border:2px solid var(--inactive);
+      background:#fff;border-radius:14px;padding:6px 10px;cursor:pointer;
+      display:flex;align-items:center;justify-content:center;min-width:115px;min-height:56px;
+    }
     .auction-buttons button.active{border-color:var(--active-red);box-shadow:0 0 0 3px rgba(255,48,48,.2);}
     .auction-buttons img{height:55px;width:auto;display:block;}
+
     .location-select{flex:1;display:flex;flex-direction:column;gap:8px;}
-    .location-select input[type="text"], .location-select select{width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:#fff;color:#000;font-size:14px;height:44px;line-height:20px;}
+    .location-select input[type="text"], .location-select select{
+      width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--line);
+      background:#fff;color:#000;font-size:14px;height:44px;line-height:20px;
+    }
+    /* keep the custom location dropdown a bit lower (your change) */
     .location-select .combo{ margin-top:25px !important; }
-    .fields-row{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:16px;}
-    .field{display:flex;flex-direction:column;gap:10px;}
-    .field input, .field select{width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:#fff;color:#000;font-size:14px;height:44px;line-height:20px;-moz-appearance:textfield;}
+
+    /* Fields grid */
+    .fields-row{display:grid;grid-template-columns: 1fr 1fr;gap:24px;margin-top:16px;}
+    .field {
+      display:flex;
+      flex-direction:column;
+      gap:10px; /* consistent spacing between label + input */
+    }
+    .field input, .field select{
+      width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--line);
+      background:#fff;color:#000;font-size:14px;height:44px;line-height:20px;-moz-appearance:textfield;
+    }
     .field input::-webkit-outer-spin-button,.field input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
-    .fields-actions{grid-template-columns:1fr 0.45fr 0.45fr;}
+
+    /* Buttons in SAME row as Transport type */
+    .fields-actions{grid-template-columns: 1fr 0.45fr 0.45fr;}
     .fields-actions .action{display:flex;align-items:flex-end;}
     .fields-actions button{width:100%;height:44px;border:none;border-radius:12px;font-weight:700;color:#fff;cursor:pointer;}
     #clearBtn{background:#ff3030;}
     #calcBtn{background:#00007F;}
+
     table{width:100%;border-collapse:collapse}
     td{padding:8px;border-bottom:1px dashed var(--line)}
     .total{font-weight:800;font-size:clamp(22px,3vw,32px);text-align:right}
     .muted{color:var(--muted);font-size:13px}
+
+    /* Safari comfort */
     @supports (-webkit-touch-callout: none) { select, input, button { font-size:16px; } }
-    .field select, .location-select select{appearance:none;-webkit-appearance:none;-moz-appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23000' d='M7 10l5 5 5-5z'/></svg>");background-repeat:no-repeat;background-size:14px;background-position:right 8px center;padding-right:32px;}
+
+    /* Custom dropdown arrow for native selects */
+    .field select, .location-select select{
+      appearance:none;-webkit-appearance:none;-moz-appearance:none;
+      background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23000' d='M7 10l5 5 5-5z'/></svg>");
+      background-repeat:no-repeat;background-size:14px;background-position:right 8px center;padding-right:32px;
+    }
+
+    /* ===== Custom searchable dropdown (looks like a select) ===== */
     .combo{position:relative;width:100%}
-    .combo-display{width:100%;height:44px;display:flex;align-items:center;justify-content:space-between;border:1px solid var(--line);border-radius:12px;background:#fff;color:#000;padding:0 14px;cursor:pointer;user-select:none;}
+    .combo-display{
+      width:100%;height:44px;display:flex;align-items:center;justify-content:space-between;
+      border:1px solid var(--line);border-radius:12px;background:#fff;color:#000;
+      padding:0 14px;cursor:pointer;user-select:none;
+    }
     .combo-display .combo-text{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .combo-display .combo-arrow{width:14px;height:14px;flex:0 0 14px;background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23000' d='M7 10l5 5 5-5z'/></svg>") no-repeat center/14px;margin-left:12px;}
-    .combo-panel{position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:20;background:#fff;opacity:1;backdrop-filter:none;color:#000;border:2px solid #000;border-radius:12px;box-shadow:0 8px 26px rgba(0,0,0,.14);padding:10px;max-height:280px;overflow:auto;scrollbar-width:none;}
+    .combo-display .combo-arrow{
+      width:14px;height:14px;flex:0 0 14px;
+      background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23000' d='M7 10l5 5 5-5z'/></svg>") no-repeat center/14px;
+      margin-left:12px;
+    }
+    .combo-panel{
+      position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:20;
+      background:#fff; opacity:1; backdrop-filter:none; color:#000;
+      border:2px solid #000;
+      border-radius:12px;
+      box-shadow:0 8px 26px rgba(0,0,0,.14);
+      padding:10px;max-height:280px;overflow:auto;
+
+      /* Hide scrollbar only in this dropdown */
+      scrollbar-width: none; /* Firefox */
+    }
+    /* Chrome/Safari/Edge */
     .combo-panel::-webkit-scrollbar { display:none; }
-    .combo-input{width:100%;height:38px;border:1px solid var(--line);border-radius:10px;padding:8px 12px;margin-bottom:8px;font-size:14px;background:#fff;color:#000;}
+
+    .combo-input{
+      width:100%;height:38px;border:1px solid var(--line);border-radius:10px;
+      padding:8px 12px;margin-bottom:8px;font-size:14px;background:#fff;color:#000;
+    }
     .combo-list{list-style:none;margin:0;padding:4px 0;background:#fff}
-    .combo-list li{padding:8px 10px;border-radius:8px;cursor:pointer;background:#fff;}
-    .combo-list li:hover,.combo-list li[aria-selected="true"]{background:rgba(26,108,255,.1);}
-    @media (max-width:700px){.container{padding:16px}.auction-row{flex-direction:column;gap:16px}.auction-buttons{flex-wrap:wrap;gap:10px 12px}.auction-buttons button{min-width:140px;min-height:52px}.auction-buttons img{height:48px}.fields-row{grid-template-columns:1fr;gap:14px;margin-top:12px}.fields-actions{grid-template-columns:1fr}.fields-actions .action button{height:44px}.field input,.field select,.location-select input[type="text"],.location-select select{height:46px;padding:11px 14px;font-size:16px}.muted{font-size:12px}.total{font-size:clamp(22px,6vw,30px)}h2{font-size:20px;margin-bottom:12px}img{max-width:100%;height:auto}}
-    @media (min-width:701px) and (max-width:900px){.container{padding:20px}.fields-row{gap:18px}}
-    .auction-row > .location-select{width:100%}
-    .location-select .combo,.location-select .combo-display{width:100%!important}
-    @supports (-webkit-touch-callout: none){.location-select,.location-select .combo,.location-select .combo-display{width:-webkit-fill-available;max-width:100%}}
+    .combo-list li{
+      padding:8px 10px;border-radius:8px;cursor:pointer;background:#fff;
+    }
+    .combo-list li:hover,.combo-list li[aria-selected="true"]{
+      background:rgba(26,108,255,.1);
+    }
+
+    /* Mobile polish */
+    @media (max-width: 700px) {
+      .container { padding: 16px; }
+      .auction-row { flex-direction: column; gap: 16px; }
+      .auction-buttons { flex-wrap: wrap; gap: 10px 12px; }
+      .auction-buttons button { min-width: 140px; min-height: 52px; }
+      .auction-buttons img { height: 48px; }
+      .fields-row { grid-template-columns: 1fr; gap: 14px; margin-top: 12px; }
+      .fields-actions { grid-template-columns: 1fr; }
+      .fields-actions .action button { height: 44px; }
+      .field input, .field select,
+      .location-select input[type="text"], .location-select select {
+        height: 46px; padding: 11px 14px; font-size: 16px;
+      }
+      .muted { font-size: 12px; }
+      .total { font-size: clamp(22px, 6vw, 30px); }
+      h2 { font-size: 20px; margin-bottom: 12px; }
+      img { max-width: 100%; height: auto; }
+    }
+    @media (min-width: 701px) and (max-width: 900px) {
+      .container { padding: 20px; }
+      .fields-row { gap: 18px; }
+    }
+
+    /* === ONLY ADDITION to force full width on mobile Safari/Android === */
+    .auction-row > .location-select { width:100%; }
+    .location-select .combo,
+    .location-select .combo-display { width:100% !important; }
+    @supports (-webkit-touch-callout: none) {
+      .location-select,
+      .location-select .combo,
+      .location-select .combo-display {
+        width:-webkit-fill-available;
+        max-width:100%;
+      }
+    }
   </style>
 </head>
 <body>
@@ -68,9 +167,110 @@
 </header>
 
 <main class="container grid grid-2" style="margin-top:16px">
-  <!-- left side form (auction buttons, combos, inputs, etc.) stays unchanged -->
   <section class="card">
-    <!-- … ASA 12 form UI … -->
+    <div class="auction-row">
+      <div class="auction-left">
+        <div class="field-label">Auction</div>
+        <div id="auctionButtons" class="auction-buttons" role="group" aria-label="Select auction">
+          <button type="button" data-value="iaa" aria-pressed="false" title="IAA">
+            <img src="assets/iaa.png" alt="IAA">
+          </button>
+          <button type="button" data-value="copart" aria-pressed="false" title="Copart">
+            <img src="assets/copart.png" alt="Copart">
+          </button>
+        </div>
+      </div>
+
+      <div class="location-select">
+        <div class="field-label">Auction location</div>
+
+        <!-- Custom searchable dropdown -->
+        <div class="combo" id="locationCombo">
+          <div class="combo-display" id="locationSearch" role="button" tabindex="0" aria-haspopup="listbox" aria-expanded="false" data-value="">
+            <span class="combo-text">Select location...</span>
+            <span class="combo-arrow" aria-hidden="true"></span>
+          </div>
+          <div class="combo-panel" id="locationPanel" hidden>
+            <input type="text" class="combo-input" id="locationFilter" placeholder="Search location..."/>
+            <ul class="combo-list" id="locationList" role="listbox" aria-label="Locations"></ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <input type="hidden" id="auction" value="" />
+
+    <!-- Car price + Production year -->
+    <div class="fields-row">
+      <div class="field">
+        <div class="field-label">Car price</div>
+        <input type="text" id="carPrice" inputmode="numeric" pattern="[0-9]*" placeholder="Enter price..." />
+      </div>
+
+      <!-- Production year: custom searchable combo -->
+      <div class="field">
+        <div class="field-label">Production year</div>
+        <div class="combo" id="yearCombo">
+          <div class="combo-display" id="yearSearch" role="button" tabindex="0" aria-haspopup="listbox" aria-expanded="false" data-value="">
+            <span class="combo-text">Select year...</span>
+            <span class="combo-arrow" aria-hidden="true"></span>
+          </div>
+          <div class="combo-panel" id="yearPanel" hidden>
+            <!-- CHANGED: numeric-only attributes -->
+            <input type="text" class="combo-input" id="yearFilter" placeholder="Search year..." inputmode="numeric" pattern="[0-9]*"/>
+            <ul class="combo-list" id="yearList" role="listbox" aria-label="Years"></ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Engine type + Engine sm³ -->
+    <div class="fields-row">
+      <!-- Engine type: custom searchable combo -->
+      <div class="field">
+        <div class="field-label">Engine type</div>
+        <div class="combo" id="engineCombo">
+          <div class="combo-display" id="engineSearch" role="button" tabindex="0" aria-haspopup="listbox" aria-expanded="false" data-value="">
+            <span class="combo-text">Select engine type...</span>
+            <span class="combo-arrow" aria-hidden="true"></span>
+          </div>
+          <div class="combo-panel" id="enginePanel" hidden>
+            <input type="text" class="combo-input" id="engineFilter" placeholder="Search engine type..."/>
+            <ul class="combo-list" id="engineList" role="listbox" aria-label="Engine types"></ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="field">
+        <div class="field-label">Engine, sm³</div>
+        <input type="text" id="engineCC" inputmode="numeric" pattern="[0-9]*" placeholder="Enter engine size..." />
+      </div>
+    </div>
+
+    <!-- Transport type + buttons on same row -->
+    <div class="fields-row fields-actions">
+      <!-- Transport type: custom searchable combo -->
+      <div class="field">
+        <div class="field-label">Transport type</div>
+        <div class="combo" id="transportCombo">
+          <div class="combo-display" id="transportSearch" role="button" tabindex="0" aria-haspopup="listbox" aria-expanded="false" data-value="">
+            <span class="combo-text">Select transport type...</span>
+            <span class="combo-arrow" aria-hidden="true"></span>
+          </div>
+          <div class="combo-panel" id="transportPanel" hidden>
+            <input type="text" class="combo-input" id="transportFilter" placeholder="Search transport type..."/>
+            <ul class="combo-list" id="transportList" role="listbox" aria-label="Transport types"></ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="action">
+        <button id="clearBtn">Clear all</button>
+      </div>
+      <div class="action">
+        <button id="calcBtn">Calculate</button>
+      </div>
+    </div>
   </section>
 
   <aside class="card">
@@ -87,7 +287,442 @@
 </main>
 
 <script>
-  /* Full ASA 12 JS with LOCATIONS as plain strings, YEARS, ENGINE_TYPES, TRANSPORT_TYPES, and renderSummary */
+  /* Full locations list (sorted) */
+  const LOCATIONS = [
+    "AL-BIRMINGHAM","AL-DOTHAN","AL-HUNTSVILLE","AL-MOBILE","AL-MONTGOMERY","AL-TANNER",
+    "AR-FAYETTEVILLE COPART","AR-FAYETTEVILLE IAA","AR-LITTLE ROCK COPART","AR-LITTLE ROCK IAA",
+    "AZ-PHOENIX","AZ-TUCSON",
+    "CA- ACE Carson","CA- ACE Perris","CA-ADELANTO","CA-ANAHEIM","CA-ANTELOPE","CA-BAKERSFIELD",
+    "CA-COLTON","CA-EAST BAY","CA-FONTANA","CA-FREMONT","CA-FRESNO","CA-HAYWARD","CA-HAYWARD DESERT VIEW",
+    "CA-HIGH DESERT","CA-LONG BEACH","CA-LOS ANGELES","CA-MARTINEZ","CA-NORTH HOLLYWOOD",
+    "CA-RANCHO CUCAMONGA","CA-RANCHO-DESERT VIEW","CA-REDDING","CA-RIVERSIDE","CA-SACRAMENTO",
+    "CA-SACRAMENTO-DESERT VIEW","CA-SAN BERNARDINO","CA-SAN DIEGO","CA-SAN DIEGO-DESERT VIEW",
+    "CA-SAN JOSE","CA-SANTA PAULA-DESERT VIEW","CA-SO SACRAMENTO","CA-SUN VALLEY","CA-VALLEJO","CA-VAN NUYS",
+    "CO-COLORADO SPRINGS","CO-DENVER","CO-DENVER CENTRAL","CO-DENVER EAST","CO-DENVER SOUTH","CO-WESTERN COLORADO",
+    "CT-HARTFORD","CT-HARTFORD SPRINGFIELD","CT-Hartford-South",
+    "DC-WASHINGTON DC-MD",
+    "DE-NEW CASTLE","DE-SEAFORD",
+    "FL-CAT Jacksonville Sub lot","FL-CAT Orlando Boggy Creek","FL-CLEARWATER","FL-Dover Sublot","FL-FORT MYERS",
+    "FL-FORT PIERCE","FL-FT.PIERCE","FL-JACKSONVILLE","FL-JACKSONVILLE EAST","FL-JACKSONVILLE WEST","FL-MIAMI",
+    "FL-MIAMI CENTRAL","FL-MIAMI NORTH","FL-MIAMI SOUTH","FL-OCALA","FL-ORLANDO","FL-ORLANDO NORTH","FL-ORLANDO SOUTH",
+    "FL-PENSACOLA","FL-PUNTA GORDA","FL-TALLAHASSEE","FL-TAMPA","FL-WEST PALM BEACH",
+    "GA-ATLANTA","GA-ATLANTA EAST","GA-ATLANTA NORTH","GA-ATLANTA SOUTH","GA-ATLANTA WEST","GA-CARTERSVILLE","GA-FAIRBURN",
+    "GA-MACON","GA-SAVANNAH","GA-TIFTON",
+    "HI-HONOLULU",
+    "IA-Crashedtoys Eldridge","IA-DAVENPORT","IA-DES MOINES",
+    "ID-BOISE",
+    "IL-CHICAGO NORTH","IL-CHICAGO SOUTH","IL-CHICAGO WEST","IL-LINCOLN","IL-PEORIA","IL-SOUTHERN ILLINOIS",
+    "IL-SPECIALTY DIVISION","IL-ST. LOUIS","IL-WHEELING",
+    "IN- IAA Indy Minnesota Street Sublot","IN-CICERO","IN-DYER","IN-FORT WAYNE","IN-HAMMOND","IN-HARTFORD CITY",
+    "IN-INDIANAPOLIS","IN-SOUTH BEND",
+    "KS-KANSAS CITY","KS-WICHITA",
+    "KY-ASHLAND","KY-BOWLING GREEN","KY-LEXINGTON EAST","KY-LEXINGTON WEST","KY-LOUISVILLE","KY-PADUCAH","KY-WALTON",
+    "LA- LAFAYETTE","LA- NEW ORLEANS EAST","LA-BATON ROUGE","LA-NEW ORLEANS","LA-SHREVEPORT",
+    "MA -TEMPLETON","MA-BOSTON SHIRLEY","MA-FREETOWN","MA-NORTH BOSTON","MA-SOUTH BOSTON","MA-TAUNTON","MA-WEST WARREN",
+    "MD White Plans Aux Lot","MD-BALTIMORE","MD-DUNDALK","MD-LAUREL","MD-METRO DC","MD-ROSEDALE",
+    "ME- Gray Sub lot","ME-LYMAN","ME-ORONO","ME-PORTLAND GORHAM",
+    "MI-DETROIT","MI-FLINT","MI-GRAND RAPIDS","MI-GREAT LAKES","MI-IONIA","MI-KINCHELOE","MI-LANSING",
+    "MN- IAA Faribault","MN-Big Lake Sub lot","MN-CRASHEDTOYS EAST BETHEL","MN-Ham lake Sun lot","MN-MINNEAPOLIS",
+    "MN-MINNEAPOLIS NORTH","MN-ST. CLOUD",
+    "MO-COLUMBIA","MO-SIKESTON","MO-SPRINGFIELD","MO-ST. LOUIS",
+    "MS-GRENADA","MS-GULF COAST","MS-JACKSON",
+    "MT-BILLINGS","MT-HELENA","MT-MISSOULA",
+    "NC-ASHEVILLE","NC-CHARLOTTE","NC-CHINA GROVE","NC-CONCORD","NC-GREENSBORO","NC-LUMBERTON","NC-MEBANE","NC-MOCKSVILLE",
+    "NC-RALEIGH","NC-WILMINGTON",
+    "ND-BISMARCK","ND-FARGO",
+    "NE-LINCOLN","NE-OMAHA",
+    "NH- Salem Sub lot","NH-CANDIA","NH-MANCHESTER","NH-WEBSTER",
+    "NJ-AVENEL NEW JERSEY","NJ-CENTRAL NEW JERSEY","NJ-ENGLISHTOWN","NJ-GLASSBORO EAST","NJ-GLASSBORO WEST",
+    "NJ-NORTHERN NEW JERSEY","NJ-SAYREVILLE","NJ-SOMERVILLE","NJ-SOUTHERN NEW JERSEY","NJ-TRENTON",
+    "NM-ALBUQUERQUE",
+    "NV-LAS VEGAS","NV-RENO",
+    "NY-ALBANY","NY-BUFFALO","NY-LONG ISLAND","NY-NEWBURGH","NY-ROCHESTER","NY-SYRACUSE",
+    "OH- IAAI Stimmel Rd Sub lot","OH- Vermillion North Ford Offsite lot","OH-AKRON CANTON","OH-CINCINNATI",
+    "OH-CLEVELAND","OH-CLEVELAND EAST","OH-CLEVELAND WEST","OH-COLUMBUS","OH-DAYTON",
+    "OK-OKLAHOMA CITY","OK-TULSA",
+    "OR-EUGENE","OR-PORTLAND","OR-PORTLAND NORTH","OR-PORTLAND SOUTH","OR-PORTLAND WEST","OR-WOODBURN",
+    "PA-ALTOONA","PA-BRIDGEPORT","PA-CHAMBERSBURG","PA-ERIE","PA-HARRISBURG","PA-PHILADELPHIA","PA-PHILADELPHIA EAST",
+    "PA-PITTSBURG","PA-PITTSBURG NORTH","PA-PITTSBURG SOUTH","PA-PITTSBURG WEST","PA-SCRANTON","PA-YORK HAVEN","PA-YORKS SPRINGS",
+    "RI-EXETER","RI-PROVIDENCE",
+    "SC-CHARLESTON","SC-COLUMBIA","SC-GREENVILLE","SC-LEXINGTON","SC-South Gaston Sublot","SC-SPARTANBURG","SC-Spartanburg sublot",
+    "SD-SIOUX FALLS",
+    "TN-CHATTANOOGA","TN-KNOXVILLE","TN-MEMPHIS","TN-NASHVILLE",
+    "TX-ABILENE","TX-AMARILLO","TX-ANDREWS","TX-AUSTIN","TX-CORPUS CHRISTI","TX-CRASHEDTOYS DALLAS","TX-DALLAS","TX-DALLAS SOUTH",
+    "TX-EL PASO","TX-FT. WORTH","TX-HOUSTON","TX-LONGVIEW","TX-LUBBOCK","TX-LUFKIN","TX-MCALLEN","TX-PERMIAN BASIN","TX-SAN ANTONIO","TX-WACO",
+    "UT-OGDEN","UT-SALT LAKE CITY",
+    "VA-CULPEPER","VA-DANVILLE","VA-FREDERICKSBURG","VA-FREDERICKSBURG-SOUTH","VA-HAMPTON","VA-NORTHERN VIRGINIA","VA-PULASKI",
+    "VA-RICHMOND","VA-ROANOKE","VA-SUFFOLK","VA-TIDEWATER",
+    "VT- Devil's Bowl Sub lot","VT-BURLINGTON","VT-FAIR HAVEN","VT-ORLEANS","VT-RUTLAND",
+    "WA- Seattle Puyallup","WA-GRAHAM","WA-NORTH SEATTLE","WA-PASCO","WA-SEATTLE","WA-SEATTLE-SOUTH","WA-SPOKANE",
+    "WI-APPLETON","WI-MADISON","WI-MILWAUKEE","WI-PORTAGE",
+    "WV-BUCKHANNON","WV-CHARLESTON","WV-SHADY SPRING",
+    "WY-CASPER"
+  ];
+  const LOCATIONS_SORTED = [...LOCATIONS].sort((a, b) => a.localeCompare(b));
+
+  // New datasets for the custom combos
+  const YEARS = (() => {
+    const current = new Date().getFullYear();
+    const out = [];
+    for (let y = current; y >= 2013; y--) out.push(String(y));
+    return out;
+  })();
+
+  const ENGINE_TYPES = ["Gasoline","Hybrid","Diesel","Full electric"];
+  const TRANSPORT_TYPES = ["Sedan","Pickup","SUV","Big SUV","Minivan"];
+
+  function setupAuctionButtons() {
+    const buttons = document.querySelectorAll('#auctionButtons button');
+    const hidden  = document.getElementById('auction');
+    function activate(val){
+      hidden.value = val;
+      buttons.forEach(b => {
+        const on = b.dataset.value === val;
+        b.classList.toggle('active', on);
+        b.setAttribute('aria-pressed', String(on));
+      });
+      renderSummary();
+    }
+    buttons.forEach(btn => btn.addEventListener('click', () => activate(btn.dataset.value)));
+  }
+
+  const nf = new Intl.NumberFormat('en-US');
+  function formatCurrency(val){ return val ? '$' + nf.format(Number(val)) : ''; }
+  function formatNumber(val){ return val ? nf.format(Number(val)) : ''; }
+  function prettyAuction(val){ if(!val) return ''; return val.toLowerCase()==='iaa' ? 'IAA' : 'Copart'; }
+
+  /* === Custom searchable dropdown: Location === */
+  function initLocationCombo(){
+    const combo   = document.getElementById('locationCombo');
+    const display = document.getElementById('locationSearch');
+    const panel   = document.getElementById('locationPanel');
+    const filter  = document.getElementById('locationFilter');
+    const list    = document.getElementById('locationList');
+    const textEl  = display.querySelector('.combo-text');
+
+    let currentValue = "";
+
+    function openPanel(){
+      panel.hidden = false;
+      display.setAttribute('aria-expanded','true');
+      filter.value = "";
+      renderList(LOCATIONS_SORTED);
+      setTimeout(()=>filter.focus(), 0);
+    }
+    function closePanel(){
+      panel.hidden = true;
+      display.setAttribute('aria-expanded','false');
+    }
+    function renderList(items){
+      list.innerHTML = items.map(loc => `<li role="option" data-value="${loc}">${loc}</li>`).join('');
+    }
+
+    display.addEventListener('click', ()=>{
+      const isOpen = display.getAttribute('aria-expanded') === 'true';
+      isOpen ? closePanel() : openPanel();
+    });
+    display.addEventListener('keydown',(e)=>{
+      if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); display.click(); }
+      if(e.key === 'Escape'){ closePanel(); }
+    });
+
+    filter.addEventListener('input', ()=>{
+      const q = filter.value.trim().toLowerCase();
+      const items = q ? LOCATIONS_SORTED.filter(l=> l.toLowerCase().includes(q)) : LOCATIONS_SORTED;
+      renderList(items);
+    });
+
+    list.addEventListener('click', (e)=>{
+      const li = e.target.closest('li[data-value]');
+      if(!li) return;
+      currentValue = li.dataset.value;
+      display.dataset.value = currentValue;
+      textEl.textContent = currentValue || 'Select location...';
+      closePanel();
+      renderSummary();
+    });
+
+    document.addEventListener('click', (e)=>{
+      if (!combo.contains(e.target)) closePanel();
+    });
+
+    combo.reset = function(){
+      currentValue = "";
+      display.dataset.value = "";
+      textEl.textContent = 'Select location...';
+      closePanel();
+    }
+  }
+
+  // === New: Year combo
+  function initYearCombo(){
+    const combo   = document.getElementById('yearCombo');
+    const display = document.getElementById('yearSearch');
+    const panel   = document.getElementById('yearPanel');
+    const filter  = document.getElementById('yearFilter');
+    const list    = document.getElementById('yearList');
+    const textEl  = display.querySelector('.combo-text');
+
+    let currentValue = "";
+
+    function openPanel(){
+      panel.hidden = false;
+      display.setAttribute('aria-expanded','true');
+      filter.value = "";
+      renderList(YEARS);
+      setTimeout(()=>filter.focus(), 0);
+    }
+    function closePanel(){
+      panel.hidden = true;
+      display.setAttribute('aria-expanded','false');
+    }
+    function renderList(items){
+      list.innerHTML = items.map(v => `<li role="option" data-value="${v}">${v}</li>`).join('');
+    }
+
+    display.addEventListener('click', ()=>{
+      const isOpen = display.getAttribute('aria-expanded') === 'true';
+      isOpen ? closePanel() : openPanel();
+    });
+    display.addEventListener('keydown',(e)=>{
+      if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); display.click(); }
+      if(e.key === 'Escape'){ closePanel(); }
+    });
+
+    // CHANGED: numeric-only enforcement for year search box
+    filter.addEventListener('input', ()=>{
+      // strip anything that's not a digit
+      const clean = filter.value.replace(/\D/g,'');
+      if (filter.value !== clean) filter.value = clean;
+
+      const q = filter.value.trim();
+      const items = q ? YEARS.filter(y => y.includes(q)) : YEARS;
+      renderList(items);
+    });
+
+    list.addEventListener('click', (e)=>{
+      const li = e.target.closest('li[data-value]');
+      if(!li) return;
+      currentValue = li.dataset.value;
+      display.dataset.value = currentValue;
+      textEl.textContent = currentValue || 'Select year...';
+      closePanel();
+      renderSummary();
+    });
+
+    document.addEventListener('click', (e)=>{
+      if (!combo.contains(e.target)) closePanel();
+    });
+
+    combo.reset = function(){
+      currentValue = "";
+      display.dataset.value = "";
+      textEl.textContent = 'Select year...';
+      closePanel();
+    }
+  }
+
+  // === New: Engine type combo
+  function initEngineCombo(){
+    const combo   = document.getElementById('engineCombo');
+    const display = document.getElementById('engineSearch');
+    const panel   = document.getElementById('enginePanel');
+    const filter  = document.getElementById('engineFilter');
+    const list    = document.getElementById('engineList');
+    const textEl  = display.querySelector('.combo-text');
+
+    let currentValue = "";
+
+    function openPanel(){
+      panel.hidden = false;
+      display.setAttribute('aria-expanded','true');
+      filter.value = "";
+      renderList(ENGINE_TYPES);
+      setTimeout(()=>filter.focus(), 0);
+    }
+    function closePanel(){
+      panel.hidden = true;
+      display.setAttribute('aria-expanded','false');
+    }
+    function renderList(items){
+      list.innerHTML = items.map(v => `<li role="option" data-value="${v}">${v}</li>`).join('');
+    }
+
+    display.addEventListener('click', ()=>{
+      const isOpen = display.getAttribute('aria-expanded') === 'true';
+      isOpen ? closePanel() : openPanel();
+    });
+    display.addEventListener('keydown',(e)=>{
+      if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); display.click(); }
+      if(e.key === 'Escape'){ closePanel(); }
+    });
+
+    filter.addEventListener('input', ()=>{
+      const q = filter.value.trim().toLowerCase();
+      const items = q ? ENGINE_TYPES.filter(v => v.toLowerCase().includes(q)) : ENGINE_TYPES;
+      renderList(items);
+    });
+
+    list.addEventListener('click', (e)=>{
+      const li = e.target.closest('li[data-value]');
+      if(!li) return;
+      currentValue = li.dataset.value;
+      display.dataset.value = currentValue;
+      textEl.textContent = currentValue || 'Select engine type...';
+      closePanel();
+      renderSummary();
+    });
+
+    document.addEventListener('click', (e)=>{
+      if (!combo.contains(e.target)) closePanel();
+    });
+
+    combo.reset = function(){
+      currentValue = "";
+      display.dataset.value = "";
+      textEl.textContent = 'Select engine type...';
+      closePanel();
+    }
+  }
+
+  // === New: Transport type combo
+  function initTransportCombo(){
+    const combo   = document.getElementById('transportCombo');
+    const display = document.getElementById('transportSearch');
+    const panel   = document.getElementById('transportPanel');
+    const filter  = document.getElementById('transportFilter');
+    const list    = document.getElementById('transportList');
+    const textEl  = display.querySelector('.combo-text');
+
+    let currentValue = "";
+
+    function openPanel(){
+      panel.hidden = false;
+      display.setAttribute('aria-expanded','true');
+      filter.value = "";
+      renderList(TRANSPORT_TYPES);
+      setTimeout(()=>filter.focus(), 0);
+    }
+    function closePanel(){
+      panel.hidden = true;
+      display.setAttribute('aria-expanded','false');
+    }
+    function renderList(items){
+      list.innerHTML = items.map(v => `<li role="option" data-value="${v}">${v}</li>`).join('');
+    }
+
+    display.addEventListener('click', ()=>{
+      const isOpen = display.getAttribute('aria-expanded') === 'true';
+      isOpen ? closePanel() : openPanel();
+    });
+    display.addEventListener('keydown',(e)=>{
+      if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); display.click(); }
+      if(e.key === 'Escape'){ closePanel(); }
+    });
+
+    filter.addEventListener('input', ()=>{
+      const q = filter.value.trim().toLowerCase();
+      const items = q ? TRANSPORT_TYPES.filter(v => v.toLowerCase().includes(q)) : TRANSPORT_TYPES;
+      renderList(items);
+    });
+
+    list.addEventListener('click', (e)=>{
+      const li = e.target.closest('li[data-value]');
+      if(!li) return;
+      currentValue = li.dataset.value;
+      display.dataset.value = currentValue;
+      textEl.textContent = currentValue || 'Select transport type...';
+      closePanel();
+      renderSummary();
+    });
+
+    document.addEventListener('click', (e)=>{
+      if (!combo.contains(e.target)) closePanel();
+    });
+
+    combo.reset = function(){
+      currentValue = "";
+      display.dataset.value = "";
+      textEl.textContent = 'Select transport type...';
+      closePanel();
+    }
+  }
+
+  function getSelectedLocation(){
+    const el = document.getElementById('locationSearch');
+    return el?.dataset?.value || "";
+  }
+  function getSelectedYear(){
+    const el = document.getElementById('yearSearch');
+    return el?.dataset?.value || "";
+  }
+  function getSelectedEngine(){
+    const el = document.getElementById('engineSearch');
+    return el?.dataset?.value || "";
+  }
+  function getSelectedTransport(){
+    const el = document.getElementById('transportSearch');
+    return el?.dataset?.value || "";
+  }
+
+  function renderSummary(){
+    const rows = [
+      ['Auction',         prettyAuction(document.getElementById('auction').value)],
+      ['Location',        getSelectedLocation()],
+      ['Car price',       formatCurrency(document.getElementById('carPrice').value)],
+      ['Production year', getSelectedYear()],
+      ['Engine type',     getSelectedEngine()],
+      ['Engine, sm³',     formatNumber(document.getElementById('engineCC').value)],
+      ['Transport type',  getSelectedTransport()]
+    ].filter(([, v]) => v);
+
+    const tbody = document.getElementById('resultBody');
+    tbody.innerHTML = rows.length === 0
+      ? '<tr><td class="muted">Nothing to calculate yet.</td></tr>'
+      : rows.map(([k, v]) => `<tr><td><strong>${k}:</strong> ${v}</td></tr>`).join('');
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    setupAuctionButtons();
+    initLocationCombo();
+    initYearCombo();
+    initEngineCombo();
+    initTransportCombo();
+    renderSummary();
+
+    document.getElementById('carPrice').addEventListener('input', renderSummary);
+    document.getElementById('engineCC').addEventListener('input', renderSummary);
+
+    // Clear all
+    document.getElementById('clearBtn').addEventListener('click', () => {
+      document.getElementById('auction').value = "";
+      document.querySelectorAll('#auctionButtons button').forEach(b => {
+        b.classList.remove('active');
+        b.setAttribute('aria-pressed','false');
+      });
+
+      // reset custom combos
+      document.getElementById('locationCombo').reset?.();
+      document.getElementById('yearCombo').reset?.();
+      document.getElementById('engineCombo').reset?.();
+      document.getElementById('transportCombo').reset?.();
+
+      document.getElementById('carPrice').value = "";
+      document.getElementById('engineCC').value = "";
+      renderSummary();
+    });
+
+    // Calculate (no heavy calc yet — just refresh)
+    document.getElementById('calcBtn').addEventListener('click', renderSummary);
+
+    // Strict numeric: strip non-digits
+    ['carPrice', 'engineCC'].forEach(id => {
+      const field = document.getElementById(id);
+      field.addEventListener('input', () => {
+        field.value = field.value.replace(/\D/g, '');
+      });
+    });
+  });
 </script>
 </body>
 </html>
